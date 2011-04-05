@@ -1,0 +1,36 @@
+teamred: rot
+teamblue: blau
+announce_noteam: '[PLAYER] hat ein neues Spleef-Spiel angekündigt - kommt alle zur
+    Arena!'
+announce_team: '[PLAYER] hat ein neues Spleef-Spiel im Team [TEAM] angekündigt - kommt
+    alle zur Arena!'
+announce_join: '[PLAYER] spielt Spleef mit!'
+announce_team_join: '[PLAYER] spielt Spleef im Team [TEAM].'
+announce_team_change: '[PLAYER] wechselt zum Spleef-Team [TEAM].'
+announce_leave: '[PLAYER] verlässt das Spleef-Spiel. So ein Feigling!'
+announce_player_logout: '[PLAYER] hat das Spleef-Spiel verlassen - Feigling!'
+announce_dropped_out: '[PLAYER] ist ausgeschieden!'
+announce_won: '[PLAYER] hat gewonnen. Herzlichen Glückwunsch!'
+announce_won_team: 'Team [TEAM] hat gewonnen. Herzlichen Glückwunsch an: [PLAYERS].'
+announce_grats: 'Herzlichen Glückwunsch zum Sieg! Du hast gewonnen: [WIN].'
+announce_grats_all: '[PLAYER] hat einen Preis gewonnen: [WIN].'
+announce_gamestopped: Spleef-Spiel wurde unterbrochen - bitte alle Stehenbleiben!
+announce_gamedeleted: Spleef-Spiel wurde gestoppt und gelöscht!
+countdown_start: 'Starte Spleef-Spiel: Es kann nur einen geben!'
+countdown_prefix: 'Spleef: '
+countdown_go: LOOOOOS!
+countdown_interrupted: Countdown abgebrochen.
+list: 'Jeder-gegen-jeden-Spiel mit folgenden Spielern: [PLAYERS].'
+list_team: 'Team [TEAM]: [PLAYERS].'
+list_nospleefers: Keine Spleefer im Spiel.
+err_game_nospleefers: Es gibt keine Spleefer im Spiel
+err_gameinprogress: Es läuft gerade ein Spiel! Bitte warte, bis es beendet ist.
+err_gameteamgame: Das aktuelle Spiel ist ein Team-Spiel. Bitte melde dich in einem der beiden Teams an!
+err_minplayers_team: In beiden Teams muss sich mindestens ein Spieler befinden!
+err_leave_notjoined: Du spielst ja sowieso nicht mit!
+err_gameinprogress_short: Das Spiel läuft bereits!
+err_gamenotinprogress: Es läuft gerade kein Spleef-Spiel!
+err_joined_already: Du bist bereits im Spiel angemeldet!
+err_minplayers: Mindestens zwei Spleefer müssen am Spiel teilnehmen!
+err_gamenoteamgame: Das aktuelle Spiel ist nicht als Team-Spiel angekündigt. Bitte melde dich einfach mit /spleef join an.
+err_joined_team_already: Du bist bereits in diesem Team angemeldet!

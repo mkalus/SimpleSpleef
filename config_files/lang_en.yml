@@ -1,0 +1,36 @@
+teamred: red
+teamblue: blue
+announce_noteam: '[PLAYER] has announced a new spleef game - you are all invited to
+    join!'
+announce_team: '[PLAYER] has announced a new spleef game in the team [TEAM] - you
+    are all invited to join!'
+announce_join: '[PLAYER] joined spleef!'
+announce_team_join: '[PLAYER] joined spleef in team [TEAM].'
+announce_team_change: '[PLAYER] changed to to team [TEAM].'
+announce_leave: '[PLAYER] left the game - what a whimp!'
+announce_player_logout: Player has left the game - whimp!
+announce_dropped_out: Player [PLAYER] dropped into the water and out of the game.
+announce_won: Player [PLAYER] has won the spleef game. Congratulations!
+announce_won_team: 'Team [TEAM] has won the spleef game. Congratulations go to: [PLAYERS].'
+announce_grats: 'You have won a price: [WIN].'
+announce_grats_all: '[PLAYER] has won a price: [WIN].'
+announce_gamestopped: Game has been stopped, please stay where you are.
+announce_gamedeleted: Game was stopped and deleted.
+countdown_start: Starting spleef game. There can only be one!
+countdown_prefix: 'Spleef: '
+countdown_go: Goooo!
+countdown_interrupted: Countdown interrupted.
+list: 'Dog-eats-dog game with following players: [PLAYERS].'
+list_team: 'Team [TEAM]: [PLAYERS].'
+list_nospleefers: No spleefers present.
+err_game_nospleefers: There are no spleefers in the game!
+err_gameinprogress: A game is already in progress! Please wait until it is finished.
+err_gameteamgame: The current game has been declared a team game. Please join one of the teams.
+err_minplayers_team: There must be at least one player in each team!
+err_leave_notjoined: You have not joined the game anyway.
+err_gameinprogress_short: A game is already in progress!
+err_gamenotinprogress: There is no game in progress!
+err_joined_already: You have already joined the game.
+err_minplayers: A minimum of two players is needed to start the game!
+err_gamenoteamgame: The current game has not been declared a team game. Please join by typing /spleef join.
+err_joined_team_already: You have already joined this team.

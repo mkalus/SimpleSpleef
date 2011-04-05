@@ -1,0 +1,19 @@
+name: SimpleSpleef
+main: de.beimax.simplespleef.SimpleSpleef
+version: 0.1
+author: maxkalus
+description: >
+             Simple Spleef Plugin
+commands:
+  spleef:
+    description: Control your spleef games
+    aliases: [spl]
+    usage: |
+      /<command> join Join a dog-eats-dog game.
+      /<command> 1 o. blue Join team blue
+      /<command> 2 o. red Join team red
+      /<command> start Start game
+      /<command> stop Stop game
+      /<command> delete Delete current game
+      /<command> leave Leave game
+      /<command> list Show game information
