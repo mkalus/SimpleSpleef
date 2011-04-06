@@ -365,6 +365,8 @@ public class SimpleSpleef extends JavaPlugin {
 		// no permissions set - everybody may do everything
 		if (SimpleSpleef.Permissions == null)
 			return true;
+		// if op, allow!
+		//if (player.isOp()) return true;
 		// permission checked
 		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission))
 			return true;

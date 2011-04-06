@@ -4,6 +4,6 @@ simplespleef.list: List command
 simplespleef.play: Join dog-eats-dog command.
 simplespleef.team: Join team commands.
 simplespleef.leave: Leave command.
-simplespleef.start: Join team commands.
-simplespleef.stop: Join team commands.
-simplespleef.delete: Join team commands.
+simplespleef.start: Start game.
+simplespleef.stop: Stop game.
+simplespleef.delete: Delete game.
