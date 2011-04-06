@@ -18,6 +18,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
 
+import com.nijiko.permissions.PermissionHandler;
+import com.nijikokun.bukkit.Permissions.Permissions;
+import org.bukkit.plugin.Plugin;
+
 /**
  * SimpleSpleef for Bukkit
  * 
@@ -28,8 +32,29 @@ public class SimpleSpleef extends JavaPlugin {
 	private SimpleSpleefGame game;
 	private SimpleSpleefPlayerListener playerListener;
 	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
-	public Configuration conf;
+	public Configuration conf; // General configuration
 	public Configuration ll; // Language configuration
+
+	/**
+	 * Permissions
+	 */
+	public static PermissionHandler Permissions;
+
+	/**
+	 * Static permissions setup - see permissions Wiki
+	 */
+	private void setupPermissions() {
+		Plugin test = this.getServer().getPluginManager()
+				.getPlugin("Permissions");
+
+		if (SimpleSpleef.Permissions == null) {
+			if (test != null) {
+				SimpleSpleef.Permissions = ((Permissions) test).getHandler();
+			} else {
+				log.info("[SimpleSpleef] Permission system not detected, defaulting to all.");
+			}
+		}
+	}
 
 	/**
 	 * initialize object, load config mainly
@@ -200,7 +225,11 @@ public class SimpleSpleef extends JavaPlugin {
 		init(); // load init
 		if (!createGame()) { // try to create game
 			log.warning("[SimpleSpleef] could not correctly initialize plugin. Disabling it.");
+			return;
 		}
+
+		// setup permissions
+		setupPermissions();
 
 		// Register our events
 		PluginManager pm = getServer().getPluginManager();
@@ -214,42 +243,46 @@ public class SimpleSpleef extends JavaPlugin {
 		System.out.println("[SimpleSpleef] " + pdfFile.getName() + " version "
 				+ pdfFile.getVersion() + " is enabled!");
 	}
-	
+
 	/**
 	 * tries to create a game
+	 * 
 	 * @return true, if correctly created, false if there was a problem
 	 */
 	protected boolean createGame() {
 		// try to load list of wins
 		List<String> wins = conf.getStringList("prizes", null);
-		
+
 		// list empty - should not happen, but might be...
 		if (wins == null) {
 			log.warning("[SimpleSpleef] Could not load prize list - it was empty or malformed.");
 			return false;
 		}
-		
+
 		// load materials into list
 		LinkedList<Material> winsMat = new LinkedList<Material>();
 		// iterate through string and transform them to a material
 		for (String win : wins) {
 			Material m = Material.getMaterial(win);
-			if (m == null) log.warning("[SimpleSpleef] Could not find a block or material called " + win + ". Ignoring it!");
-			else winsMat.add(m); // add to list
+			if (m == null)
+				log.warning("[SimpleSpleef] Could not find a block or material called "
+						+ win + ". Ignoring it!");
+			else
+				winsMat.add(m); // add to list
 		}
-		
+
 		// check, if list is still empty after transformation
 		if (winsMat.isEmpty()) {
 			log.warning("[SimpleSpleef] Could not load prize list - it was empty in the end.");
 			return false;
 		}
-		
+
 		// turn list into array
 		Material[] randomWins = new Material[winsMat.size()];
 		randomWins = winsMat.toArray(randomWins);
-		
+
 		// ok, now load game
-		game = new SimpleSpleefGame(this, randomWins);		
+		game = new SimpleSpleefGame(this, randomWins);
 		playerListener = new SimpleSpleefPlayerListener(this, game);
 		return true;
 	}
@@ -260,7 +293,8 @@ public class SimpleSpleef extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String commandLabel, String[] args) {
 		// ignore commands if disabled
-		if (game == null) return true;
+		if (game == null)
+			return true;
 
 		String command = cmd.getName();
 
@@ -281,29 +315,68 @@ public class SimpleSpleef extends JavaPlugin {
 				command = "2"; // alias for team 2
 
 			// check actual commands
-			if (command.equalsIgnoreCase("join"))
+			if (command.equalsIgnoreCase("join")) {
+				if (!checkPermission(player, "play"))
+					return true; // check permission
 				game.addPlayer(player, null); // join no-team spleef
-			else if (command.equalsIgnoreCase("1"))
+			} else if (command.equalsIgnoreCase("1")) {
+				if (!checkPermission(player, "team"))
+					return true; // check permission
 				game.addPlayer(player, 1); // add player to team 1
-			else if (command.equalsIgnoreCase("2"))
+			} else if (command.equalsIgnoreCase("2")) {
+				if (!checkPermission(player, "team"))
+					return true; // check permission
 				game.addPlayer(player, 2); // add player to team 2
-			else if (command.equalsIgnoreCase("leave"))
+			} else if (command.equalsIgnoreCase("leave")) {
+				if (!checkPermission(player, "leave"))
+					return true; // check permission
 				game.leavePlayer(player); // player leaves spleef
-			else if (command.equalsIgnoreCase("list"))
+			} else if (command.equalsIgnoreCase("list")) {
+				if (!checkPermission(player, "list"))
+					return true; // check permission
 				game.listSpleefers(player); // print a list of
 											// spleefers
-			else if (command.equalsIgnoreCase("start"))
+			} else if (command.equalsIgnoreCase("start")) {
+				if (!checkPermission(player, "start"))
+					return true; // check permission
 				game.startGame(player); // start a game
-			else if (command.equalsIgnoreCase("stop"))
+			} else if (command.equalsIgnoreCase("stop")) {
+				if (!checkPermission(player, "stop"))
+					return true; // check permission
 				game.stopGame(player); // stop a game
-			else if (command.equalsIgnoreCase("delete"))
+			} else if (command.equalsIgnoreCase("delete")) {
+				if (!checkPermission(player, "delete"))
+					return true; // check permission
 				game.deleteGame(player); // delete a game
-			else
+			} else
 				return false;
 		}
 		return true;
 	}
 
+	/**
+	 * helper method to check permission
+	 * 
+	 * @param player
+	 *            player to check
+	 * @param permission
+	 *            String of part of permission like "join"
+	 * @return
+	 */
+	private boolean checkPermission(Player player, String permission) {
+		// no permissions set - everybody may do everything
+		if (SimpleSpleef.Permissions == null)
+			return true;
+		// permission checked
+		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission))
+			return true;
+		// all others may not do this!
+		return false;
+	}
+
+	/**
+	 * called on disable
+	 */
 	public void onDisable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
 

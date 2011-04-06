@@ -1,0 +1,9 @@
+You can use SimpleSpleef with permission plugin. The following rights are available:
+
+simplespleef.list: List command
+simplespleef.play: Join dog-eats-dog command.
+simplespleef.team: Join team commands.
+simplespleef.leave: Leave command.
+simplespleef.start: Join team commands.
+simplespleef.stop: Join team commands.
+simplespleef.delete: Join team commands.
