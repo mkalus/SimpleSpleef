@@ -2,7 +2,6 @@ package de.beimax.simplespleef;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,7 +30,6 @@ public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	private SimpleSpleefGame game;
 	private SimpleSpleefPlayerListener playerListener;
-	private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 	public Configuration conf; // General configuration
 	public Configuration ll; // Language configuration
 
@@ -382,17 +380,5 @@ public class SimpleSpleef extends JavaPlugin {
 
 		System.out.println("[SimpleSpleef] " + pdfFile.getName() + " version "
 				+ pdfFile.getVersion() + " was disabled!");
-	}
-
-	public boolean isDebugging(final Player player) {
-		if (debugees.containsKey(player)) {
-			return debugees.get(player);
-		} else {
-			return false;
-		}
-	}
-
-	public void setDebugging(final Player player, final boolean value) {
-		debugees.put(player, value);
 	}
 }
