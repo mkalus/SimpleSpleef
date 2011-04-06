@@ -22,15 +22,8 @@ public class SimpleSpleefGame {
 	private static Random generator = new Random();
 
 	// random gifts
-	private static final Material[] randomWins = { Material.APPLE,
-			Material.BED, Material.BOOK, Material.CAKE,
-			Material.CHAINMAIL_HELMET, Material.CLAY_BALL, Material.COMPASS,
-			Material.COOKED_FISH, Material.DIAMOND, Material.FLINT_AND_STEEL,
-			Material.GOLD_INGOT, Material.GLOWSTONE, Material.GOLD_HELMET,
-			Material.INK_SACK, Material.IRON_INGOT, Material.IRON_HELMET,
-			Material.OBSIDIAN, Material.RED_ROSE, Material.SNOW_BLOCK,
-			Material.STRING, Material.SULPHUR, Material.TNT,
-			Material.YELLOW_FLOWER };
+	private static Material[] randomWins;
+	// TODO: Does ist make sense to make randomWins static?
 
 	// return next random element from Material Array
 	public static Material get(Material[] array) {
@@ -59,16 +52,18 @@ public class SimpleSpleefGame {
 	 * Constructor
 	 * 
 	 * @param instance
+	 * @param randomWins, defined random wins
 	 */
-	public SimpleSpleefGame(SimpleSpleef instance) {
+	public SimpleSpleefGame(SimpleSpleef instance, Material[] randomWins) {
 		plugin = instance;
 		spleefers = null;
 		teams = null;
 		lost = null;
 		started = false;
 		countdown = null;
+		SimpleSpleefGame.randomWins = randomWins;
 	}
-
+	
 	/**
 	 * return team name
 	 * 
