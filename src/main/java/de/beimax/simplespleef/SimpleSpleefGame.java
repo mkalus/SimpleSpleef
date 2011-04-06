@@ -595,10 +595,11 @@ public class SimpleSpleefGame {
 											.replaceAll(
 													"\\[PLAYERS\\]",
 													compileList(teams.get(team))));
-			// give gifts
-			for (Player player : teams.get(team)) {
-				giveRandomGift(player);
-			}
+			// give gifts, if activated in config
+			if (plugin.conf.getBoolean("prizes", true))
+				for (Player player : teams.get(team)) {
+					giveRandomGift(player);
+				}
 		}
 
 		// stop and reset game
@@ -621,13 +622,13 @@ public class SimpleSpleefGame {
 		player.getInventory().addItem(new ItemStack(random));
 		if (player.isOnline()) { // only online players are gifted
 			player.sendMessage(plugin.ll.getString("announce_grats",
-					"You have won a price: [WIN].").replaceAll("\\[WIN\\]",
+					"You have won a prize: [WIN].").replaceAll("\\[WIN\\]",
 					random.name()));
 			plugin.getServer().broadcastMessage(
 					ChatColor.GOLD
 							+ plugin.ll
 									.getString("announce_grats_all",
-											"[PLAYER] has won a price: [WIN].")
+											"[PLAYER] has won a prize: [WIN].")
 									.replaceAll("\\[WIN\\]", random.name())
 									.replaceAll("\\[PLAYER\\]",
 											player.getName()));

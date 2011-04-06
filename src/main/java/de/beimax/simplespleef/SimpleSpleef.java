@@ -53,7 +53,7 @@ public class SimpleSpleef extends JavaPlugin {
 			log.info("Creating new configuration file for SimpleSpleef.");
 			try {
 				FileWriter fw = new FileWriter(confFile);
-				fw.write("lang: en\nprices: true\n");
+				fw.write("lang: en\nprizes: true\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("Could not write SimpleSpleef.yml: " + e.getMessage());
