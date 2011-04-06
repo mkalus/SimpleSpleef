@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -368,8 +369,11 @@ public class SimpleSpleef extends JavaPlugin {
 		// if op, allow!
 		//if (player.isOp()) return true;
 		// permission checked
-		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission))
+		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission)) {
+			// inform player
+			player.sendMessage(ChatColor.RED + "You do not have the permission to use this command!");
 			return true;
+		}
 		// all others may not do this!
 		return false;
 	}
