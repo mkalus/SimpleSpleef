@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.beimax</groupId>
 	<artifactId>SimpleSpleef</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 	<name>SimpleSpleef</name>
 	<description>Simple Spleefing plugin for bukkit server</description>
 	<dependencies>

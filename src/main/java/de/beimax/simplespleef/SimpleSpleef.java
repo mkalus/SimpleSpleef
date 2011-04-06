@@ -80,8 +80,8 @@ public class SimpleSpleef extends JavaPlugin {
 						"announce_dropped_out: Player [PLAYER] dropped into the water and out of the game.\n" +
 						"announce_won: Player [PLAYER] has won the spleef game. Congratulations!\n" +
 						"announce_won_team: 'Team [TEAM] has won the spleef game. Congratulations go to: [PLAYERS].'\n" +
-						"announce_grats: 'You have won a price: [WIN].'\n" +
-						"announce_grats_all: '[PLAYER] has won a price: [WIN].'\n" +
+						"announce_grats: 'You have won a prize: [WIN].'\n" +
+						"announce_grats_all: '[PLAYER] has won a prize: [WIN].'\n" +
 						"announce_gamestopped: Game has been stopped, please stay where you are.\n" +
 						"announce_gamedeleted: Game was stopped and deleted.\n" +
 						"countdown_start: Starting spleef game. There can only be one!\n" +
