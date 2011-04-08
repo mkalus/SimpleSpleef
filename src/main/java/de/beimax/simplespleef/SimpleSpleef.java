@@ -62,7 +62,8 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * @param plugin Permissions plugin setter
+	 * @param plugin
+	 *            Permissions plugin setter
 	 * @return true if set
 	 */
 	public static boolean setPermissions(PermissionHandler plugin) {
@@ -80,17 +81,19 @@ public class SimpleSpleef extends JavaPlugin {
 	public static iConomy getiConomy() {
 		return iConomy;
 	}
-	
+
 	/**
 	 * @return true if iConomy exists
 	 */
 	public static boolean checkiConomy() {
-		if (iConomy != null) return true;
+		if (iConomy != null)
+			return true;
 		return false;
 	}
 
 	/**
-	 * @param plugin iConomy plugin setter
+	 * @param plugin
+	 *            iConomy plugin setter
 	 * @return true if set
 	 */
 	public static boolean setiConomy(iConomy plugin) {
@@ -217,7 +220,11 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "err_joined_already: You have already joined the game.\n"
 						+ "err_minplayers: A minimum of two players is needed to start the game!\n"
 						+ "err_gamenoteamgame: The current game has not been declared a team game. Please join by typing /spleef join.\n"
-						+ "err_joined_team_already: You have already joined this team.\n");
+						+ "err_joined_team_already: You have already joined this team.\n"
+						+ "fee_entry: You paid an entry fee of [MONEY].\n"
+						+ "fee_entry_err: Insufficient funds - you need at least [MONEY].\n"
+						+ "prize_money: Player [PLAYER] has won [MONEY] of prize money.\n"
+						+ "prize_money_team: Each member of the team received [MONEY] prize money.\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_en.yml: "
@@ -264,7 +271,11 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "err_joined_already: Du bist bereits im Spiel angemeldet!\n"
 						+ "err_minplayers: Mindestens zwei Spleefer müssen am Spiel teilnehmen!\n"
 						+ "err_gamenoteamgame: Das aktuelle Spiel ist nicht als Team-Spiel angekündigt. Bitte melde dich einfach mit /spleef join an.\n"
-						+ "err_joined_team_already: Du bist bereits in diesem Team angemeldet!\n");
+						+ "err_joined_team_already: Du bist bereits in diesem Team angemeldet!\n"
+						+ "fee_entry: Du hast ein Startgeld von [MONEY] gezahlt.\n"
+						+ "fee_entry_err: Du hast nicht die benötigten [MONEY] Startgeld.\n"
+						+ "prize_money: Spieler [PLAYER] hat ein Preisgeld in Höhe von [MONEY] gewonnen.\n"
+						+ "prize_money_team: Jeder Spieler des Teams hat ein Preisgeld in Höhe von [MONEY] gewonnen.\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_de.yml: "
@@ -295,7 +306,8 @@ public class SimpleSpleef extends JavaPlugin {
 		// register enable events from other plugins
 		PluginListener = new PluginListener();
 
-		getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, PluginListener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE,
+				PluginListener, Priority.Monitor, this);
 
 		// Register our events
 		PluginManager pm = getServer().getPluginManager();
