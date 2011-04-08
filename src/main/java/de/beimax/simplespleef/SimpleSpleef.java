@@ -220,6 +220,9 @@ public class SimpleSpleef extends JavaPlugin {
 		ll.load();
 	}
 
+	/**
+	 * called on enable
+	 */
 	public void onEnable() {
 		init(); // load init
 		if (!createGame()) { // try to create game
@@ -289,6 +292,7 @@ public class SimpleSpleef extends JavaPlugin {
 	/**
 	 * Catch commands
 	 */
+	@Override
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String commandLabel, String[] args) {
 		// ignore commands if disabled
@@ -367,7 +371,7 @@ public class SimpleSpleef extends JavaPlugin {
 		if (SimpleSpleef.Permissions == null)
 			return true;
 		// if op, allow!
-		//if (player.isOp()) return true;
+		if (player.isOp()) return true;
 		// permission checked
 		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission)) {
 			// inform player
