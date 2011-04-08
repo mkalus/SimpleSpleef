@@ -22,6 +22,14 @@
 			<type>jar</type>
 			<!-- <systemPath>${java.home}/../lib/tools.jar</systemPath>-->
 		</dependency>
+		<dependency>
+			<groupId>com.nijikokun.coelho.iConomy</groupId>
+			<artifactId>iConomy</artifactId>
+			<version>4.63</version>
+			<scope>system</scope>
+			<type>jar</type>
+			<systemPath>/home/mkalus/devel/Java/CraftBukkit/plugins/iConomy.jar</systemPath>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

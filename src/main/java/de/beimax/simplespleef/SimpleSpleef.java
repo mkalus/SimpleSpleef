@@ -18,9 +18,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
 
+import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.Server;
 
 /**
  * SimpleSpleef for Bukkit
@@ -34,25 +36,64 @@ public class SimpleSpleef extends JavaPlugin {
 	public Configuration conf; // General configuration
 	public Configuration ll; // Language configuration
 
+	private static PluginListener PluginListener = null;
+	private static Server Server = null;
+
 	/**
 	 * Permissions
 	 */
-	public static PermissionHandler Permissions;
+	private static PermissionHandler Permissions;
 
 	/**
-	 * Static permissions setup - see permissions Wiki
+	 * iConomy
 	 */
-	private void setupPermissions() {
-		Plugin test = this.getServer().getPluginManager()
-				.getPlugin("Permissions");
+	private static iConomy iConomy;
 
-		if (SimpleSpleef.Permissions == null) {
-			if (test != null) {
-				SimpleSpleef.Permissions = ((Permissions) test).getHandler();
-			} else {
-				log.info("[SimpleSpleef] Permission system not detected, defaulting to all.");
-			}
+	/**
+	 * @return BukkitServer
+	 */
+	public static Server getBukkitServer() {
+		return Server;
+	}
+
+	/**
+	 * @return Permissions instance or null
+	 */
+	public static PermissionHandler getPermissions() {
+		return Permissions;
+	}
+
+	/**
+	 * @param plugin Permissions plugin setter
+	 * @return true if set
+	 */
+	public static boolean setPermissions(PermissionHandler plugin) {
+		if (Permissions == null) {
+			Permissions = plugin;
+		} else {
+			return false;
 		}
+		return true;
+	}
+
+	/**
+	 * @return iConomy instance or null
+	 */
+	public static iConomy getiConomy() {
+		return iConomy;
+	}
+
+	/**
+	 * @param plugin iConomy plugin setter
+	 * @return true if set
+	 */
+	public static boolean setiConomy(iConomy plugin) {
+		if (iConomy == null) {
+			iConomy = plugin;
+		} else {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -230,8 +271,13 @@ public class SimpleSpleef extends JavaPlugin {
 			return;
 		}
 
-		// setup permissions
-		setupPermissions();
+		// set server
+		Server = getServer();
+
+		// register enable events from other plugins
+		PluginListener = new PluginListener();
+
+		getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, PluginListener, Priority.Monitor, this);
 
 		// Register our events
 		PluginManager pm = getServer().getPluginManager();
@@ -371,11 +417,13 @@ public class SimpleSpleef extends JavaPlugin {
 		if (SimpleSpleef.Permissions == null)
 			return true;
 		// if op, allow!
-		if (player.isOp()) return true;
+		if (player.isOp())
+			return true;
 		// permission checked
 		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission)) {
 			// inform player
-			player.sendMessage(ChatColor.RED + "You do not have the permission to use this command!");
+			player.sendMessage(ChatColor.RED
+					+ "You do not have the permission to use this command!");
 			return true;
 		}
 		// all others may not do this!
