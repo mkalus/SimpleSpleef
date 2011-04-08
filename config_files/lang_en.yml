@@ -34,3 +34,7 @@ err_joined_already: You have already joined the game.
 err_minplayers: A minimum of two players is needed to start the game!
 err_gamenoteamgame: The current game has not been declared a team game. Please join by typing /spleef join.
 err_joined_team_already: You have already joined this team.
+fee_entry: You paid an entry fee of [MONEY].
+fee_entry_err: Insufficient funds - you need at least [MONEY].
+prize_money: Player [PLAYER] has won [MONEY] of prize money.
+prize_money_team: Each member of the team received [MONEY] prize money.

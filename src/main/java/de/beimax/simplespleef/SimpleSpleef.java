@@ -20,8 +20,6 @@ import org.bukkit.util.config.Configuration;
 
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.Server;
 
 /**
@@ -81,6 +79,14 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public static iConomy getiConomy() {
 		return iConomy;
+	}
+	
+	/**
+	 * @return true if iConomy exists
+	 */
+	public static boolean checkiConomy() {
+		if (iConomy != null) return true;
+		return false;
 	}
 
 	/**
@@ -150,6 +156,18 @@ public class SimpleSpleef extends JavaPlugin {
 					"OBSIDIAN", "RED_ROSE", "SNOW_BLOCK", "STRING", "SULPHUR",
 					"TNT", "YELLOW_FLOWER" };
 			conf.setProperty("prizes", defaultWins);
+			changed = true;
+		}
+		if (conf.getProperty("entryfee") == null) {
+			conf.setProperty("entryfee", 5);
+			changed = true;
+		}
+		if (conf.getProperty("prizemoney_fixed") == null) {
+			conf.setProperty("prizemoney_fixed", 0);
+			changed = true;
+		}
+		if (conf.getProperty("prizemoey_perplayer") == null) {
+			conf.setProperty("prizemoey_perplayer", 5);
 			changed = true;
 		}
 

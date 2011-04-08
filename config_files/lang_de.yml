@@ -34,3 +34,7 @@ err_joined_already: Du bist bereits im Spiel angemeldet!
 err_minplayers: Mindestens zwei Spleefer müssen am Spiel teilnehmen!
 err_gamenoteamgame: Das aktuelle Spiel ist nicht als Team-Spiel angekündigt. Bitte melde dich einfach mit /spleef join an.
 err_joined_team_already: Du bist bereits in diesem Team angemeldet!
+fee_entry: Du hast ein Startgeld von [MONEY] gezahlt.
+fee_entry_err: Du hast nicht die benötigten [MONEY] Startgeld.
+prize_money: Spieler [PLAYER] hat ein Preisgeld in Höhe von [MONEY] gewonnen.
+prize_money_team: Jeder Spieler des Teams hat ein Preisgeld in Höhe von [MONEY] gewonnen.

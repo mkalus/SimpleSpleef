@@ -13,6 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.Account;
+
 /**
  * @author mkalus
  * 
@@ -23,6 +26,7 @@ public class SimpleSpleefGame {
 
 	// random gifts
 	private static Material[] randomWins;
+
 	// TODO: Does ist make sense to make randomWins static?
 
 	// return next random element from Material Array
@@ -49,10 +53,16 @@ public class SimpleSpleefGame {
 	private Countdown countdown;
 
 	/**
+	 * accumulated players at start of game - to count fees at the end
+	 */
+	private int numberOfPlayers = 0;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param instance
-	 * @param randomWins, defined random wins
+	 * @param randomWins
+	 *            , defined random wins
 	 */
 	public SimpleSpleefGame(SimpleSpleef instance, Material[] randomWins) {
 		plugin = instance;
@@ -63,7 +73,7 @@ public class SimpleSpleefGame {
 		countdown = null;
 		SimpleSpleefGame.randomWins = randomWins;
 	}
-	
+
 	/**
 	 * return team name
 	 * 
@@ -82,6 +92,7 @@ public class SimpleSpleefGame {
 	 * @param team
 	 *            to add the player to - may be null
 	 */
+	@SuppressWarnings("static-access")
 	public void addPlayer(Player player, Integer team) {
 		if (started || countdown != null) {
 			player.sendMessage(ChatColor.RED
@@ -174,7 +185,33 @@ public class SimpleSpleefGame {
 												.replaceAll("\\[TEAM\\]",
 														getTeamName(team)));
 			}
-		} else { // add new player to spleefers
+		} else { // add new player to spleefers, if he or she has enough money
+			// check account of player
+			if (SimpleSpleef.checkiConomy()) {
+				double fee = plugin.conf.getDouble("entryfee", 5.0);
+				if (fee != 0) {
+					iConomy iConomy = SimpleSpleef.getiConomy();
+					Account account = iConomy.getBank().getAccount(
+							player.getName());
+					if (account.hasEnough(fee)) {
+						account.subtract(fee);
+						player.sendMessage(ChatColor.AQUA
+								+ plugin.ll.getString("fee_entry",
+										"You paid an entry fee of [MONEY].")
+										.replaceAll("\\[MONEY\\]",
+												iConomy.getBank().format(fee)));
+					} else {
+						player.sendMessage(ChatColor.RED
+								+ plugin.ll
+										.getString("fee_entry_err",
+												"Insufficient funds - you need at least [MONEY].")
+										.replaceAll("\\[MONEY\\]",
+												iConomy.getBank().format(fee)));
+						return;
+					}
+				}
+			}
+
 			spleefers.add(player);
 			// also add to team?
 			if (team != null) {
@@ -241,8 +278,9 @@ public class SimpleSpleefGame {
 				teams.get(2).remove(player);
 		}
 		// possibly remove player from loser list
-		if (lost != null && lost.contains(player))
+		if (lost != null && lost.contains(player)) {
 			lost.remove(player);
+		}
 		plugin.getServer().broadcastMessage(
 				ChatColor.GREEN
 						+ plugin.ll.getString("announce_leave",
@@ -309,6 +347,8 @@ public class SimpleSpleefGame {
 	private void startGameAndDeleteCountdown() {
 		started = true;
 		countdown = null;
+		// count players at start of game
+		numberOfPlayers = spleefers.size();
 	}
 
 	/**
@@ -558,9 +598,20 @@ public class SimpleSpleefGame {
 	 * called on a victory
 	 * 
 	 * @param team
-	 *            for team numnber - 0 is no team
+	 *            for team number - 0 is no team
 	 */
 	private void declareVictory(int team) {
+		// do we have to calculate prize money?
+		double win;
+		if (SimpleSpleef.checkiConomy()) {
+			// get money hight
+			double fixed = plugin.conf.getDouble("prizemoney_fixed", 0.0);
+			double perplayer = plugin.conf.getDouble("prizemoney_perplayer",
+					5.0);
+			win = fixed + perplayer * numberOfPlayers;
+		} else
+			win = 0; // no prize money
+
 		if (team == 0) {
 			// who has won?
 			for (Player player : spleefers) {
@@ -575,6 +626,24 @@ public class SimpleSpleefGame {
 															player.getName()));
 					// give gift
 					giveRandomGift(player);
+					// player wins all the money
+					if (win > 0) {
+						plugin.getServer()
+								.broadcastMessage(
+										ChatColor.GOLD
+												+ plugin.ll
+														.getString(
+																"prize_money",
+																"Player [PLAYER] has won [MONEY] of prize money.")
+														.replaceAll(
+																"\\[PLAYER\\]",
+																player.getName())
+														.replaceAll(
+																"\\[MONEY\\]",
+																iConomy.getBank()
+																		.format(win)));
+						payWin(player, win);
+					}
 					break;
 				}
 			}
@@ -590,11 +659,27 @@ public class SimpleSpleefGame {
 											.replaceAll(
 													"\\[PLAYERS\\]",
 													compileList(teams.get(team))));
+			// each player get a fraction of the money
+			win = win / teams.get(team).size();
+			
 			// give gifts, if activated in config
 			if (plugin.conf.getBoolean("prizes", true))
 				for (Player player : teams.get(team)) {
 					giveRandomGift(player);
+					// give money
+					payWin(player, win);
 				}
+			if (win > 0)
+				plugin.getServer()
+						.broadcastMessage(
+								ChatColor.GOLD
+										+ plugin.ll
+												.getString("prize_money_team",
+														"Each member of the team received [MONEY] prize money.")
+												.replaceAll(
+														"\\[MONEY\\]",
+														iConomy.getBank()
+																.format(win)));
 		}
 
 		// stop and reset game
@@ -602,6 +687,22 @@ public class SimpleSpleefGame {
 		teams = null;
 		spleefers = null;
 		lost = null;
+		numberOfPlayers = 0;
+	}
+	
+	/**
+	 * puts an amount of money on the player's account
+	 * @param player
+	 * @param win
+	 */
+	private void payWin(Player player, double win) {
+		// sanity check
+		if (win <= 0 || !SimpleSpleef.checkiConomy()) return;
+		iConomy iConomy = SimpleSpleef.getiConomy();
+		@SuppressWarnings("static-access")
+		Account account = iConomy.getBank().getAccount(
+				player.getName());
+		account.add(win);
 	}
 
 	/**

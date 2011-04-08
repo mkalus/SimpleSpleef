@@ -1,5 +1,14 @@
+#language file to load
 lang: de
+# fee to enter a game - set to 0 to disable
+entryfee: 5.0
+# fixed amount of money that a player wins
+prizemoney_fixed: 0.0
+# money a player wins per player in the game
+prizemoney_perplayer: 5.0
+# do the winners get prizes?
 giveprizes: true
+# prizes to win (one random)
 prizes:
 - APPLE
 - BED
