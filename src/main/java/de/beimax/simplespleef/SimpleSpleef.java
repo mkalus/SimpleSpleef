@@ -18,9 +18,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
 
-import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.Server;
+import com.iConomy.iConomy;
 
 /**
  * SimpleSpleef for Bukkit

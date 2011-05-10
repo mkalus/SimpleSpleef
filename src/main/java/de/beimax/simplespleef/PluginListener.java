@@ -3,7 +3,7 @@ package de.beimax.simplespleef;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 
-import com.nijiko.coelho.iConomy.iConomy;
+import com.iConomy.iConomy;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 import org.bukkit.plugin.Plugin;
@@ -54,11 +54,11 @@ public class PluginListener extends ServerListener {
 					.getPlugin("iConomy");
 
 			if (iConomy != null) {
-				if (iConomy.isEnabled()) {
+				if (iConomy.isEnabled() && iConomy.getClass().getName().equals("com.iConomy.iConomy")) {
 					SimpleSpleef.setiConomy((iConomy) iConomy);
 
 					SimpleSpleef.log
-							.info("[SimpleSpleef] Successfully linked with iConomy.");
+							.info("[SimpleSpleef] Successfully linked with iConomy 5.0+.");
 				}
 			}
 		}

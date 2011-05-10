@@ -12,9 +12,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
-
-import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
+import com.iConomy.iConomy;
+import com.iConomy.system.*;
 
 /**
  * @author mkalus
@@ -191,22 +190,22 @@ public class SimpleSpleefGame {
 				double fee = plugin.conf.getDouble("entryfee", 5.0);
 				if (fee != 0) {
 					iConomy iConomy = SimpleSpleef.getiConomy();
-					Account account = iConomy.getBank().getAccount(
-							player.getName());
-					if (account.hasEnough(fee)) {
-						account.subtract(fee);
+					Holdings holdings = iConomy.getAccount(player.getName())
+							.getHoldings();
+					if (holdings.hasEnough(fee)) {
+						holdings.subtract(fee);
 						player.sendMessage(ChatColor.AQUA
 								+ plugin.ll.getString("fee_entry",
 										"You paid an entry fee of [MONEY].")
 										.replaceAll("\\[MONEY\\]",
-												iConomy.getBank().format(fee)));
+												iConomy.format(fee)));
 					} else {
 						player.sendMessage(ChatColor.RED
 								+ plugin.ll
 										.getString("fee_entry_err",
 												"Insufficient funds - you need at least [MONEY].")
 										.replaceAll("\\[MONEY\\]",
-												iConomy.getBank().format(fee)));
+												iConomy.format(fee)));
 						return;
 					}
 				}
@@ -640,8 +639,7 @@ public class SimpleSpleefGame {
 																player.getName())
 														.replaceAll(
 																"\\[MONEY\\]",
-																iConomy.getBank()
-																		.format(win)));
+																iConomy.format(win)));
 						payWin(player, win);
 					}
 					break;
@@ -661,7 +659,7 @@ public class SimpleSpleefGame {
 													compileList(teams.get(team))));
 			// each player get a fraction of the money
 			win = win / teams.get(team).size();
-			
+
 			// give gifts, if activated in config
 			if (plugin.conf.getBoolean("prizes", true))
 				for (Player player : teams.get(team)) {
@@ -676,10 +674,8 @@ public class SimpleSpleefGame {
 										+ plugin.ll
 												.getString("prize_money_team",
 														"Each member of the team received [MONEY] prize money.")
-												.replaceAll(
-														"\\[MONEY\\]",
-														iConomy.getBank()
-																.format(win)));
+												.replaceAll("\\[MONEY\\]",
+														iConomy.format(win)));
 		}
 
 		// stop and reset game
@@ -689,20 +685,21 @@ public class SimpleSpleefGame {
 		lost = null;
 		numberOfPlayers = 0;
 	}
-	
+
 	/**
 	 * puts an amount of money on the player's account
+	 * 
 	 * @param player
 	 * @param win
 	 */
 	private void payWin(Player player, double win) {
 		// sanity check
-		if (win <= 0 || !SimpleSpleef.checkiConomy()) return;
+		if (win <= 0 || !SimpleSpleef.checkiConomy())
+			return;
 		iConomy iConomy = SimpleSpleef.getiConomy();
 		@SuppressWarnings("static-access")
-		Account account = iConomy.getBank().getAccount(
-				player.getName());
-		account.add(win);
+		Holdings holdings = iConomy.getAccount(player.getName()).getHoldings();
+		holdings.add(win);
 	}
 
 	/**
