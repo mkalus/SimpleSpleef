@@ -710,9 +710,12 @@ public class SimpleSpleefGame {
 	private void giveRandomGift(Player player) {
 		// get random Material
 		Material random = get(randomWins);
+		// create an item stack
+		ItemStack itemStack = new ItemStack(random);
+		itemStack.setAmount(1);
 
 		// add to player inventory
-		player.getInventory().addItem(new ItemStack(random));
+		player.getInventory().addItem(itemStack);
 		if (player.isOnline()) { // only online players are gifted
 			player.sendMessage(plugin.ll.getString("announce_grats",
 					"You have won a prize: [WIN].").replaceAll("\\[WIN\\]",
