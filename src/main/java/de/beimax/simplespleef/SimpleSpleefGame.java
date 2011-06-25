@@ -277,6 +277,9 @@ public class SimpleSpleefGame {
 							"You have not joined the game anyway."));
 			return;
 		}
+		
+		// remove shovel from player
+		playerLoosesShovel(player);
 
 		// delete player from list
 		spleefers.remove(player);
