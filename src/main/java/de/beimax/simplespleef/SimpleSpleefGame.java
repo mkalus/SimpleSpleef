@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import com.iConomy.iConomy;
 import com.iConomy.system.*;
@@ -317,7 +318,7 @@ public class SimpleSpleefGame {
 			return;
 		}
 
-		// too few games
+		// too few gamers
 		if (spleefers.size() < 2) {
 			player.sendMessage(ChatColor.RED
 					+ plugin.ll
@@ -348,6 +349,8 @@ public class SimpleSpleefGame {
 		countdown = null;
 		// count players at start of game
 		numberOfPlayers = spleefers.size();
+		// receive shovels if setting has been activated in yaml file
+		playersReceiveShovels();
 	}
 
 	/**
@@ -375,6 +378,9 @@ public class SimpleSpleefGame {
 		if (countdown != null)
 			countdown.interrupted = true;
 
+		// remove shovels if needed
+		playersLooseShovels();
+
 		// message and stop game
 		started = false;
 		plugin.getServer()
@@ -399,6 +405,9 @@ public class SimpleSpleefGame {
 		// still in countdown?
 		if (countdown != null)
 			countdown.interrupted = true;
+		
+		// remove shovels if needed
+		playersLooseShovels();
 
 		// message and stop game
 		started = false;
@@ -574,6 +583,9 @@ public class SimpleSpleefGame {
 
 		// add to list
 		lost.add(player);
+		
+		// take away shovel from player if needed
+		playerLoosesShovel(player);
 
 		// check victory conditions
 		if (teams == null) { // easy
@@ -678,6 +690,9 @@ public class SimpleSpleefGame {
 														iConomy.format(win)));
 		}
 
+		// remove shovels if needed
+		playersLooseShovels();
+
 		// stop and reset game
 		started = false;
 		teams = null;
@@ -730,7 +745,61 @@ public class SimpleSpleefGame {
 											player.getName()));
 		}
 	}
+	
+	/**
+	 * if the setting has been activated, give all players a shovel
+	 */
+	private void playersReceiveShovels() {
+		// if no shovels should be given - return
+		if (!plugin.conf.getBoolean("players_get_shovel", true)) return;
+		int shovelItem = plugin.conf.getInt("players_get_shovel", Material.STONE_SPADE.getId()); // STONE_SPADE as default
+		// each player receives a shovel
+		for (Player player : spleefers) {
+			// create an item stack
+			ItemStack itemStack = new ItemStack(shovelItem);
+			itemStack.setAmount(1);
+			// give it to the player
+			player.getInventory().addItem(itemStack);
+		}
+	}
+	
+	/**
+	 * called at stop of game - all remaining players might loose their shovels
+	 */
+	private void playersLooseShovels() {
+		for (Player player : spleefers) {
+			// only loose shovel, if have not lost already
+			if (!lost.contains(player)) playerLoosesShovel(player);
+		}
+	}
 
+	/**
+	 * called if a player drops out of the game or it stops
+	 */
+	private void playerLoosesShovel(Player player) {
+		// if no shovels should be taken - return
+		if (!plugin.conf.getBoolean("players_loose_shovel", true)) return;
+		int shovelItem = plugin.conf.getInt("players_get_shovel", Material.STONE_SPADE.getId()); // STONE_SPADE as default
+		// take if, if player still has it - yes, there are exploits, but I do not want to handle them ;-)
+		Inventory inventory = player.getInventory();
+		if (inventory.contains(shovelItem)) {
+			int index = inventory.first(shovelItem);
+			// get the first stack
+			ItemStack stack = inventory.getItem(index);
+			if (stack.getAmount() > 1) { // shovels should only come in packs of one, but who knows?
+				stack.setAmount(stack.getAmount() - 1); // reduce amount by one
+				inventory.setItem(index, stack);
+			} else {
+				inventory.setItem(index, null); // remove item
+			}
+		}
+	}
+
+	/**
+	 * Countdown class
+	 * @author mkalus
+	 *
+	 */
 	private class Countdown extends Thread {
 		// flag to toggle interrupts
 		private boolean interrupted = false;

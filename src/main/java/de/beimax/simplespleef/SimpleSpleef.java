@@ -161,16 +161,28 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("prizes", defaultWins);
 			changed = true;
 		}
-		if (conf.getProperty("entryfee") == null) {
+		if (conf.getProperty("entryfee") == null) { // define entry fee
 			conf.setProperty("entryfee", 5);
 			changed = true;
 		}
-		if (conf.getProperty("prizemoney_fixed") == null) {
+		if (conf.getProperty("prizemoney_fixed") == null) { // define fixed prize money
 			conf.setProperty("prizemoney_fixed", 0);
 			changed = true;
 		}
-		if (conf.getProperty("prizemoney_perplayer") == null) {
+		if (conf.getProperty("prizemoney_perplayer") == null) { // define prize money per player
 			conf.setProperty("prizemoney_perplayer", 5);
+			changed = true;
+		}
+		if (conf.getProperty("players_get_shovel") == null) { // define if players receive a shovel
+			conf.setProperty("players_get_shovel", true);
+			changed = true;
+		}
+		if (conf.getProperty("players_loose_shovel") == null) { // define if players loose a shovel after the game
+			conf.setProperty("players_loose_shovel", true);
+			changed = true;
+		}
+		if (conf.getProperty("shovel_item") == null) { // define the item id of the shovel
+			conf.setProperty("shovel_item", Material.STONE_SPADE.getId()); // 273 as default
 			changed = true;
 		}
 
