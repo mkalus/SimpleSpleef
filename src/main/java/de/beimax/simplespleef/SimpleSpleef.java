@@ -169,8 +169,8 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("prizemoney_fixed", 0);
 			changed = true;
 		}
-		if (conf.getProperty("prizemoey_perplayer") == null) {
-			conf.setProperty("prizemoey_perplayer", 5);
+		if (conf.getProperty("prizemoney_perplayer") == null) {
+			conf.setProperty("prizemoney_perplayer", 5);
 			changed = true;
 		}
 
