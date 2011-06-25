@@ -1,6 +1,6 @@
 name: SimpleSpleef
 main: de.beimax.simplespleef.SimpleSpleef
-version: 0.6
+version: 0.7
 author: maxkalus
 description: >
              Simple Spleef Plugin
@@ -17,3 +17,4 @@ commands:
       /<command> delete Delete current game
       /<command> leave Leave game
       /<command> list Show game information
+      /<command> reload Reload configuration

@@ -439,10 +439,32 @@ public class SimpleSpleef extends JavaPlugin {
 				if (!checkPermission(player, "delete"))
 					return true; // check permission
 				game.deleteGame(player); // delete a game
+			} else if (command.equalsIgnoreCase("reload")) {
+				if (!checkPermission(player, "reload"))
+					return true; // check permission
+				reloadConfiguration(player); // reload configuration
 			} else
 				return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * reload configuration
+	 * @param Player player calling reload
+	 */
+	private void reloadConfiguration(Player player) {
+		File confFile = new File("plugins" + File.separator + "SimpleSpleef",
+		"SimpleSpleef.yml");
+		// check if the conf file has disappeared somehow
+		if (!confFile.exists() || !confFile.canRead()) {
+			player.sendMessage(ChatColor.RED + "ERROR: Configuration file does not exist or is not readable!");
+			return;
+		}
+		// reload configuration
+		conf = new Configuration(confFile);
+		conf.load();
+		player.sendMessage(ChatColor.GOLD + "Spleef configuration refreshed.");
 	}
 
 	/**
