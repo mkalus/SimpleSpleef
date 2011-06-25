@@ -236,7 +236,10 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "fee_entry: You paid an entry fee of [MONEY].\n"
 						+ "fee_entry_err: Insufficient funds - you need at least [MONEY].\n"
 						+ "prize_money: Player [PLAYER] has won [MONEY] of prize money.\n"
-						+ "prize_money_team: Each member of the team received [MONEY] prize money.\n");
+						+ "prize_money_team: Each member of the team received [MONEY] prize money.\n"
+						+ "prize_item_set: Prize has been set to [ITEM].\n"
+						+ "prize_money_set: Prize has been set to [MONEY].\n"
+						+ "prize_item_money_deleted: Prize has been deleted.\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_en.yml: "
@@ -287,7 +290,10 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "fee_entry: Du hast ein Startgeld von [MONEY] gezahlt.\n"
 						+ "fee_entry_err: Du hast nicht die benötigten [MONEY] Startgeld.\n"
 						+ "prize_money: Spieler [PLAYER] hat ein Preisgeld in Höhe von [MONEY] gewonnen.\n"
-						+ "prize_money_team: Jeder Spieler des Teams hat ein Preisgeld in Höhe von [MONEY] gewonnen.\n");
+						+ "prize_money_team: Jeder Spieler des Teams hat ein Preisgeld in Höhe von [MONEY] gewonnen.\n"
+						+ "prize_item_set: Preis wurde gesetzt: [ITEM].\n"
+						+ "prize_money_set: Preis wurde gesetzt: [MONEY].\n"
+						+ "prize_item_money_deleted: Ausgelobter Preis wurde gelöscht.\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_de.yml: "
@@ -395,56 +401,85 @@ public class SimpleSpleef extends JavaPlugin {
 		Player player = (Player) sender;
 
 		// command without any parameters
-		if (args.length != 1) {
+		if (args.length < 1) {
 			return false;
 		} else {
 			command = args[0];
-			// check aliases
-			if (command.equalsIgnoreCase("blue"))
-				command = "1"; // alias for team 1
-			else if (command.equalsIgnoreCase("red"))
-				command = "2"; // alias for team 2
-
-			// check actual commands
-			if (command.equalsIgnoreCase("join")) {
-				if (!checkPermission(player, "play"))
-					return true; // check permission
-				game.addPlayer(player, null); // join no-team spleef
-			} else if (command.equalsIgnoreCase("1")) {
-				if (!checkPermission(player, "team"))
-					return true; // check permission
-				game.addPlayer(player, 1); // add player to team 1
-			} else if (command.equalsIgnoreCase("2")) {
-				if (!checkPermission(player, "team"))
-					return true; // check permission
-				game.addPlayer(player, 2); // add player to team 2
-			} else if (command.equalsIgnoreCase("leave")) {
-				if (!checkPermission(player, "leave"))
-					return true; // check permission
-				game.leavePlayer(player); // player leaves spleef
-			} else if (command.equalsIgnoreCase("list")) {
-				if (!checkPermission(player, "list"))
-					return true; // check permission
-				game.listSpleefers(player); // print a list of
-											// spleefers
-			} else if (command.equalsIgnoreCase("start")) {
-				if (!checkPermission(player, "start"))
-					return true; // check permission
-				game.startGame(player); // start a game
-			} else if (command.equalsIgnoreCase("stop")) {
-				if (!checkPermission(player, "stop"))
-					return true; // check permission
-				game.stopGame(player); // stop a game
-			} else if (command.equalsIgnoreCase("delete")) {
-				if (!checkPermission(player, "delete"))
-					return true; // check permission
-				game.deleteGame(player); // delete a game
-			} else if (command.equalsIgnoreCase("reload")) {
-				if (!checkPermission(player, "reload"))
-					return true; // check permission
-				reloadConfiguration(player); // reload configuration
-			} else
-				return false;
+			// one argument
+			if (args.length == 1) {
+				// check aliases
+				if (command.equalsIgnoreCase("blue"))
+					command = "1"; // alias for team 1
+				else if (command.equalsIgnoreCase("red"))
+					command = "2"; // alias for team 2
+	
+				// check actual commands
+				if (command.equalsIgnoreCase("join")) {
+					if (!checkPermission(player, "play"))
+						return true; // check permission
+					game.addPlayer(player, null); // join no-team spleef
+				} else if (command.equalsIgnoreCase("1")) {
+					if (!checkPermission(player, "team"))
+						return true; // check permission
+					game.addPlayer(player, 1); // add player to team 1
+				} else if (command.equalsIgnoreCase("2")) {
+					if (!checkPermission(player, "team"))
+						return true; // check permission
+					game.addPlayer(player, 2); // add player to team 2
+				} else if (command.equalsIgnoreCase("leave")) {
+					if (!checkPermission(player, "leave"))
+						return true; // check permission
+					game.leavePlayer(player); // player leaves spleef
+				} else if (command.equalsIgnoreCase("list")) {
+					if (!checkPermission(player, "list"))
+						return true; // check permission
+					game.listSpleefers(player); // print a list of
+												// spleefers
+				} else if (command.equalsIgnoreCase("start")) {
+					if (!checkPermission(player, "start"))
+						return true; // check permission
+					game.startGame(player); // start a game
+				} else if (command.equalsIgnoreCase("stop")) {
+					if (!checkPermission(player, "stop"))
+						return true; // check permission
+					game.stopGame(player); // stop a game
+				} else if (command.equalsIgnoreCase("delete")) {
+					if (!checkPermission(player, "delete"))
+						return true; // check permission
+					game.deleteGame(player); // delete a game
+				} else if (command.equalsIgnoreCase("reload")) {
+					if (!checkPermission(player, "reload"))
+						return true; // check permission
+					reloadConfiguration(player); // reload configuration
+				} else
+					return false;
+			} else { // multiple arguments
+				if (command.equalsIgnoreCase("prize")) {
+					if (!checkPermission(player, "prize"))
+						return true; // check permission
+					// get second argument
+					String second = args[1];
+					if (second.equalsIgnoreCase("money")) { // money prize
+						if (args.length != 3) return false;
+						try {
+							Integer money = Integer.parseInt(args[2]);
+							if (money == null) return false;
+							game.setMoneyPrize(player, (int) money);
+						} catch (NumberFormatException e) {
+							return false;
+						}
+					} else { // item prize, possibly
+						if (args.length != 2) return false;
+						try {
+							int prizeId = Integer.parseInt(second);
+							game.setItemPrize(player, prizeId);
+						} catch (NumberFormatException e) {
+							return false;
+						}
+					}
+				} else
+					return false;
+			}
 		}
 		return true;
 	}

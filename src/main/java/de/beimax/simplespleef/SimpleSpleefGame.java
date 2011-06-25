@@ -27,7 +27,7 @@ public class SimpleSpleefGame {
 	// random gifts
 	private static Material[] randomWins;
 
-	// TODO: Does ist make sense to make randomWins static?
+	// TODO: Does it make sense to make randomWins static?
 
 	// return next random element from Material Array
 	public static Material get(Material[] array) {
@@ -57,6 +57,16 @@ public class SimpleSpleefGame {
 	 */
 	private int numberOfPlayers = 0;
 
+	/**
+	 * prize money
+	 */
+	int prizeMoney = 0;
+
+	/**
+	 * prize item
+	 */
+	int prizeItemId = 0;
+	
 	/**
 	 * Constructor
 	 * 
@@ -614,12 +624,17 @@ public class SimpleSpleefGame {
 	private void declareVictory(int team) {
 		// do we have to calculate prize money?
 		double win;
-		if (SimpleSpleef.checkiConomy()) {
-			// get money hight
-			double fixed = plugin.conf.getDouble("prizemoney_fixed", 0.0);
-			double perplayer = plugin.conf.getDouble("prizemoney_perplayer",
-					5.0);
-			win = fixed + perplayer * numberOfPlayers;
+		if (SimpleSpleef.checkiConomy()) { // get prize money
+			// fixed for this game?
+			if (prizeMoney > 0) {
+				win = (double) prizeMoney;
+				prizeMoney = 0; // reset prize money
+			} else {
+				double fixed = plugin.conf.getDouble("prizemoney_fixed", 0.0);
+				double perplayer = plugin.conf.getDouble("prizemoney_perplayer",
+						5.0);
+				win = fixed + perplayer * numberOfPlayers;
+			}
 		} else
 			win = 0; // no prize money
 
@@ -723,9 +738,15 @@ public class SimpleSpleefGame {
 	 * @param player
 	 */
 	private void giveRandomGift(Player player) {
-		// get random Material
-		Material random = get(randomWins);
-		// create an item stack
+		Material random;
+		// determine win
+		if (prizeItemId != 0) { // fixed item id?
+			random = Material.getMaterial(prizeItemId);
+			prizeItemId = 0; // reset one time prize
+		} else { // get random Material
+			random = get(randomWins);
+		}
+		// create an item stack of the win
 		ItemStack itemStack = new ItemStack(random);
 		itemStack.setAmount(1);
 
@@ -793,6 +814,60 @@ public class SimpleSpleefGame {
 				inventory.setItem(index, null); // remove item
 			}
 		}
+	}
+	
+	/**
+	 * sets the price money
+	 * @param player
+	 * @param amount
+	 */
+	public void setMoneyPrize(Player player, int amount) {
+		// sanity check
+		if (amount < 0) {
+			player.sendMessage(ChatColor.RED + "ERROR: Prize money must be positive or 0!");
+			return;
+		}
+
+		// reset prizeItemId on setting money
+		prizeItemId = 0;
+		
+		// set or reset prize?
+		if (amount == 0) {
+			player.sendMessage(plugin.ll.getString("prize_item_money_deleted",
+					"Prize has been deleted."));
+		} else {
+			player.sendMessage(plugin.ll.getString("prize_money_set",
+			"Prize has been set to [MONEY].").replaceAll("\\[MONEY\\]",
+					String.valueOf(amount)));			
+		}
+		prizeMoney = amount;
+	}
+	
+	/**
+	 * sets the prize item
+	 * @param player
+	 * @param itemId
+	 */
+	public void setItemPrize(Player player, int itemId) {
+		// sanity check
+		if (itemId != 0 && Material.getMaterial(itemId) == null) {
+			player.sendMessage(ChatColor.RED + "ERROR: No such item id!");
+			return;
+		}
+		
+		// reset prizeMoney on setting item
+		prizeMoney = 0;
+		
+		// set or reset prize?
+		if (itemId == 0) {
+			player.sendMessage(plugin.ll.getString("prize_item_money_deleted",
+					"Prize has been deleted."));
+		} else {
+			player.sendMessage(plugin.ll.getString("prize_item_set",
+			"Prize has been set to [ITEM].").replaceAll("\\[ITEM\\]",
+					Material.getMaterial(itemId).name()));			
+		}
+		prizeItemId = itemId;
 	}
 
 	/**

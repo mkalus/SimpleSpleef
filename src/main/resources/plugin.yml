@@ -17,4 +17,6 @@ commands:
       /<command> delete Delete current game
       /<command> leave Leave game
       /<command> list Show game information
+      /<command> prize money 1000 The next winner receives 1000 money (admin command).
+      /<command> prize 322 The next winner receives a golden apple (item id) (admin command).
       /<command> reload Reload configuration
