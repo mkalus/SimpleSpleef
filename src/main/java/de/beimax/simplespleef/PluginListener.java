@@ -58,7 +58,7 @@ public class PluginListener extends ServerListener {
 					SimpleSpleef.setiConomy((iConomy) iConomy);
 
 					SimpleSpleef.log
-							.info("[SimpleSpleef] Successfully linked with iConomy 5.0+.");
+							.info("[SimpleSpleef] Successfully linked with iConomy.");
 				}
 			}
 		}
