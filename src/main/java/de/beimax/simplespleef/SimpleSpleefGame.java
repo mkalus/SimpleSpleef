@@ -793,7 +793,7 @@ public class SimpleSpleefGame {
 	private void playersLooseShovels() {
 		for (Player player : spleefers) {
 			// only loose shovel, if have not lost already
-			if (!lost.contains(player)) playerLoosesShovel(player);
+			if (lost == null || !lost.contains(player)) playerLoosesShovel(player);
 		}
 	}
 
