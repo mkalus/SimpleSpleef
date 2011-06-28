@@ -497,13 +497,18 @@ public class SimpleSpleefGame {
 	}
 
 	/**
-	 * possibly remove player on quit
+	 * possibly remove player on quit or on death
 	 * 
 	 * @param player
+	 * @param died true on a death event
 	 */
-	public void removePlayerOnQuit(Player player) {
+	public void removePlayerOnQuitorDeath(Player player, boolean died) {
 		// check, if player is in spleef list - if not, return
 		if (spleefers == null || !spleefers.contains(player))
+			return;
+		
+		// death of player and not have config set to kick out players after death?
+		if (died && !plugin.conf.getBoolean("dead_players_leavegame", true))
 			return;
 
 		// this spleefers automatically looses
@@ -533,11 +538,19 @@ public class SimpleSpleefGame {
 			lost.remove(player);
 
 		// inform world
-		plugin.getServer().broadcastMessage(
-				ChatColor.DARK_PURPLE
-						+ plugin.ll.getString("announce_player_logout",
-								"Player has left the game - whimp!")
-								.replaceAll("\\[PLAYER\\]", player.getName()));
+		if (died) {
+			plugin.getServer().broadcastMessage(
+					ChatColor.DARK_PURPLE
+							+ plugin.ll.getString("announce_player_death",
+									"[PLAYER] has opted to get himself killed instead of playing - whimp!")
+									.replaceAll("\\[PLAYER\\]", player.getName()));
+		} else {
+			plugin.getServer().broadcastMessage(
+					ChatColor.DARK_PURPLE
+							+ plugin.ll.getString("announce_player_logout",
+									"[PLAYER] has left the game - whimp!")
+									.replaceAll("\\[PLAYER\\]", player.getName()));
+		}
 
 		// are there players left?
 		if (spleefers.size() == 0) {

@@ -13,6 +13,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	//private final SimpleSpleef plugin;
 	private final SimpleSpleefGame game;
 
+	/**
+	 * Constructor
+	 * @param instance
+	 * @param game
+	 */
 	public SimpleSpleefPlayerListener(SimpleSpleef instance,
 			SimpleSpleefGame game) {
 		//plugin = instance;
@@ -28,7 +33,7 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		game.removePlayerOnQuit(event.getPlayer());
+		game.removePlayerOnQuitorDeath(event.getPlayer(), false);
 	}
 
 	/*

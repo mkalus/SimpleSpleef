@@ -31,6 +31,7 @@ public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	private SimpleSpleefGame game;
 	private SimpleSpleefPlayerListener playerListener;
+	private SimpleSpleefEntityListener entityListener;
 	public Configuration conf; // General configuration
 	public Configuration ll; // Language configuration
 
@@ -185,6 +186,10 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("shovel_item", Material.STONE_SPADE.getId()); // 273 as default
 			changed = true;
 		}
+		if (conf.getProperty("dead_players_leavegame") == null) { // define if dead players should leave the game
+			conf.setProperty("dead_players_leavegame", true);
+			changed = true;
+		}
 
 		// config has been changed: save it
 		if (changed) {
@@ -207,7 +212,8 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "announce_team_join: '[PLAYER] joined spleef in team [TEAM].'\n"
 						+ "announce_team_change: '[PLAYER] changed to to team [TEAM].'\n"
 						+ "announce_leave: '[PLAYER] left the game - what a whimp!'\n"
-						+ "announce_player_logout: Player has left the game - whimp!\n"
+						+ "announce_player_logout: [PLAYER] has left the game - whimp!\n"
+						+ "announce_player_death: [PLAYER] has opted to get himself killed instead of playing - whimp!\n"
 						+ "announce_dropped_out: Player [PLAYER] dropped into the water and out of the game.\n"
 						+ "announce_won: Player [PLAYER] has won the spleef game. Congratulations!\n"
 						+ "announce_won_team: 'Team [TEAM] has won the spleef game. Congratulations go to: [PLAYERS].'\n"
@@ -262,6 +268,7 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "announce_team_change: '[PLAYER] wechselt zum Spleef-Team [TEAM].'\n"
 						+ "announce_leave: '[PLAYER] verlässt das Spleef-Spiel. So ein Feigling!'\n"
 						+ "announce_player_logout: '[PLAYER] hat das Spleef-Spiel verlassen - Feigling!'\n"
+						+ "announce_player_death: [PLAYER] ist lieber gestorben als zu spielen - Feigling!\n"
 						+ "announce_dropped_out: '[PLAYER] ist ausgeschieden!'\n"
 						+ "announce_won: '[PLAYER] hat gewonnen. Herzlichen Glückwunsch!'\n"
 						+ "announce_won_team: 'Team [TEAM] hat gewonnen. Herzlichen Glückwunsch an: [PLAYERS].'\n"
@@ -334,6 +341,8 @@ public class SimpleSpleef extends JavaPlugin {
 				Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
 				Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, // deaths are handled by entity
+				Priority.Normal, this);
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[SimpleSpleef] " + pdfFile.getName() + " version "
@@ -380,6 +389,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// ok, now load game
 		game = new SimpleSpleefGame(this, randomWins);
 		playerListener = new SimpleSpleefPlayerListener(this, game);
+		entityListener = new SimpleSpleefEntityListener(this, game);
 		return true;
 	}
 
