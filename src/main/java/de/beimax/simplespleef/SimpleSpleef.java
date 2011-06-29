@@ -1,7 +1,9 @@
 package de.beimax.simplespleef;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -201,7 +203,8 @@ public class SimpleSpleef extends JavaPlugin {
 		if (!enFile.exists()) {
 			log.info("[SimpleSpleef] Creating new English language file.");
 			try {
-				FileWriter fw = new FileWriter(enFile);
+				OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(enFile),"UTF-8");
+				//FileWriter fw = new FileWriter(enFile);
 				fw.write("teamred: red\n"
 						+ "teamblue: blue\n"
 						+ "announce_noteam: '[PLAYER] has announced a new spleef game - you are all invited to\n"
@@ -256,7 +259,8 @@ public class SimpleSpleef extends JavaPlugin {
 		if (!deFile.exists()) {
 			log.info("[SimpleSpleef] Creating new German language file.");
 			try {
-				FileWriter fw = new FileWriter(deFile);
+				//FileWriter fw = new FileWriter(deFile);
+				OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(deFile),"UTF-8");
 				fw.write("teamred: rot\n"
 						+ "teamblue: blau\n"
 						+ "announce_noteam: '[PLAYER] hat ein neues Spleef-Spiel angekündigt - kommt alle zur\n"
