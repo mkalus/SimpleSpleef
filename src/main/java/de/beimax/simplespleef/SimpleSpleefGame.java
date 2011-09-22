@@ -68,6 +68,11 @@ public class SimpleSpleefGame {
 	int prizeItemId = 0;
 	
 	/**
+	 * also loose when touching lava - defined in the constructor by calling <code>plugin.conf.getBoolean("also_loose_in_lava", true);</code>
+	 */
+	boolean alsoLooseInLava;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param instance
@@ -82,6 +87,8 @@ public class SimpleSpleefGame {
 		started = false;
 		countdown = null;
 		SimpleSpleefGame.randomWins = randomWins;
+		// to make this work faster
+		alsoLooseInLava = plugin.conf.getBoolean("also_loose_in_lava", true);
 	}
 
 	/**
@@ -579,9 +586,10 @@ public class SimpleSpleefGame {
 		if (lost != null && lost.contains(player))
 			return;
 
-		// check current spleefer if he/she has touched water...
-		if (event.getTo().getBlock().getType()
-				.compareTo(Material.STATIONARY_WATER) == 0) {
+		// check current spleefer if he/she has touched water... and maybe lava
+		Material touchedBlock = event.getTo().getBlock().getType();
+		if (touchedBlock.compareTo(Material.STATIONARY_WATER) == 0 ||
+				(alsoLooseInLava && touchedBlock.compareTo(Material.STATIONARY_LAVA) == 0)) {
 			// Ha, lost!
 			playerLoses(player);
 		}

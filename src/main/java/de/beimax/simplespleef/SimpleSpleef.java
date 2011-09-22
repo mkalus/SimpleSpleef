@@ -192,6 +192,10 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("dead_players_leavegame", true);
 			changed = true;
 		}
+		if (conf.getProperty("also_loose_in_lava") == null) { // define if lava should be defined as material to drop out
+			conf.setProperty("also_loose_in_lava", true);
+			changed = true;
+		}
 
 		// config has been changed: save it
 		if (changed) {
