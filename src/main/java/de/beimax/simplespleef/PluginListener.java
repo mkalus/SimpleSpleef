@@ -34,7 +34,6 @@ public class PluginListener extends ServerListener {
 		if (SimpleSpleef.getPermissions() == null) {
 			Plugin permissions = SimpleSpleef.getBukkitServer()
 					.getPluginManager().getPlugin("Permissions");
-
 			if (permissions != null) {
 				if (permissions.isEnabled()) {
 					SimpleSpleef.setPermissions(((Permissions) permissions)
@@ -43,10 +42,16 @@ public class PluginListener extends ServerListener {
 					SimpleSpleef.log.info("[SimpleSpleef] Using Permissions.");
 				}
 			} else {
-				SimpleSpleef.log
+				try {
+					Class.forName("org.bukkit.permissions.Permission");
+					SimpleSpleef.log
+						.info("[SimpleSpleef] Permission system not detected, defaulting to Bukkit builtin.");
+				} catch (ClassNotFoundException e) {
+					SimpleSpleef.log
 						.info("[SimpleSpleef] Permission system not detected, defaulting to all.");
+				}
 			}
-		}
+		}//
 
 		// load iConomy
 		if (SimpleSpleef.getiConomy() == null) {

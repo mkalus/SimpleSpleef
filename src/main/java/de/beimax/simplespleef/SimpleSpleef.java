@@ -530,12 +530,23 @@ public class SimpleSpleef extends JavaPlugin {
 	 * @return
 	 */
 	private boolean checkPermission(Player player, String permission) {
-		// no permissions set - everybody may do everything
-		if (SimpleSpleef.Permissions == null)
-			return true;
 		// if op, allow!
 		if (player.isOp())
 			return true;
+		// no permissions set - check builtin permissions of craftbukkit for v1.8+
+		if (SimpleSpleef.Permissions == null) {
+			try { // new permission system is very easy
+				Class.forName("org.bukkit.permissions.Permission");
+				if (player.hasPermission("simplespleef." + permission) || player.hasPermission("simplespleef.*")) return true;
+				// inform player
+				player.sendMessage(ChatColor.RED
+						+ "You do not have the permission to use this command!");
+				return false;				
+			} catch (ClassNotFoundException e) {
+				// no permissions set - everybody may do everything
+				return true;
+			}
+		}
 		// permission checked
 		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission)) {
 			// inform player
