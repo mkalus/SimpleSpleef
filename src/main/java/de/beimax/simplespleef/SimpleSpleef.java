@@ -20,7 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
 
-import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.Server;
 import com.iConomy.iConomy;
 
@@ -41,11 +40,6 @@ public class SimpleSpleef extends JavaPlugin {
 	private static Server Server = null;
 
 	/**
-	 * Permissions
-	 */
-	private static PermissionHandler Permissions;
-
-	/**
 	 * iConomy
 	 */
 	private static iConomy iConomy;
@@ -55,27 +49,6 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public static Server getBukkitServer() {
 		return Server;
-	}
-
-	/**
-	 * @return Permissions instance or null
-	 */
-	public static PermissionHandler getPermissions() {
-		return Permissions;
-	}
-
-	/**
-	 * @param plugin
-	 *            Permissions plugin setter
-	 * @return true if set
-	 */
-	public static boolean setPermissions(PermissionHandler plugin) {
-		if (Permissions == null) {
-			Permissions = plugin;
-		} else {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -530,31 +503,12 @@ public class SimpleSpleef extends JavaPlugin {
 	 * @return
 	 */
 	private boolean checkPermission(Player player, String permission) {
-		// if op, allow!
-		if (player.isOp())
+		// the new permission system is very easy
+		if (player.hasPermission("simplespleef." + permission)
+				|| player.hasPermission("simplespleef.*"))
 			return true;
-		// no permissions set - check builtin permissions of craftbukkit for v1.8+
-		if (SimpleSpleef.Permissions == null) {
-			try { // new permission system is very easy
-				Class.forName("org.bukkit.permissions.Permission");
-				if (player.hasPermission("simplespleef." + permission) || player.hasPermission("simplespleef.*")) return true;
-				// inform player
-				player.sendMessage(ChatColor.RED
-						+ "You do not have the permission to use this command!");
-				return false;				
-			} catch (ClassNotFoundException e) {
-				// no permissions set - everybody may do everything
-				return true;
-			}
-		}
-		// permission checked
-		if (SimpleSpleef.Permissions.has(player, "simplespleef." + permission)) {
-			// inform player
-			player.sendMessage(ChatColor.RED
-					+ "You do not have the permission to use this command!");
-			return true;
-		}
-		// all others may not do this!
+		player.sendMessage(ChatColor.RED
+				+ "You do not have the permission to use this command!");
 		return false;
 	}
 
