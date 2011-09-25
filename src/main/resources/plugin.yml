@@ -1,6 +1,6 @@
 name: SimpleSpleef
 main: de.beimax.simplespleef.SimpleSpleef
-version: 1.0
+version: 1.2
 author: maxkalus
 description: >
              Simple Spleef Plugin
@@ -20,3 +20,44 @@ commands:
       /<command> prize money 1000 The next winner receives 1000 money (admin command).
       /<command> prize 322 The next winner receives a golden apple (item id) (admin command).
       /<command> reload Reload configuration
+
+permissions:
+  simplespleef.*:
+    description: Access to all spleef commands
+    children:
+      simplespleef.list: true
+      simplespleef.play: true
+      simplespleef.team: true
+      simplespleef.leave: true
+      simplespleef.start: true
+      simplespleef.stop: true
+      simplespleef.delete: true
+      simplespleef.reload: true
+      simplespleef.prize: true
+  simplespleef.list:
+    description: List command
+    default: true
+  simplespleef.play:
+    description: Join dog-eats-dog command.
+    default: true
+  simplespleef.team:
+    description: Join team commands.
+    default: true
+  simplespleef.leave:
+    description: Leave command.
+    default: true
+  simplespleef.start:
+    description: Start game.
+    default: true
+  simplespleef.stop:
+    description: Stop game.
+    default: true
+  simplespleef.delete:
+    description: Delete game.
+    default: true
+  simplespleef.reload:
+    description: Reload configuration file.
+    default: op
+  simplespleef.prize:
+    description: Use the prize command to set a prize for the next winner (money or item id).
+    default: op
