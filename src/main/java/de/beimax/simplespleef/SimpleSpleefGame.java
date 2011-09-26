@@ -797,7 +797,7 @@ public class SimpleSpleefGame {
 	private void playersReceiveShovels() {
 		// if no shovels should be given - return
 		if (!plugin.conf.getBoolean("players_get_shovel", true)) return;
-		int shovelItem = plugin.conf.getInt("players_get_shovel", Material.STONE_SPADE.getId()); // STONE_SPADE as default
+		int shovelItem = plugin.conf.getInt("shovel_item", Material.STONE_SPADE.getId()); // STONE_SPADE as default
 		// each player receives a shovel
 		for (Player player : spleefers) {
 			// create an item stack
@@ -824,7 +824,7 @@ public class SimpleSpleefGame {
 	private void playerLoosesShovel(Player player) {
 		// if no shovels should be taken - return
 		if (!plugin.conf.getBoolean("players_loose_shovel", true)) return;
-		int shovelItem = plugin.conf.getInt("players_get_shovel", Material.STONE_SPADE.getId()); // STONE_SPADE as default
+		int shovelItem = plugin.conf.getInt("shovel_item", Material.STONE_SPADE.getId()); // STONE_SPADE as default
 		// take if, if player still has it - yes, there are exploits, but I do not want to handle them ;-)
 		Inventory inventory = player.getInventory();
 		if (inventory.contains(shovelItem)) {
