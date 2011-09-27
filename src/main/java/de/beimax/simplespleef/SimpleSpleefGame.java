@@ -60,18 +60,19 @@ public class SimpleSpleefGame {
 	/**
 	 * prize money
 	 */
-	int prizeMoney = 0;
+	private int prizeMoney = 0;
 
 	/**
 	 * prize item
 	 */
-	int prizeItemId = 0;
-	
+	private int prizeItemId = 0;
+
 	/**
-	 * also loose when touching lava - defined in the constructor by calling <code>plugin.conf.getBoolean("also_loose_in_lava", true);</code>
+	 * also loose when touching lava - defined in the constructor by calling
+	 * <code>plugin.conf.getBoolean("also_loose_in_lava", true);</code>
 	 */
-	boolean alsoLooseInLava;
-	
+	private boolean alsoLooseInLava;
+
 	/**
 	 * Constructor
 	 * 
@@ -284,7 +285,7 @@ public class SimpleSpleefGame {
 							"You have not joined the game anyway."));
 			return;
 		}
-		
+
 		// remove shovel from player
 		playerLoosesShovel(player);
 
@@ -320,8 +321,10 @@ public class SimpleSpleefGame {
 	 * Attempt to start a spleef game
 	 * 
 	 * @param player
+	 * @param startsingle
+	 *            true for starting the game with only one player (for testing)
 	 */
-	public void startGame(Player player) {
+	public void startGame(Player player, boolean startsingle) {
 		// game already started
 		if (started || countdown != null) {
 			player.sendMessage(ChatColor.RED
@@ -339,7 +342,7 @@ public class SimpleSpleefGame {
 		}
 
 		// too few gamers
-		if (spleefers.size() < 2) {
+		if (!startsingle && spleefers.size() < 2) {
 			player.sendMessage(ChatColor.RED
 					+ plugin.ll
 							.getString("err_minplayers",
@@ -425,7 +428,7 @@ public class SimpleSpleefGame {
 		// still in countdown?
 		if (countdown != null)
 			countdown.interrupted = true;
-		
+
 		// remove shovels if needed
 		playersLooseShovels();
 
@@ -507,14 +510,16 @@ public class SimpleSpleefGame {
 	 * possibly remove player on quit or on death
 	 * 
 	 * @param player
-	 * @param died true on a death event
+	 * @param died
+	 *            true on a death event
 	 */
 	public void removePlayerOnQuitorDeath(Player player, boolean died) {
 		// check, if player is in spleef list - if not, return
 		if (spleefers == null || !spleefers.contains(player))
 			return;
-		
-		// death of player and not have config set to kick out players after death?
+
+		// death of player and not have config set to kick out players after
+		// death?
 		if (died && !plugin.conf.getBoolean("dead_players_leavegame", true))
 			return;
 
@@ -546,17 +551,21 @@ public class SimpleSpleefGame {
 
 		// inform world
 		if (died) {
-			plugin.getServer().broadcastMessage(
-					ChatColor.DARK_PURPLE
-							+ plugin.ll.getString("announce_player_death",
-									"[PLAYER] has opted to get himself killed instead of playing - whimp!")
-									.replaceAll("\\[PLAYER\\]", player.getName()));
+			plugin.getServer()
+					.broadcastMessage(
+							ChatColor.DARK_PURPLE
+									+ plugin.ll
+											.getString("announce_player_death",
+													"[PLAYER] has opted to get himself killed instead of playing - whimp!")
+											.replaceAll("\\[PLAYER\\]",
+													player.getName()));
 		} else {
 			plugin.getServer().broadcastMessage(
 					ChatColor.DARK_PURPLE
 							+ plugin.ll.getString("announce_player_logout",
 									"[PLAYER] has left the game - whimp!")
-									.replaceAll("\\[PLAYER\\]", player.getName()));
+									.replaceAll("\\[PLAYER\\]",
+											player.getName()));
 		}
 
 		// are there players left?
@@ -588,8 +597,9 @@ public class SimpleSpleefGame {
 
 		// check current spleefer if he/she has touched water... and maybe lava
 		Material touchedBlock = event.getTo().getBlock().getType();
-		if (touchedBlock.compareTo(Material.STATIONARY_WATER) == 0 ||
-				(alsoLooseInLava && touchedBlock.compareTo(Material.STATIONARY_LAVA) == 0)) {
+		if (touchedBlock.compareTo(Material.STATIONARY_WATER) == 0
+				|| (alsoLooseInLava && touchedBlock
+						.compareTo(Material.STATIONARY_LAVA) == 0)) {
 			// Ha, lost!
 			playerLoses(player);
 		}
@@ -617,7 +627,7 @@ public class SimpleSpleefGame {
 
 		// add to list
 		lost.add(player);
-		
+
 		// take away shovel from player if needed
 		playerLoosesShovel(player);
 
@@ -655,8 +665,8 @@ public class SimpleSpleefGame {
 				prizeMoney = 0; // reset prize money
 			} else {
 				double fixed = plugin.conf.getDouble("prizemoney_fixed", 0.0);
-				double perplayer = plugin.conf.getDouble("prizemoney_perplayer",
-						5.0);
+				double perplayer = plugin.conf.getDouble(
+						"prizemoney_perplayer", 5.0);
 				win = fixed + perplayer * numberOfPlayers;
 			}
 		} else
@@ -732,6 +742,11 @@ public class SimpleSpleefGame {
 		// remove shovels if needed
 		playersLooseShovels();
 
+		if (spleefers.size() == lost.size())
+			plugin.getServer()
+					.broadcastMessage(
+							"No players left in game - seems to be a single player game or a bug.");
+
 		// stop and reset game
 		started = false;
 		teams = null;
@@ -790,14 +805,16 @@ public class SimpleSpleefGame {
 											player.getName()));
 		}
 	}
-	
+
 	/**
 	 * if the setting has been activated, give all players a shovel
 	 */
 	private void playersReceiveShovels() {
 		// if no shovels should be given - return
-		if (!plugin.conf.getBoolean("players_get_shovel", true)) return;
-		int shovelItem = plugin.conf.getInt("shovel_item", Material.STONE_SPADE.getId()); // STONE_SPADE as default
+		if (!plugin.conf.getBoolean("players_get_shovel", true))
+			return;
+		int shovelItem = plugin.conf.getInt("shovel_item",
+				Material.STONE_SPADE.getId()); // STONE_SPADE as default
 		// each player receives a shovel
 		for (Player player : spleefers) {
 			// create an item stack
@@ -807,14 +824,15 @@ public class SimpleSpleefGame {
 			player.getInventory().addItem(itemStack);
 		}
 	}
-	
+
 	/**
 	 * called at stop of game - all remaining players might loose their shovels
 	 */
 	private void playersLooseShovels() {
 		for (Player player : spleefers) {
 			// only loose shovel, if have not lost already
-			if (lost == null || !lost.contains(player)) playerLoosesShovel(player);
+			if (lost == null || !lost.contains(player))
+				playerLoosesShovel(player);
 		}
 	}
 
@@ -823,15 +841,19 @@ public class SimpleSpleefGame {
 	 */
 	private void playerLoosesShovel(Player player) {
 		// if no shovels should be taken - return
-		if (!plugin.conf.getBoolean("players_loose_shovel", true)) return;
-		int shovelItem = plugin.conf.getInt("shovel_item", Material.STONE_SPADE.getId()); // STONE_SPADE as default
-		// take if, if player still has it - yes, there are exploits, but I do not want to handle them ;-)
+		if (!plugin.conf.getBoolean("players_loose_shovel", true))
+			return;
+		int shovelItem = plugin.conf.getInt("shovel_item",
+				Material.STONE_SPADE.getId()); // STONE_SPADE as default
+		// take if, if player still has it - yes, there are exploits, but I do
+		// not want to handle them ;-)
 		Inventory inventory = player.getInventory();
 		if (inventory.contains(shovelItem)) {
 			int index = inventory.first(shovelItem);
 			// get the first stack
 			ItemStack stack = inventory.getItem(index);
-			if (stack.getAmount() > 1) { // shovels should only come in packs of one, but who knows?
+			if (stack.getAmount() > 1) { // shovels should only come in packs of
+											// one, but who knows?
 				stack.setAmount(stack.getAmount() - 1); // reduce amount by one
 				inventory.setItem(index, stack);
 			} else {
@@ -839,36 +861,39 @@ public class SimpleSpleefGame {
 			}
 		}
 	}
-	
+
 	/**
 	 * sets the price money
+	 * 
 	 * @param player
 	 * @param amount
 	 */
 	public void setMoneyPrize(Player player, int amount) {
 		// sanity check
 		if (amount < 0) {
-			player.sendMessage(ChatColor.RED + "ERROR: Prize money must be positive or 0!");
+			player.sendMessage(ChatColor.RED
+					+ "ERROR: Prize money must be positive or 0!");
 			return;
 		}
 
 		// reset prizeItemId on setting money
 		prizeItemId = 0;
-		
+
 		// set or reset prize?
 		if (amount == 0) {
 			player.sendMessage(plugin.ll.getString("prize_item_money_deleted",
 					"Prize has been deleted."));
 		} else {
 			player.sendMessage(plugin.ll.getString("prize_money_set",
-			"Prize has been set to [MONEY].").replaceAll("\\[MONEY\\]",
-					String.valueOf(amount)));			
+					"Prize has been set to [MONEY].").replaceAll("\\[MONEY\\]",
+					String.valueOf(amount)));
 		}
 		prizeMoney = amount;
 	}
-	
+
 	/**
 	 * sets the prize item
+	 * 
 	 * @param player
 	 * @param itemId
 	 */
@@ -878,26 +903,27 @@ public class SimpleSpleefGame {
 			player.sendMessage(ChatColor.RED + "ERROR: No such item id!");
 			return;
 		}
-		
+
 		// reset prizeMoney on setting item
 		prizeMoney = 0;
-		
+
 		// set or reset prize?
 		if (itemId == 0) {
 			player.sendMessage(plugin.ll.getString("prize_item_money_deleted",
 					"Prize has been deleted."));
 		} else {
 			player.sendMessage(plugin.ll.getString("prize_item_set",
-			"Prize has been set to [ITEM].").replaceAll("\\[ITEM\\]",
-					Material.getMaterial(itemId).name()));			
+					"Prize has been set to [ITEM].").replaceAll("\\[ITEM\\]",
+					Material.getMaterial(itemId).name()));
 		}
 		prizeItemId = itemId;
 	}
 
 	/**
 	 * Countdown class
+	 * 
 	 * @author mkalus
-	 *
+	 * 
 	 */
 	private class Countdown extends Thread {
 		// flag to toggle interrupts

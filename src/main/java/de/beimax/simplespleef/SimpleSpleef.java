@@ -429,7 +429,11 @@ public class SimpleSpleef extends JavaPlugin {
 				} else if (command.equalsIgnoreCase("start")) {
 					if (!checkPermission(player, "start"))
 						return true; // check permission
-					game.startGame(player); // start a game
+					game.startGame(player, false); // start a game
+				} else if (command.equalsIgnoreCase("startsingle")) {
+					if (!checkPermission(player, "startsingle"))
+						return true; // check permission
+					game.startGame(player, true); // start a game
 				} else if (command.equalsIgnoreCase("stop")) {
 					if (!checkPermission(player, "stop"))
 						return true; // check permission
