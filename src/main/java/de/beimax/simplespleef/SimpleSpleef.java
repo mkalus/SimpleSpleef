@@ -33,6 +33,7 @@ public class SimpleSpleef extends JavaPlugin {
 	private SimpleSpleefGame game;
 	private SimpleSpleefPlayerListener playerListener;
 	private SimpleSpleefEntityListener entityListener;
+	private SimpleSpleefBlockListener blockListener;
 	public Configuration conf; // General configuration
 	public Configuration ll; // Language configuration
 
@@ -167,6 +168,10 @@ public class SimpleSpleef extends JavaPlugin {
 		}
 		if (conf.getProperty("also_loose_in_lava") == null) { // define if lava should be defined as material to drop out
 			conf.setProperty("also_loose_in_lava", true);
+			changed = true;
+		}
+		if (conf.getProperty("restore_blocks_after_game") == null) { // define if game should keep track of changed blocks and restore them after the game
+			conf.setProperty("restore_blocks_after_game", false);
 			changed = true;
 		}
 
@@ -324,7 +329,15 @@ public class SimpleSpleef extends JavaPlugin {
 				Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, // deaths are handled by entity
 				Priority.Normal, this);
+		
+		// Register block breaks, if accounting is set on
+		if (conf.getBoolean("restore_blocks_after_game", false)) {
+			pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
+					Priority.Normal, this);
+			System.out.println("[SimpleSpleef] restore_blocks_after_game is enabled - listening to block breaks when game is on.");
+		}
 
+		
 		PluginDescriptionFile pdfFile = this.getDescription();
 		System.out.println("[SimpleSpleef] " + pdfFile.getName() + " version "
 				+ pdfFile.getVersion() + " is enabled!");
@@ -371,6 +384,7 @@ public class SimpleSpleef extends JavaPlugin {
 		game = new SimpleSpleefGame(this, randomWins);
 		playerListener = new SimpleSpleefPlayerListener(this, game);
 		entityListener = new SimpleSpleefEntityListener(this, game);
+		blockListener = new SimpleSpleefBlockListener(this, game);
 		return true;
 	}
 

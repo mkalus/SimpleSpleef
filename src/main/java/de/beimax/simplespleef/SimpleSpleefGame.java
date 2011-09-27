@@ -5,11 +5,15 @@ package de.beimax.simplespleef;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,37 +25,56 @@ import com.iConomy.system.*;
  * 
  */
 public class SimpleSpleefGame {
-	// random number generator
+	/**
+	 * random number generator
+	 */
 	private static Random generator = new Random();
 
-	// random gifts
+	/**
+	 * random gifts
+	 */
 	private static Material[] randomWins;
 
 	// TODO: Does it make sense to make randomWins static?
 
-	// return next random element from Material Array
+	/**
+	 * return next random element from Material Array
+	 */
 	public static Material get(Material[] array) {
 		int rnd = generator.nextInt(array.length);
 		return array[rnd];
 	}
 
+	/**
+	 * reference to plugin
+	 */
 	private final SimpleSpleef plugin;
 
-	// list of spleefers currently spleefing
+	/**
+	 *  list of spleefers currently spleefing
+	 */
 	private HashSet<Player> spleefers;
 
-	// team list, only taken if needed
+	/**
+	 * team list, only taken if needed
+	 */
 	private HashMap<Integer, HashSet<Player>> teams;
 
-	// list of players lost
+	/**
+	 * list of players lost
+	 */
 	private HashSet<Player> lost;
 
-	// game has started?
+	/**
+	 * game has started?
+	 */
 	private boolean started;
 
-	// private countdown class
+	/**
+	 * private countdown class
+	 */
 	private Countdown countdown;
-
+	
 	/**
 	 * accumulated players at start of game - to count fees at the end
 	 */
@@ -72,6 +95,16 @@ public class SimpleSpleefGame {
 	 * <code>plugin.conf.getBoolean("also_loose_in_lava", true);</code>
 	 */
 	private boolean alsoLooseInLava;
+	
+	/**
+	 * remember blocks broken - defined in the constructor by calling
+	 * <code>plugin.conf.getBoolean("restore_blocks_after_game", true);</code>
+	 */
+	private boolean restoreBlocksAfterGame;
+	/**
+	 * remembers blocks broken
+	 */
+	private HashMap<Block, Material> brokenBlocks;
 
 	/**
 	 * Constructor
@@ -90,7 +123,11 @@ public class SimpleSpleefGame {
 		SimpleSpleefGame.randomWins = randomWins;
 		// to make this work faster
 		alsoLooseInLava = plugin.conf.getBoolean("also_loose_in_lava", true);
-	}
+		restoreBlocksAfterGame = plugin.conf.getBoolean("restore_blocks_after_game", false);
+		// remember blocks broken, if config says so - create hashset to remember
+		if (restoreBlocksAfterGame) brokenBlocks = new HashMap<Block, Material>();
+		else brokenBlocks = null;
+}
 
 	/**
 	 * return team name
@@ -431,6 +468,9 @@ public class SimpleSpleefGame {
 
 		// remove shovels if needed
 		playersLooseShovels();
+		
+		// restore blocks if needed
+		restoreBlocks();
 
 		// message and stop game
 		started = false;
@@ -742,6 +782,9 @@ public class SimpleSpleefGame {
 		// remove shovels if needed
 		playersLooseShovels();
 
+		// restore blocks if needed
+		restoreBlocks();
+
 		if (spleefers.size() == lost.size())
 			plugin.getServer()
 					.broadcastMessage(
@@ -917,6 +960,36 @@ public class SimpleSpleefGame {
 					Material.getMaterial(itemId).name()));
 		}
 		prizeItemId = itemId;
+	}
+	
+	/**
+	 * Check block breaks to restore them after the game
+	 * @param event
+	 */
+	public void checkBlockBreak(BlockBreakEvent event) {
+		// no checks, if no game has started or no block breaking should be remembered
+		if (!started || !restoreBlocksAfterGame)
+			return;
+		// check, if player is in spleef list - if not, return
+		Player player = event.getPlayer();
+		if (!spleefers.contains(player))
+			return;
+		// already on looser list?
+		if (lost != null && lost.contains(player))
+			return;
+		
+		// remember block
+		brokenBlocks.put(event.getBlock(), event.getBlock().getType());
+	}
+	
+	/**
+	 * Restore blocks after the game
+	 */
+	protected void restoreBlocks() {
+		if (!restoreBlocksAfterGame) return;
+		for (Entry<Block, Material> entry : brokenBlocks.entrySet()) {
+			entry.getKey().setType(entry.getValue());
+		}
 	}
 
 	/**
