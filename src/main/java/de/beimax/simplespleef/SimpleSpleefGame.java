@@ -53,6 +53,11 @@ public class SimpleSpleefGame {
 	 *  list of spleefers currently spleefing
 	 */
 	private HashSet<Player> spleefers;
+	
+	/**
+	 * reference to first player (for teleport)
+	 */
+	private Player firstPlayer;
 
 	/**
 	 * team list, only taken if needed
@@ -158,6 +163,9 @@ public class SimpleSpleefGame {
 
 		// create list of spleefers, if needed
 		if (spleefers == null) {
+			// set first player
+			firstPlayer = player;
+			// create set
 			spleefers = new HashSet<Player>();
 			// tell everyone
 			if (team == null)
@@ -350,7 +358,9 @@ public class SimpleSpleefGame {
 			spleefers = null;
 			teams = null;
 			lost = null;
-		}
+		} else
+			// replace First player if needed
+			checkAndReplaceFirstPlayer(player);
 	}
 
 	/**
@@ -476,6 +486,7 @@ public class SimpleSpleefGame {
 		spleefers = null;
 		teams = null;
 		lost = null;
+		firstPlayer = null;
 		plugin.getServer().broadcastMessage(
 				ChatColor.DARK_PURPLE
 						+ plugin.ll.getString("announce_gamedeleted",
@@ -562,7 +573,7 @@ public class SimpleSpleefGame {
 		if (died && !plugin.conf.getBoolean("dead_players_leavegame", true))
 			return;
 
-		// this spleefers automatically looses
+		// this spleefer automatically looses
 		if (started) {
 			playerLoses(player);
 			return;
@@ -614,7 +625,8 @@ public class SimpleSpleefGame {
 			teams = null;
 			lost = null;
 			return;
-		}
+		} else // replace First player if needed
+			checkAndReplaceFirstPlayer(player);
 	}
 
 	/**
@@ -996,6 +1008,43 @@ public class SimpleSpleefGame {
 			block.setType(rBlock.material);
 			block.setData(rBlock.data);
 		}
+		brokenBlocks = new HashMap<Block, SimpleSpleefGame.RememberedBlock>(); // create new
+	}
+	
+	/**
+	 * teleport players to first one if set so in configuration
+	 */
+	protected void teleportPlayersToFirst() {
+		// check configuration
+		if (!plugin.conf.getBoolean("teleport_players_to_first", false)) return;
+		// sanity check
+		if (firstPlayer == null || spleefers == null) return;
+		
+		// cycle through players and teleport to first player
+		for (Player cPlayer : spleefers) {
+			if (firstPlayer != cPlayer) {
+				cPlayer.teleport(firstPlayer);
+			}
+		}
+	}
+	
+	/**
+	 * check if player is first player and change first player if needed
+	 * @param player to be checked
+	 */
+	protected void checkAndReplaceFirstPlayer(Player player) {
+		if (player != firstPlayer || spleefers == null) return;
+		
+		for (Player cPlayer : spleefers) {
+			if (!(lost == null || lost.contains(cPlayer))) {
+				if (cPlayer != firstPlayer) {
+					firstPlayer = cPlayer;
+					return;
+				}
+			}
+		}
+		
+		firstPlayer = null; // set first player to null, if none was found
 	}
 
 	/**
@@ -1030,6 +1079,8 @@ public class SimpleSpleefGame {
 									+ plugin.ll
 											.getString("countdown_start",
 													"Starting spleef game. There can only be one!"));
+			
+			teleportPlayersToFirst();
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;

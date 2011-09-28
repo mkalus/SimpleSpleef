@@ -174,6 +174,10 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("restore_blocks_after_game", false);
 			changed = true;
 		}
+		if (conf.getProperty("teleport_players_to_first") == null) { // should the game teleport all players to the first after starting game
+			conf.setProperty("teleport_players_to_first", false);
+			changed = true;
+		}
 
 		// config has been changed: save it
 		if (changed) {
@@ -185,7 +189,7 @@ public class SimpleSpleef extends JavaPlugin {
 		if (!enFile.exists()) {
 			log.info("[SimpleSpleef] Creating new English language file.");
 			try {
-				OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(enFile),"UTF-8");
+				OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(enFile), "UTF-8");
 				//FileWriter fw = new FileWriter(enFile);
 				fw.write("teamred: red\n"
 						+ "teamblue: blue\n"
@@ -242,7 +246,7 @@ public class SimpleSpleef extends JavaPlugin {
 			log.info("[SimpleSpleef] Creating new German language file.");
 			try {
 				//FileWriter fw = new FileWriter(deFile);
-				OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(deFile),"UTF-8");
+				OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(deFile), "UTF-8");
 				fw.write("teamred: rot\n"
 						+ "teamblue: blau\n"
 						+ "announce_noteam: '[PLAYER] hat ein neues Spleef-Spiel angekündigt - kommt alle zur\n"
