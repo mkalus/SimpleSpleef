@@ -5,7 +5,6 @@ package de.beimax.simplespleef;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -104,7 +103,7 @@ public class SimpleSpleefGame {
 	/**
 	 * remembers blocks broken
 	 */
-	private HashMap<Block, Material> brokenBlocks;
+	private HashMap<Block, RememberedBlock> brokenBlocks;
 
 	/**
 	 * Constructor
@@ -125,7 +124,7 @@ public class SimpleSpleefGame {
 		alsoLooseInLava = plugin.conf.getBoolean("also_loose_in_lava", true);
 		restoreBlocksAfterGame = plugin.conf.getBoolean("restore_blocks_after_game", false);
 		// remember blocks broken, if config says so - create hashset to remember
-		if (restoreBlocksAfterGame) brokenBlocks = new HashMap<Block, Material>();
+		if (restoreBlocksAfterGame) brokenBlocks = new HashMap<Block, RememberedBlock>();
 		else brokenBlocks = null;
 }
 
@@ -979,7 +978,11 @@ public class SimpleSpleefGame {
 			return;
 		
 		// remember block
-		brokenBlocks.put(event.getBlock(), event.getBlock().getType());
+		Block block = event.getBlock();
+		RememberedBlock rBlock = new RememberedBlock();
+		rBlock.material = block.getType();
+		rBlock.data = block.getData();
+		brokenBlocks.put(block, rBlock);
 	}
 	
 	/**
@@ -987,8 +990,11 @@ public class SimpleSpleefGame {
 	 */
 	protected void restoreBlocks() {
 		if (!restoreBlocksAfterGame) return;
-		for (Entry<Block, Material> entry : brokenBlocks.entrySet()) {
-			entry.getKey().setType(entry.getValue());
+		for (Entry<Block, RememberedBlock> entry : brokenBlocks.entrySet()) {
+			Block block = entry.getKey();
+			RememberedBlock rBlock = entry.getValue();
+			block.setType(rBlock.material);
+			block.setData(rBlock.data);
 		}
 	}
 
@@ -1068,5 +1074,14 @@ public class SimpleSpleefGame {
 			}
 			startGameAndDeleteCountdown();
 		}
+	}
+	
+	/**
+	 * Remembered Block structure used by the block restore mechanism
+	 * @author mkalus
+	 */
+	private class RememberedBlock {
+		Material material;
+		byte data;
 	}
 }
