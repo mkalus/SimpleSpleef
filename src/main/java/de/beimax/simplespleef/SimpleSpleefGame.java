@@ -575,7 +575,7 @@ public class SimpleSpleefGame {
 
 		// this spleefer automatically looses
 		if (started) {
-			playerLoses(player);
+			playerLoses(player, null);
 			return;
 		}
 		// interrupt countdown
@@ -652,7 +652,7 @@ public class SimpleSpleefGame {
 				|| (alsoLooseInLava && touchedBlock
 						.compareTo(Material.STATIONARY_LAVA) == 0)) {
 			// Ha, lost!
-			playerLoses(player);
+			playerLoses(player, touchedBlock);
 		}
 	}
 
@@ -661,20 +661,27 @@ public class SimpleSpleefGame {
 	 * 
 	 * @param player
 	 */
-	protected void playerLoses(Player player) {
+	protected void playerLoses(Player player, Material material) {
 		// does the looser list exist already?
 		if (lost == null)
 			lost = new HashSet<Player>();
 
-		// send message
-		plugin.getServer()
-				.broadcastMessage(
-						ChatColor.AQUA
-								+ plugin.ll
-										.getString("announce_dropped_out",
-												"Player [PLAYER] dropped into the water and out of the game.")
-										.replaceAll("\\[PLAYER\\]",
-												player.getName()));
+		// get lava or water?
+		if (material != null) { // only message if the player actually lost
+			String fellInto;
+			if (material.compareTo(Material.STATIONARY_LAVA) == 0)
+				fellInto = plugin.ll.getString("LAVA", "lava");
+			else fellInto = plugin.ll.getString("WATER", "water");
+			// send message
+			plugin.getServer()
+					.broadcastMessage(
+							ChatColor.AQUA
+									+ plugin.ll
+											.getString("announce_dropped_out",
+													"Player [PLAYER] dropped into the [WATER] and out of the game.")
+											.replaceAll("\\[PLAYER\\]",
+													player.getName()).replaceAll("\\[WATER\\]", fellInto));
+		}
 
 		// add to list
 		lost.add(player);
