@@ -743,7 +743,7 @@ public class SimpleSpleefGame {
 													.replaceAll("\\[PLAYER\\]",
 															player.getName()));
 					// give gift
-					giveRandomGift(player);
+					if (plugin.conf.getBoolean("giveprizes", true)) giveRandomGift(player);
 					// player wins all the money
 					if (win > 0) {
 						plugin.getServer()
@@ -780,7 +780,7 @@ public class SimpleSpleefGame {
 			win = win / teams.get(team).size();
 
 			// give gifts, if activated in config
-			if (plugin.conf.getBoolean("prizes", true))
+			if (plugin.conf.getBoolean("giveprizes", true) && plugin.conf.getBoolean("prizes", true))
 				for (Player player : teams.get(team)) {
 					giveRandomGift(player);
 					// give money
