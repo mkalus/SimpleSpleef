@@ -29,6 +29,8 @@ public class PluginListener extends ServerListener {
 	 */
 	@Override
 	public void onPluginEnable(PluginEnableEvent event) {
+		//TODO: add allpay...
+		
 		// load iConomy
 		if (SimpleSpleef.getiConomy() == null) {
 			Plugin iConomy = SimpleSpleef.getBukkitServer().getPluginManager()

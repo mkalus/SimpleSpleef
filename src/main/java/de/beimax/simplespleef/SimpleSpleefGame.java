@@ -1005,17 +1005,13 @@ public class SimpleSpleefGame {
 	}
 	
 	/**
-	 * Restore blocks after the game
+	 * Restore blocks after the game - starts waiter thread only
 	 */
 	protected void restoreBlocks() {
 		if (!restoreBlocksAfterGame) return;
-		for (Entry<Block, RememberedBlock> entry : brokenBlocks.entrySet()) {
-			Block block = entry.getKey();
-			RememberedBlock rBlock = entry.getValue();
-			block.setType(rBlock.material);
-			block.setData(rBlock.data);
-		}
-		brokenBlocks = new HashMap<Block, SimpleSpleefGame.RememberedBlock>(); // create new
+		// start a new game by starting countdown
+		BlockRestoreWaiter blockRestorer = new BlockRestoreWaiter();
+		blockRestorer.start();
 	}
 	
 	/**
@@ -1077,7 +1073,7 @@ public class SimpleSpleefGame {
 		}
 
 		/**
-		 * Thread class
+		 * Thread method
 		 */
 		public void run() {
 			plugin.getServer()
@@ -1141,5 +1137,30 @@ public class SimpleSpleefGame {
 	private class RememberedBlock {
 		Material material;
 		byte data;
+	}
+
+	/**
+	 * Class that waits 2 secs before blocks are restored
+	 * 
+	 * @author mkalus
+	 */
+	private class BlockRestoreWaiter extends Thread {
+		/**
+		 * Thread method
+		 */
+		public void run() {
+			try {
+				sleep(2000);
+			} catch (InterruptedException e) {
+			}
+
+			for (Entry<Block, RememberedBlock> entry : brokenBlocks.entrySet()) {
+				Block block = entry.getKey();
+				RememberedBlock rBlock = entry.getValue();
+				block.setType(rBlock.material);
+				block.setData(rBlock.data);
+			}
+			brokenBlocks = new HashMap<Block, SimpleSpleefGame.RememberedBlock>(); // create new
+		}
 	}
 }
