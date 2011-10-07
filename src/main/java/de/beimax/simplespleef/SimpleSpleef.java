@@ -21,7 +21,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
 
 import org.bukkit.Server;
-import com.iConomy.iConomy;
+
+import com.fernferret.allpay.AllPay;
 
 /**
  * SimpleSpleef for Bukkit
@@ -41,11 +42,6 @@ public class SimpleSpleef extends JavaPlugin {
 	private static Server Server = null;
 
 	/**
-	 * iConomy
-	 */
-	private static iConomy iConomy;
-
-	/**
 	 * @return BukkitServer
 	 */
 	public static Server getBukkitServer() {
@@ -53,33 +49,16 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * @return iConomy instance or null
+	 * AllPay singleton
 	 */
-	public static iConomy getiConomy() {
-		return iConomy;
-	}
+	private static AllPay allPay = null;
 
 	/**
-	 * @return true if iConomy exists
+	 * @return allPay instance (singleton)
 	 */
-	public static boolean checkiConomy() {
-		if (iConomy != null)
-			return true;
-		return false;
-	}
-
-	/**
-	 * @param plugin
-	 *            iConomy plugin setter
-	 * @return true if set
-	 */
-	public static boolean setiConomy(iConomy plugin) {
-		if (iConomy == null) {
-			iConomy = plugin;
-		} else {
-			return false;
-		}
-		return true;
+	public AllPay getAllPay() {
+		if (SimpleSpleef.allPay == null) SimpleSpleef.allPay = new AllPay(this, "SimpleSpleef: ");
+		return SimpleSpleef.allPay;
 	}
 
 	/**
@@ -140,6 +119,10 @@ public class SimpleSpleef extends JavaPlugin {
 		}
 		if (conf.getProperty("entryfee") == null) { // define entry fee
 			conf.setProperty("entryfee", 5);
+			changed = true;
+		}
+		if (conf.getProperty("entryitem") == null) { // define entry item (or -1 for money)
+			conf.setProperty("entryitem", -1);
 			changed = true;
 		}
 		if (conf.getProperty("prizemoney_fixed") == null) { // define fixed prize money
