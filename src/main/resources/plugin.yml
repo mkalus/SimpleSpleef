@@ -29,6 +29,8 @@ permissions:
       simplespleef.list: true
       simplespleef.play: true
       simplespleef.team: true
+      simplespleef.initialize: true
+      simplespleef.initializeteam: true
       simplespleef.leave: true
       simplespleef.start: true
       simplespleef.stop: true
@@ -44,6 +46,12 @@ permissions:
     default: true
   simplespleef.team:
     description: Join team commands.
+    default: true
+  simplespleef.initialize:
+    description: Join dog-eats-dog command (initialize game).
+    default: true
+  simplespleef.initializeteam:
+    description: Join team commands (initialize game).
     default: true
   simplespleef.leave:
     description: Leave command.

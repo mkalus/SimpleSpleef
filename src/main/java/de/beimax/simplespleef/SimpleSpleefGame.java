@@ -131,7 +131,16 @@ public class SimpleSpleefGame {
 		// remember blocks broken, if config says so - create hashset to remember
 		if (restoreBlocksAfterGame) brokenBlocks = new HashMap<Block, RememberedBlock>();
 		else brokenBlocks = null;
-}
+	}
+	
+	/**
+	 * returns true, if there are no spleefers present in the game
+	 * @return
+	 */
+	public boolean isEmpty() {
+		if (spleefers == null || spleefers.size() == 0) return true;
+		return false;
+	}
 
 	/**
 	 * return team name

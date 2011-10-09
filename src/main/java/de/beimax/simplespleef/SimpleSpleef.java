@@ -411,14 +411,23 @@ public class SimpleSpleef extends JavaPlugin {
 	
 				// check actual commands
 				if (command.equalsIgnoreCase("join")) {
+					// has first player permission on empty game?
+					if (game.isEmpty() && !checkPermission(player, "initialize"))
+						return true;
 					if (!checkPermission(player, "play"))
 						return true; // check permission
 					game.addPlayer(player, null); // join no-team spleef
 				} else if (command.equalsIgnoreCase("1")) {
+					// has first player permission on empty game?
+					if (game.isEmpty() && !checkPermission(player, "initializeteam"))
+						return true;
 					if (!checkPermission(player, "team"))
 						return true; // check permission
 					game.addPlayer(player, 1); // add player to team 1
 				} else if (command.equalsIgnoreCase("2")) {
+					// has first player permission on empty game?
+					if (game.isEmpty() && !checkPermission(player, "initializeteam"))
+						return true;
 					if (!checkPermission(player, "team"))
 						return true; // check permission
 					game.addPlayer(player, 2); // add player to team 2
