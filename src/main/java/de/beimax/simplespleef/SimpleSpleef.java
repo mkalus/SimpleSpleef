@@ -161,6 +161,10 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("teleport_players_to_first", false);
 			changed = true;
 		}
+		if (conf.getProperty("countdown_from") == null) { // countdown starts at
+			conf.setProperty("countdown_from", 10);
+			changed = true;
+		}		
 
 		// config has been changed: save it
 		if (changed) {

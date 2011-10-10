@@ -1073,7 +1073,7 @@ public class SimpleSpleefGame {
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;
-			int count = 10;
+			int count = plugin.conf.getInt("countdown_from", 10);
 			boolean started = false; // start flag
 
 			do {
