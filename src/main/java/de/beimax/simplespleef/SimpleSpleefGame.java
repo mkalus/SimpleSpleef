@@ -200,7 +200,7 @@ public class SimpleSpleefGame {
 	 * @return
 	 */
 	public boolean isEmpty() {
-		if (spleefers == null || spleefers.size() == 0) return true;
+		if (spleefers == null) return true;
 		return false;
 	}
 
@@ -212,6 +212,31 @@ public class SimpleSpleefGame {
 	public String getTeamName(int team) {
 		String teamname = team == 1 ? "blue" : "red";
 		return plugin.ll.getString("team" + teamname, teamname);
+	}
+	
+	/**
+	 * Announce a new game without actually joining
+	 */
+	public void announceNewGame(Player player) {
+		// game started, countdown, game already declared?
+		if (started || countdown != null || spleefers != null) {
+			player.sendMessage(ChatColor.RED
+					+ plugin.ll
+							.getString("err_gameinprogress",
+									"A game is already in progress! Please wait until it is finished."));
+			return;
+		}
+		
+		// create a new game
+		spleefers = new HashSet<Player>();
+		plugin.getServer()
+				.broadcastMessage(
+						ChatColor.GOLD
+								+ plugin.ll
+										.getString("announce_noteam",
+												"[PLAYER] has announced a new spleef game - you are all invited to join!")
+										.replaceAll("\\[PLAYER\\]",
+												player.getName()));
 	}
 
 	/**
@@ -337,11 +362,17 @@ public class SimpleSpleefGame {
 											"Insufficient funds - you need at least [MONEY].")
 									.replaceAll("\\[MONEY\\]",
 											bank.getFormattedAmount(player, fee, feeitem)));
+					// team empty after this?
+					if (spleefers.size() == 0)
+						spleefers = null; // to prevent exploit that people with insufficient funds actually create empty games
 					return;
 				}
 			}
 
 			spleefers.add(player);
+			// add first player if empty
+			if (firstPlayer == null)
+				firstPlayer = player;
 			// also add to team?
 			if (team != null) {
 				if (teams == null) { // if empty create new hash map set

@@ -434,6 +434,11 @@ public class SimpleSpleef extends JavaPlugin {
 					if (!checkPermission(player, "play"))
 						return true; // check permission
 					game.addPlayer(player, null); // join no-team spleef
+				} else if (command.equalsIgnoreCase("announce")) {
+					// announce game without actually joining
+					if (!checkPermission(player, "announce"))
+						return true; // check permission
+					game.announceNewGame(player);
 				} else if (command.equalsIgnoreCase("1")) {
 					// has first player permission on empty game?
 					if (game.isEmpty() && !checkPermission(player, "initializeteam"))

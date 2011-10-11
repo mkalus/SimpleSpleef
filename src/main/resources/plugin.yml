@@ -44,6 +44,9 @@ permissions:
   simplespleef.play:
     description: Join dog-eats-dog command.
     default: true
+  simplespleef.announce:
+    description: Announce a new dog-eats-dog game people can join.
+    default: op
   simplespleef.team:
     description: Join team commands.
     default: true
