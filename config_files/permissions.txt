@@ -10,3 +10,4 @@ simplespleef.delete Delete game.
 simplespleef.reload Reload configuration file.
 simplespleef.prize Use the prize command to set a prize for the next winner (money or item id).
 simplespleef.startsingle Start the game as a single player.
+simplespleef.admin Administration commands

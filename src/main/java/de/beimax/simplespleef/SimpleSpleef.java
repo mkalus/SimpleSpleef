@@ -6,9 +6,11 @@ import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,6 +21,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
+import org.bukkit.util.config.ConfigurationNode;
 
 import org.bukkit.Server;
 
@@ -490,6 +493,53 @@ public class SimpleSpleef extends JavaPlugin {
 							return false;
 						}
 					}
+				} else if (command.equalsIgnoreCase("admin")) {
+					if (!checkPermission(player, "admin"))
+						return true; // check permission
+					// get second argument
+					String second = args[1];
+					if (second.equalsIgnoreCase("setspawn")) {
+						try {
+							conf.setProperty("spawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spleef spawn could not be saved!");
+					} else if (second.equalsIgnoreCase("setbluespawn")) {
+						try {
+							conf.setProperty("bluespawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef blue spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef blue spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spleef blue spawn could not be saved!");						
+					} else if (second.equalsIgnoreCase("setredspawn")) {
+						try {
+							conf.setProperty("redspawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef red spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef red spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spleef red spawn could not be saved!");
+					} else if (second.equalsIgnoreCase("a")) {
+						try {
+							conf.setProperty("arenaa", getStandingOnLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef arena point could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef arena point set.");
+						else player.sendMessage(ChatColor.RED + "Spleef arena point could not be saved!");
+					} else if (second.equalsIgnoreCase("b")) {
+						try {
+							conf.setProperty("arenab", getStandingOnLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef arena point could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef arena point set.");
+						else player.sendMessage(ChatColor.RED + "Spleef arena point could not be saved!");
+					} else
+						return false;
 				} else
 					return false;
 			}
@@ -497,6 +547,38 @@ public class SimpleSpleef extends JavaPlugin {
 		return true;
 	}
 	
+	/**
+	 * get an exact location
+	 * @param location
+	 * @return
+	 */
+	private Map<String, Object> getExactLocation(Location location) {
+		ConfigurationNode locNode = Configuration.getEmptyNode();
+		locNode.setProperty("world", location.getWorld().getName());
+		locNode.setProperty("x", location.getX());
+		locNode.setProperty("y", location.getY());
+		locNode.setProperty("z", location.getZ());
+		locNode.setProperty("yaw", location.getYaw());
+		locNode.setProperty("pitch", location.getPitch());
+		
+		return locNode.getAll();
+	}
+
+	/**
+	 * get an exact location
+	 * @param location
+	 * @return
+	 */
+	private Map<String, Object> getStandingOnLocation(Location location) {
+		ConfigurationNode locNode = Configuration.getEmptyNode();
+		locNode.setProperty("world", location.getWorld().getName());
+		locNode.setProperty("x", location.getBlockX());
+		locNode.setProperty("y", location.getBlockY() - 1); // one below
+		locNode.setProperty("z", location.getBlockZ());
+		
+		return locNode.getAll();
+	}
+
 	/**
 	 * reload configuration
 	 * @param Player player calling reload

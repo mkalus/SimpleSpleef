@@ -38,6 +38,7 @@ permissions:
       simplespleef.reload: true
       simplespleef.prize: true
       simplespleef.startsingle: true
+      simplespleef.admin: true
   simplespleef.list:
     description: List command
     default: true
@@ -74,4 +75,6 @@ permissions:
   simplespleef.startsingle:
     description: Start the game, even if there is only one person. Good for Ops to test arenas.
     default: op
- 
+  simplespleef.admin:
+    description: Administrative commands.
+    default: op 

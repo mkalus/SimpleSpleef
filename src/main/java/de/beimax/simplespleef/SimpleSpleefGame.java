@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,8 +17,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.config.ConfigurationNode;
 
 import com.fernferret.allpay.GenericBank;
+
+import fr.crafter.tickleman.RealPlugin.Color;
 
 /**
  * @author mkalus
@@ -1001,9 +1005,28 @@ public class SimpleSpleefGame {
 	}
 	
 	/**
-	 * teleport players to first one if set so in configuration
+	 * teleport players to first one or to spawn points if set so in configuration
 	 */
-	protected void teleportPlayersToFirst() {
+	protected void teleportPlayers() {
+		// check spawn points
+		if (teams != null) { // teleport team players to spawn
+			Location bluespawn = getExactLocationFromNode("bluespawn");
+			Location redspawn = getExactLocationFromNode("redspawn");
+			if (redspawn != null && bluespawn != null) {
+				for (Player cPlayer : teams.get(1))
+					cPlayer.teleport(bluespawn);
+				for (Player cPlayer : teams.get(2))
+					cPlayer.teleport(redspawn);
+				return;
+			}
+		} else { // teleport single player
+			Location spawn = getExactLocationFromNode("spawn");
+			if (spawn != null)
+				for (Player cPlayer : spleefers)
+					cPlayer.teleport(spawn);
+			return;
+		}
+		
 		// check configuration
 		if (!plugin.conf.getBoolean("teleport_players_to_first", false)) return;
 		// sanity check
@@ -1015,6 +1038,26 @@ public class SimpleSpleefGame {
 				cPlayer.teleport(firstPlayer);
 			}
 		}
+	}
+	
+	/**
+	 * Get an exact location from a node name
+	 * @param nodeName
+	 * @return
+	 */
+	private Location getExactLocationFromNode(String nodeName) {
+		ConfigurationNode node = plugin.conf.getNode(nodeName);
+		if (node != null) {
+			Location location;
+			try {
+				location = new Location(plugin.getServer().getWorld(node.getString("world")), node.getDouble("x", 0.0), node.getDouble("y", 0.0),
+						node.getDouble("z", 0.0), (float) node.getDouble("yaw", 0.0), (float) node.getDouble("pitch", 0.0));
+				return location;
+			} catch (Exception e) {
+				plugin.getServer().broadcastMessage(Color.RED + "Could not load spawn location from config node " + nodeName + ". Error in config!");
+			}
+		}
+		return null;		
 	}
 	
 	/**
@@ -1069,7 +1112,7 @@ public class SimpleSpleefGame {
 											.getString("countdown_start",
 													"Starting spleef game. There can only be one!"));
 			
-			teleportPlayersToFirst();
+			teleportPlayers();
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;
