@@ -22,8 +22,6 @@ import org.bukkit.util.config.ConfigurationNode;
 
 import com.fernferret.allpay.GenericBank;
 
-import fr.crafter.tickleman.RealPlugin.Color;
-
 /**
  * @author mkalus
  * 
