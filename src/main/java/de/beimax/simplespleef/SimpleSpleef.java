@@ -157,7 +157,7 @@ public class SimpleSpleef extends JavaPlugin {
 			changed = true;
 		}
 		if (conf.getProperty("restore_blocks_after_game") == null) { // define if game should keep track of changed blocks and restore them after the game
-			conf.setProperty("restore_blocks_after_game", false);
+			conf.setProperty("restore_blocks_after_game", true);
 			changed = true;
 		}
 		if (conf.getProperty("teleport_players_to_first") == null) { // should the game teleport all players to the first after starting game
@@ -166,6 +166,14 @@ public class SimpleSpleef extends JavaPlugin {
 		}
 		if (conf.getProperty("countdown_from") == null) { // countdown starts at
 			conf.setProperty("countdown_from", 10);
+			changed = true;
+		}		
+		if (conf.getProperty("protect_arena") == null) { // protect arena from being changed by anyone except during games (arena needs to be set up!)
+			conf.setProperty("protect_arena", true);
+			changed = true;
+		}		
+		if (conf.getProperty("disallow_breaking_outside_arena") == null) { // isallow breaking of blocks out of the arena once the game has started (arena needs to be set up!)
+			conf.setProperty("disallow_breaking_outside_arena", true);
 			changed = true;
 		}		
 
@@ -226,7 +234,8 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "prize_money_team: 'Each member of the team received [MONEY] prize money.'\n"
 						+ "prize_item_set: 'Prize has been set to [ITEM].'\n"
 						+ "prize_money_set: 'Prize has been set to [MONEY].'\n"
-						+ "prize_item_money_deleted: 'Prize has been deleted.'\n");
+						+ "prize_item_money_deleted: 'Prize has been deleted.'\n"
+						+ "block_break_prohibited: 'You are not allowed to break this block.'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_en.yml: "
@@ -284,7 +293,8 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "prize_money_team: 'Jeder Spieler des Teams hat ein Preisgeld in Höhe von [MONEY] gewonnen.'\n"
 						+ "prize_item_set: 'Preis wurde gesetzt: [ITEM].'\n"
 						+ "prize_money_set: 'Preis wurde gesetzt: [MONEY].'\n"
-						+ "prize_item_money_deleted: 'Ausgelobter Preis wurde gelöscht.'\n");
+						+ "prize_item_money_deleted: 'Ausgelobter Preis wurde gelöscht.'\n"
+						+ "block_break_prohibited: 'Du darfst diesen Block nicht zerstören.'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_de.yml: "
@@ -329,11 +339,11 @@ public class SimpleSpleef extends JavaPlugin {
 				Priority.Normal, this);
 		
 		// Register block breaks, if accounting is set on
-		if (conf.getBoolean("restore_blocks_after_game", false)) {
+		//if (conf.getBoolean("restore_blocks_after_game", false)) {
 			pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
 					Priority.Normal, this);
-			System.out.println("[SimpleSpleef] restore_blocks_after_game is enabled - listening to block breaks when game is on.");
-		}
+		//	System.out.println("[SimpleSpleef] restore_blocks_after_game is enabled - listening to block breaks when game is on.");
+		//}
 
 		
 		PluginDescriptionFile pdfFile = this.getDescription();
@@ -594,6 +604,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// reload configuration
 		conf = new Configuration(confFile);
 		conf.load();
+		game.loadFromConfiguration(); // reload stuff
 		player.sendMessage(ChatColor.GOLD + "Spleef configuration refreshed.");
 	}
 

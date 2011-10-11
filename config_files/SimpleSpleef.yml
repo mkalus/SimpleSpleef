@@ -55,3 +55,7 @@ dead_players_leavegame: true
 also_loose_in_lava: false
 # remember blocks destroyed by the spleefers and restore these after the game
 restore_blocks_after_game: false
+# protect arena from being changed by anyone except during games (arena needs to be set up!)
+protect_arena: true
+# disallow breaking of blocks out of the arena once the game has started (arena needs to be set up!)
+disallow_breaking_outside_arena: true

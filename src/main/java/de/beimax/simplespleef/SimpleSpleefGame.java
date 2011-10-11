@@ -11,6 +11,7 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -109,6 +110,33 @@ public class SimpleSpleefGame {
 	 * <code>plugin.conf.getBoolean("restore_blocks_after_game", true);</code>
 	 */
 	private boolean restoreBlocksAfterGame;
+	
+	/**
+	 * saved coordinates of the arena
+	 */
+	private int arenaMinX;
+	private int arenaMinY;
+	private int arenaMinZ;
+	private int arenaMaxX;
+	private int arenaMaxY;
+	private int arenaMaxZ;
+	private World arenaWorld;
+	
+	/**
+	 * true if arena is defiend
+	 */
+	private boolean arenaDefined = false;
+	
+	/**
+	 * true if arena should be protected outside games
+	 */
+	private boolean protectArena;
+	
+	/**
+	 * true if spleefers may only break stuff inside the arena while playing
+	 */
+	private boolean disallowBreakingOutsideArena;
+	
 	/**
 	 * remembers blocks broken
 	 */
@@ -129,12 +157,44 @@ public class SimpleSpleefGame {
 		started = false;
 		countdown = null;
 		SimpleSpleefGame.randomWins = randomWins;
+		loadFromConfiguration();
+	}
+	
+	/**
+	 * load defaults from configuration
+	 */
+	public void loadFromConfiguration() {
 		// to make this work faster
 		alsoLooseInLava = plugin.conf.getBoolean("also_loose_in_lava", true);
 		restoreBlocksAfterGame = plugin.conf.getBoolean("restore_blocks_after_game", false);
 		// remember blocks broken, if config says so - create hashset to remember
 		if (restoreBlocksAfterGame) brokenBlocks = new HashMap<Block, RememberedBlock>();
 		else brokenBlocks = null;
+		protectArena = plugin.conf.getBoolean("protect_arena", true);
+		disallowBreakingOutsideArena = plugin.conf.getBoolean("disallow_breaking_outside_arena", true);
+		// check if arena is defined
+		defineArena();		
+	}
+	
+	/**
+	 * Define arena to make cube checks faster later
+	 */
+	private void defineArena() {
+		ConfigurationNode a = plugin.conf.getNode("arenaa");
+		ConfigurationNode b = plugin.conf.getNode("arenab");
+		if (b == null || a == null) return; // one of them is undefined
+		// same world?
+		if (b.getString("world") == null || !b.getString("world").equals(a.getString("world"))) return; //nope
+		arenaWorld = plugin.getServer().getWorld(a.getString("world"));
+		if (arenaWorld == null) return;
+		// define minimums to make checks faster later
+		arenaMinX = Math.min(a.getInt("x", 0), b.getInt("x", 0));
+		arenaMinY = Math.min(a.getInt("y", 0), b.getInt("y", 0));
+		arenaMinZ = Math.min(a.getInt("z", 0), b.getInt("z", 0));
+		arenaMaxX = Math.max(a.getInt("x", 0), b.getInt("x", 0));
+		arenaMaxY = Math.max(a.getInt("y", 0), b.getInt("y", 0));
+		arenaMaxZ = Math.max(a.getInt("z", 0), b.getInt("z", 0));
+		arenaDefined = true;
 	}
 	
 	/**
@@ -975,23 +1035,61 @@ public class SimpleSpleefGame {
 	 * @param event
 	 */
 	public void checkBlockBreak(BlockBreakEvent event) {
-		// no checks, if no game has started or no block breaking should be remembered
-		if (!started || !restoreBlocksAfterGame)
-			return;
-		// check, if player is in spleef list - if not, return
-		Player player = event.getPlayer();
-		if (!spleefers.contains(player))
-			return;
-		// already on looser list?
-		if (lost != null && lost.contains(player))
-			return;
+		// check if arena is defined and has to be protected
+		if (arenaDefined && protectArena) {
+			// check if block is inside arena
+			if (checkInsideArena(event.getBlock().getLocation())) {
+				// inside: check if a game is running and the player is spleefer
+				if (!started || spleefers == null || spleefers.size() == 0 || !spleefers.contains(event.getPlayer()) || (lost != null && lost.contains(event.getPlayer()))) {
+					event.getPlayer().sendMessage(ChatColor.RED + plugin.ll.getString("block_break_prohibited",
+						"You are not allowed to break this block."));
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
 		
-		// remember block
-		Block block = event.getBlock();
-		RememberedBlock rBlock = new RememberedBlock();
-		rBlock.material = block.getType();
-		rBlock.data = block.getData();
-		brokenBlocks.put(block, rBlock);
+		// check if arena is defined and game is running and spleefers may not change outside blocks
+		if (arenaDefined && started && disallowBreakingOutsideArena && spleefers.contains(event.getPlayer()) && (lost == null || !lost.contains(event.getPlayer()))) {
+			if (!checkInsideArena(event.getBlock().getLocation())) {
+				event.getPlayer().sendMessage(ChatColor.RED + plugin.ll.getString("block_break_prohibited",
+					"You are not allowed to break this block."));
+				event.setCancelled(true);
+				return;
+			}
+		}
+		
+		// no checks, if no game has started or no block breaking should be remembered
+		if (started && restoreBlocksAfterGame) {
+			// check, if player is in spleef list - if not, return
+			Player player = event.getPlayer();
+			if (!spleefers.contains(player))
+				return;
+			// already on looser list?
+			if (lost != null && lost.contains(player))
+				return;
+			
+			// remember block
+			Block block = event.getBlock();
+			RememberedBlock rBlock = new RememberedBlock();
+			rBlock.material = block.getType();
+			rBlock.data = block.getData();
+			brokenBlocks.put(block, rBlock);
+		}
+	}
+	
+	/**
+	 * main checking routine if location is within the arena
+	 * @param location
+	 * @return
+	 */
+	private boolean checkInsideArena(Location location) {
+		if (location.getWorld() != arenaWorld) return false;
+		int x = location.getBlockX();
+		int y = location.getBlockY();
+		int z = location.getBlockZ();
+		if (arenaMinX <= x && x <= arenaMaxX && arenaMinY <= y && y <= arenaMaxY && arenaMinZ <= z && z <= arenaMaxZ) return true;
+		return false;
 	}
 	
 	/**
@@ -1054,7 +1152,7 @@ public class SimpleSpleefGame {
 						node.getDouble("z", 0.0), (float) node.getDouble("yaw", 0.0), (float) node.getDouble("pitch", 0.0));
 				return location;
 			} catch (Exception e) {
-				plugin.getServer().broadcastMessage(Color.RED + "Could not load spawn location from config node " + nodeName + ". Error in config!");
+				plugin.getServer().broadcastMessage(ChatColor.RED + "Could not load spawn location from config node " + nodeName + ". Error in config!");
 			}
 		}
 		return null;		
