@@ -5,8 +5,11 @@ package de.beimax.simplespleef;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -36,8 +39,6 @@ public class SimpleSpleefGame {
 	 * random gifts
 	 */
 	private static Material[] randomWins;
-
-	// TODO: Does it make sense to make randomWins static?
 
 	/**
 	 * return next random element from Material Array
@@ -369,7 +370,17 @@ public class SimpleSpleefGame {
 				}
 			}
 
+			//save player's original position - or update timestamp if playing again...
+			addOriginalLocation(player);
+			
+			// add player to spleefer list
 			spleefers.add(player);
+
+			//teleport to lounge, if point is set
+			Location loungespawn = getExactLocationFromNode("loungespawn");
+			if (loungespawn != null)
+				player.teleport(loungespawn);
+
 			// add first player if empty
 			if (firstPlayer == null)
 				firstPlayer = player;
@@ -892,6 +903,15 @@ public class SimpleSpleefGame {
 														bank.getFormattedAmount(this.firstPlayer, win, -1))); // bot so nice to have the first player here, but what the heck...
 		}
 
+		//update players' original position timestamps
+		long maxTime = plugin.conf.getInt("keep_original_locations_seconds", 1200);
+		if (maxTime > 0) { // only if setting is higher than -1
+			// prune locations first
+			pruneOriginalLocations();
+			for (Player player : spleefers)
+				updateOriginalLocationTimestamp(player);
+		}
+		
 		// remove shovels if needed
 		playersLooseShovels();
 
@@ -1205,6 +1225,48 @@ public class SimpleSpleefGame {
 		
 		firstPlayer = null; // set first player to null, if none was found
 	}
+	
+	/**
+	 * Jump to spectation point
+	 * @param spectator
+	 */
+	public void spectateGame(Player spectator) {
+		Location spectatorspawn = getExactLocationFromNode("spectatorspawn");
+		if (spectatorspawn == null)
+			spectator.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("block_break_prohibited",
+							"No spectator spawn has been defined."));
+		
+		// save spectator's original position
+		addOriginalLocation(spectator);
+		
+		// teleport spectator to specation point 
+		spectator.teleport(spectatorspawn);
+	}
+	
+	/**
+	 * Teleport player back to where he/she started, provided the point is not too old
+	 * @param player
+	 */
+	public void teleportPlayerBack(Player player) {
+		// is the player a spleefer and the game has started?
+		if (spleefers.contains(player) && (started || countdown != null)) {
+			player.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_wait_for_game_to_finish",
+							"Please wait for the game to finish!"));
+			return;
+		}
+		// either game is finished or the player has left the game or he/she is a spectator
+		Location loc = getAndRemoveOriginalLocation(player);
+		if (loc == null) {
+			player.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_could_not_find_location",
+							"Could not find a location to teleport back to - maybe you waited too long!"));
+			return;
+		}
+		// everything ok => teleport back
+		player.teleport(loc);
+	}
 
 	/**
 	 * Countdown class
@@ -1317,6 +1379,82 @@ public class SimpleSpleefGame {
 				block.setData(rBlock.data);
 			}
 			brokenBlocks = new HashMap<Block, SimpleSpleefGame.RememberedBlock>(); // create new
+		}
+	}
+	
+	/**
+	 * Simple keeper class for timestamps and locations of players
+	 * @author mkalus
+	 *
+	 */
+	private class PlayerOriginalLocation {
+		long timestamp;
+		
+		Location location;
+	}
+
+	/**
+	 * Keeps data of players teleported
+	 */
+	private HashMap<String, PlayerOriginalLocation> playerOriginalLocations = new HashMap<String, SimpleSpleefGame.PlayerOriginalLocation>();
+	
+	/**
+	 * Add an original location - or update old one
+	 * @param player
+	 */
+	public void addOriginalLocation(Player player) {
+		long maxTime = plugin.conf.getInt("keep_original_locations_seconds", 1200);
+		if (maxTime < 0) return; // ignore -1 and lower
+
+		// prune first
+		pruneOriginalLocations();
+		
+		String playerName = player.getName();
+		// already in list? => update old etry
+		if (playerOriginalLocations.containsKey(playerName))
+			updateOriginalLocationTimestamp(player);
+		else {
+			PlayerOriginalLocation loc = new PlayerOriginalLocation();
+			loc.timestamp = System.currentTimeMillis() / 1000;
+			loc.location = player.getLocation().clone();
+		}
+	}
+	
+	/**
+	 * Return original location and remove entry
+	 * @param player
+	 * @return
+	 */
+	public Location getAndRemoveOriginalLocation(Player player) {
+		// prune first
+		pruneOriginalLocations();
+
+		PlayerOriginalLocation loc = playerOriginalLocations.get(player.getName());
+		if (loc == null) return null;
+		playerOriginalLocations.remove(player.getName());
+		return loc.location;
+	}
+	
+	/**
+	 * Update timestamp of of an original location
+	 * @param player
+	 */
+	public void updateOriginalLocationTimestamp(Player player) {
+		PlayerOriginalLocation loc = playerOriginalLocations.get(player.getName());
+		if (loc != null)
+			loc.timestamp = System.currentTimeMillis() / 1000;
+	}
+	
+	/**
+	 * called by above methods to clean out original locations list periodically
+	 */
+	protected void pruneOriginalLocations() {
+		long maxTime = plugin.conf.getInt("keep_original_locations_seconds", 1200);
+		if (maxTime < 0) return; // should not happen...
+		long checkTime = (System.currentTimeMillis() / 1000) - maxTime;
+		for (Map.Entry<String, PlayerOriginalLocation> entry : playerOriginalLocations.entrySet()) {
+			if (entry.getValue().timestamp < checkTime) // remove entries that are too old
+				playerOriginalLocations.remove(entry.getKey());
 		}
 	}
 }

@@ -172,8 +172,12 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("protect_arena", true);
 			changed = true;
 		}		
-		if (conf.getProperty("disallow_breaking_outside_arena") == null) { // isallow breaking of blocks out of the arena once the game has started (arena needs to be set up!)
+		if (conf.getProperty("disallow_breaking_outside_arena") == null) { // disallow breaking of blocks out of the arena once the game has started (arena needs to be set up!)
 			conf.setProperty("disallow_breaking_outside_arena", true);
+			changed = true;
+		}		
+		if (conf.getProperty("keep_original_locations_seconds") == null) { // remember original locations
+			conf.setProperty("keep_original_locations_seconds", 1200);
 			changed = true;
 		}		
 
@@ -235,7 +239,10 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "prize_item_set: 'Prize has been set to [ITEM].'\n"
 						+ "prize_money_set: 'Prize has been set to [MONEY].'\n"
 						+ "prize_item_money_deleted: 'Prize has been deleted.'\n"
-						+ "block_break_prohibited: 'You are not allowed to break this block.'\n");
+						+ "block_break_prohibited: 'You are not allowed to break this block.'\n"
+						+ "no_spectator_spawn_defined: 'No spectator spawn has been defined.'\n"
+						+ "err_wait_for_game_to_finish: 'Please wait for the game to finish!'\n"
+						+ "err_could_not_find_location: 'Could not find a location to teleport back to - maybe you waited too long!'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_en.yml: "
@@ -294,7 +301,10 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "prize_item_set: 'Preis wurde gesetzt: [ITEM].'\n"
 						+ "prize_money_set: 'Preis wurde gesetzt: [MONEY].'\n"
 						+ "prize_item_money_deleted: 'Ausgelobter Preis wurde gelöscht.'\n"
-						+ "block_break_prohibited: 'Du darfst diesen Block nicht zerstören.'\n");
+						+ "block_break_prohibited: 'Du darfst diesen Block nicht zerstören.'\n"
+						+ "no_spectator_spawn_defined: 'Es wurde kein Spawnpunkt für Zuschauer definiert.'\n"
+						+ "err_wait_for_game_to_finish: 'Bitte warte auf das Ende des Spiels!'\n"
+						+ "err_could_not_find_location: 'Konnte keinen Ort für das Zurückteleportieren mehr finden - vielleicht hast du zu lange gewartet!'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_de.yml: "
@@ -478,6 +488,14 @@ public class SimpleSpleef extends JavaPlugin {
 					if (!checkPermission(player, "delete"))
 						return true; // check permission
 					game.deleteGame(player); // delete a game
+				} else if (command.equalsIgnoreCase("spectate")) {
+					if (!checkPermission(player, "spectate"))
+						return true; // check permission
+					game.spectateGame(player); // jump to spectation spawn point
+				} else if (command.equalsIgnoreCase("back")) {
+					if (!checkPermission(player, "back"))
+						return true; // check permission
+					game.teleportPlayerBack(player); // jump back to saved point
 				} else if (command.equalsIgnoreCase("reload")) {
 					if (!checkPermission(player, "reload"))
 						return true; // check permission
@@ -553,6 +571,22 @@ public class SimpleSpleef extends JavaPlugin {
 						}
 						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef arena point set.");
 						else player.sendMessage(ChatColor.RED + "Spleef arena point could not be saved!");
+					} else if (second.equalsIgnoreCase("setspectatorspawn")) {
+						try {
+							conf.setProperty("spectatorspawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spectator spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spectator spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spectator spawn could not be saved!");						
+					} else if (second.equalsIgnoreCase("setloungespawn")) {
+						try {
+							conf.setProperty("loungespawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Lounge spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Lounge spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Lounge spawn could not be saved!");						
 					} else
 						return false;
 				} else
