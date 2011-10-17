@@ -1232,10 +1232,26 @@ public class SimpleSpleefGame {
 	 */
 	public void spectateGame(Player spectator) {
 		Location spectatorspawn = getExactLocationFromNode("spectatorspawn");
-		if (spectatorspawn == null)
+		if (spectatorspawn == null) {
 			spectator.sendMessage(ChatColor.RED
 					+ plugin.ll.getString("block_break_prohibited",
 							"No spectator spawn has been defined."));
+			return;
+		}
+		// is there a game in progress or has started? Prohibit spectation if there is no game
+		if (spleefers == null) {
+			spectator.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_nogameinprogress",
+							"No game is in progress."));
+			return;
+		}
+		// players may not spectate...
+		if (spleefers.contains(spectator)) {
+			spectator.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_you_are_spleefer",
+							"You are a spleefer, not a spectator!"));
+			return;
+		}
 		
 		// save spectator's original position
 		addOriginalLocation(spectator);

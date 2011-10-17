@@ -242,7 +242,9 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "block_break_prohibited: 'You are not allowed to break this block.'\n"
 						+ "no_spectator_spawn_defined: 'No spectator spawn has been defined.'\n"
 						+ "err_wait_for_game_to_finish: 'Please wait for the game to finish!'\n"
-						+ "err_could_not_find_location: 'Could not find a location to teleport back to - maybe you waited too long!'\n");
+						+ "err_could_not_find_location: 'Could not find a location to teleport back to - maybe you waited too long!'\n"
+						+ "err_nogameinprogress: 'No game is in progress.'\n"
+						+ "err_you_are_spleefer: 'You are a spleefer, not a spectator!'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_en.yml: "
@@ -304,7 +306,9 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "block_break_prohibited: 'Du darfst diesen Block nicht zerstören.'\n"
 						+ "no_spectator_spawn_defined: 'Es wurde kein Spawnpunkt für Zuschauer definiert.'\n"
 						+ "err_wait_for_game_to_finish: 'Bitte warte auf das Ende des Spiels!'\n"
-						+ "err_could_not_find_location: 'Konnte keinen Ort für das Zurückteleportieren mehr finden - vielleicht hast du zu lange gewartet!'\n");
+						+ "err_could_not_find_location: 'Konnte keinen Ort für das Zurückteleportieren mehr finden - vielleicht hast du zu lange gewartet!'\n"
+						+ "err_nogameinprogress: 'Momentan kein Spiel.'\n"
+						+ "err_you_are_spleefer: 'Du bist ein Spleefer, kein Zuschauer!'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_de.yml: "
