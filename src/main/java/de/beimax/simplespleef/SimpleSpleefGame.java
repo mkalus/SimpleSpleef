@@ -1266,7 +1266,7 @@ public class SimpleSpleefGame {
 	 */
 	public void teleportPlayerBack(Player player) {
 		// is the player a spleefer and the game has started?
-		if (spleefers.contains(player) && (started || countdown != null)) {
+		if (spleefers != null && spleefers.contains(player) && (started || countdown != null)) {
 			player.sendMessage(ChatColor.RED
 					+ plugin.ll.getString("err_wait_for_game_to_finish",
 							"Please wait for the game to finish!"));
@@ -1433,6 +1433,8 @@ public class SimpleSpleefGame {
 			PlayerOriginalLocation loc = new PlayerOriginalLocation();
 			loc.timestamp = System.currentTimeMillis() / 1000;
 			loc.location = player.getLocation().clone();
+			
+			playerOriginalLocations.put(player.getName(), loc);
 		}
 	}
 	
