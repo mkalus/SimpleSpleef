@@ -84,7 +84,7 @@ permissions:
     description: Spectate a game (teleport to spectation area)
     default: true
   simplespleef.back:
-    description: Teleport back to original position (player of spectator)
+    description: Teleport back to original position (player or spectator)
     default: true
   simplespleef.admin:
     description: Administrative commands.

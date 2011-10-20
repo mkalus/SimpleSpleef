@@ -583,7 +583,7 @@ public class SimpleSpleef extends JavaPlugin {
 						}
 						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spectator spawn location set.");
 						else player.sendMessage(ChatColor.RED + "Spectator spawn could not be saved!");						
-					} else if (second.equalsIgnoreCase("setloungespawn")) {
+					} else if (second.equalsIgnoreCase("loungespawn")) {
 						try {
 							conf.setProperty("loungespawn", getExactLocation(player.getLocation()));
 						} catch (Exception e) {
