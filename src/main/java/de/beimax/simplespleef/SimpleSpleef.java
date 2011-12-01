@@ -575,7 +575,7 @@ public class SimpleSpleef extends JavaPlugin {
 						}
 						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef arena point set.");
 						else player.sendMessage(ChatColor.RED + "Spleef arena point could not be saved!");
-					} else if (second.equalsIgnoreCase("setspectatorspawn")) {
+					} else if (second.equalsIgnoreCase("spectatorspawn")) {
 						try {
 							conf.setProperty("spectatorspawn", getExactLocation(player.getLocation()));
 						} catch (Exception e) {

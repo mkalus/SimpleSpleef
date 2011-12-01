@@ -1266,7 +1266,7 @@ public class SimpleSpleefGame {
 	 */
 	public void teleportPlayerBack(Player player) {
 		// is the player a spleefer and the game has started?
-		if (spleefers != null && spleefers.contains(player) && (started || countdown != null)) {
+		if (spleefers != null && spleefers.contains(player)) {
 			player.sendMessage(ChatColor.RED
 					+ plugin.ll.getString("err_wait_for_game_to_finish",
 							"Please wait for the game to finish!"));
