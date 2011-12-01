@@ -180,6 +180,14 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("keep_original_locations_seconds", 1200);
 			changed = true;
 		}		
+		if (conf.getProperty("instant_block_destroy") == null) { // turn instant block destruction on or off
+			conf.setProperty("instant_block_destroy", false);
+			changed = true;
+		}		
+		if (conf.getProperty("disallow_block_placing") == null) { // disallow block placing
+			conf.setProperty("disallow_block_placing", true);
+			changed = true;
+		}		
 
 		// config has been changed: save it
 		if (changed) {
@@ -348,6 +356,8 @@ public class SimpleSpleef extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,
 				Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
+				Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
 				Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, // deaths are handled by entity
 				Priority.Normal, this);

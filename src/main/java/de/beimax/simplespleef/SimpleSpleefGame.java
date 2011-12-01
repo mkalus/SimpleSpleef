@@ -17,7 +17,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -744,17 +746,10 @@ public class SimpleSpleefGame {
 	 * @param event
 	 */
 	public void checkPlayerMove(PlayerMoveEvent event) {
-		// no checks, if no game has started
-		if (!started)
-			return;
-		// check, if player is in spleef list - if not, return
+		// need to check?
 		Player player = event.getPlayer();
-		if (!spleefers.contains(player))
-			return;
-		// already on looser list?
-		if (lost != null && lost.contains(player))
-			return;
-
+		if (!needCheck(player)) return;
+		
 		// check current spleefer if he/she has touched water... and maybe lava
 		Material touchedBlock = event.getTo().getBlock().getType();
 		if (touchedBlock.compareTo(Material.STATIONARY_WATER) == 0
@@ -763,6 +758,64 @@ public class SimpleSpleefGame {
 			// Ha, lost!
 			playerLoses(player, touchedBlock);
 		}
+	}
+
+	/**
+	 * check player interactions
+	 * 
+	 * @param event
+	 */
+	public void checkPlayerInteract(PlayerInteractEvent event) {
+		// need to check?
+		Player player = event.getPlayer();
+		if (!needCheck(player)) return;
+		
+		// player's action
+		Action action = event.getAction();
+		
+		// check if block placing is disallowed
+		if (plugin.conf.getBoolean("disallow_block_placing", true) && (action.compareTo(Action.RIGHT_CLICK_BLOCK) == 0 || action.compareTo(Action.RIGHT_CLICK_AIR) == 0)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		// check instant destruction of blocks
+		if (plugin.conf.getBoolean("instant_block_destroy", false) && action.compareTo(Action.LEFT_CLICK_BLOCK) == 0) {
+			// check if block is inside arena
+			Block clickedBlock = event.getClickedBlock();
+			if (checkInsideArena(clickedBlock.getLocation())) {
+				// remember block
+				if (restoreBlocksAfterGame) {
+					RememberedBlock rBlock = new RememberedBlock();
+					rBlock.material = clickedBlock.getType();
+					rBlock.data = clickedBlock.getData();
+					brokenBlocks.put(clickedBlock, rBlock);
+				}
+				clickedBlock.setType(Material.AIR);
+				clickedBlock.setData((byte) 0);
+			}
+			if (!disallowBreakingOutsideArena) return;
+			// disallow event outside arena and inside to avoid complications
+			event.setCancelled(true);
+		}
+	}
+	
+	/**
+	 * Helper to check whether check function should be checked at all
+	 * @param player
+	 * @return
+	 */
+	private boolean needCheck(Player player) {
+		// no checks, if no game has started
+		if (!started)
+			return false;
+		// check, if player is in spleef list - if not, return
+		if (!spleefers.contains(player))
+			return false;
+		// already on looser list?
+		if (lost != null && lost.contains(player))
+			return false;
+		return true;
 	}
 
 	/**
