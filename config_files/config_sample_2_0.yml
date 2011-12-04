@@ -1,0 +1,207 @@
+#Sample for the config file for SimpleSpleef 2.0.
+#Simple Spleef configuration
+# File version of config (used by updates, etc.)
+fileVersion: 1
+# Language - reads configuration from specific language file
+language: en
+# global settings
+settings:
+# Allow "arena free" gaming - simply join and play (settings taken from "default" arena) - no arenas required
+    allowFreeStylePlaying: true
+# "default" arena
+    defaultArena: default
+# active arena command signs to join/spectate/return/etc.
+    enableSigns: true
+# globally announce when a game is created by someone not joining the game
+    announceGame: true
+# globally announce when players join games
+    announceJoin: true
+# globally announce when game starts
+    announceStart: true
+# globally announce countdown
+    announceCountdown: false
+# globally announce when players loose
+    announceLoose: true
+# globally announce when players win the game
+    announceWin: true
+# globally announce the prize won by a player
+    announcePrize: true
+# arena specific settings
+arenas:
+# "special" default arena
+    default:
+# Minimum and maximum players
+        minimumPlayers: 0
+        maximumPlayers: 0
+# Clear inventory at game start and restore after game has ended
+        clearInventory: false
+# Add stuff the inventory? amount:item or amount:item:subid
+        addToInventory: false
+        addInventoryItems:
+            - 1:BOW
+            - 64:ARROW
+# Fees to join (money or items)
+        entryFee: 5.0
+        entryItem: -1
+# Turn prizes of items on/off
+        giveItemPrizes: true
+# Prizes (name/id): amount:item or amount:item:subid
+        itemPrizes:
+            - 1:APPLE
+            - 1:BED
+            - 6:BOOK
+            - 1:CAKE
+            - 1:CHAINMAIL_HELMET
+            - 16:CLAY_BALL
+            - 1:COMPASS
+            - 4:COOKED_FISH
+            - 1:DIAMOND
+            - 1:FLINT_AND_STEEL
+            - 1:GOLD_INGOT
+            - 4:IRON_INGOT
+            - 1:GLOWSTONE
+            - 1:GOLD_HELMET
+            - 16:INK_SACK
+            - 1:IRON_HELMET
+            - 2:OBSIDIAN
+            - 6:RED_ROSE
+            - 3:SNOW_BLOCK
+            - 6:STRING
+            - 3:SULPHUR
+            - 1:TNT
+            - 6:YELLOW_FLOWER
+            - 1:MELON_SEEDS
+            - 1:EYE_OF_ENDER
+            - 1:GRASS
+            - 4:SMOOTH_BRICK:1
+# Winner gets this amount of price money for each player in game
+        prizeMoneyPerPlayer: 5.0
+# Winner gets this amount of price money fixed (toal is per player + fixed)
+        prizeMoneyFixed: 0.0
+# Loose game by touching these blocks (in them/standing on them - name/id)
+        looseOnTouchBlocks:
+            - STATIONARY_WATER
+            - STATIONARY_LAVA
+# Players dying loose
+        looseOnDeath: true
+# Players logging out loose
+        looseOnLogout: false
+# Allow Digging away of blocks (name/id) of...
+        allowDigBlocks:
+            - DIRT
+# Alternatively: disallow digging away of certain blocks (name/id)
+        disallowDigBlocks:
+            - STONE
+# Instant digging of blocks (no shovel needed)
+        instantDig: true
+# Alternatively: players are given shovel at the start of the game
+        playersReceiveShovelAtGameStart: false
+# players loose shovel when leaving game (also stop, etc.)
+        playersLooseShovelAtGameEnd: false
+# Item (name/id) of shovel/spade
+        shovelItem: DIAMOND_SPADE
+# Countdown starts at
+        countdownFrom: 10
+# Can blocks be placed
+        allowBlockPlacing: false
+# If instantDig is false, do dug blocks drop blocks that can be picked up by players?
+        blockDropping: true
+# Can players actually dig/break blocks outside defined arena?
+        allowDiggingOutsideArena: false
+# Protect arena against changes by non-players
+        protectArena: true
+# Restore arena after the game
+        restoreArenaAfterGame: true
+# Arena cube that will be protected (saved in memory for restoration)
+        arena:
+            enabled: false
+            a:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+            b:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+# Arena floor (can be dug by players)
+        floor:
+            enabled: false
+            a:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+            b:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+# Entering this cube area will make players loose
+        loose:
+            enabled: false
+            a:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+            b:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+# Teleport point where players are sent to after joining game
+        loungeSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where players are sent to after starting game
+        gameSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where players are sent to after starting game (team red)
+        redTeamSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where players are sent to after starting game (team blue)
+        blueTeamSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where spectators can watch from
+        spectatorSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where players are teleported to after loosing game
+        looseSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
