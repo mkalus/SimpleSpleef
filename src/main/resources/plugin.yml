@@ -21,6 +21,8 @@ commands:
       /<command> prize 322 The next winner receives a golden apple (item id) (admin command).
       /<command> reload Reload configuration
       /<command> startsingle Op command to test game start with only one person
+      /<command> spectate Spectate the game
+      /<command> back Teleport back (player of spectator)
 
 permissions:
   simplespleef.*:
@@ -29,12 +31,15 @@ permissions:
       simplespleef.list: true
       simplespleef.play: true
       simplespleef.team: true
+      simplespleef.initialize: true
+      simplespleef.initializeteam: true
       simplespleef.leave: true
       simplespleef.start: true
       simplespleef.stop: true
       simplespleef.delete: true
       simplespleef.reload: true
       simplespleef.prize: true
+      simplespleef.spectate: true
       simplespleef.startsingle: true
   simplespleef.list:
     description: List command
@@ -42,8 +47,17 @@ permissions:
   simplespleef.play:
     description: Join dog-eats-dog command.
     default: true
+  simplespleef.announce:
+    description: Announce a new dog-eats-dog game people can join.
+    default: op
   simplespleef.team:
     description: Join team commands.
+    default: true
+  simplespleef.initialize:
+    description: Join dog-eats-dog command (initialize game).
+    default: true
+  simplespleef.initializeteam:
+    description: Join team commands (initialize game).
     default: true
   simplespleef.leave:
     description: Leave command.
@@ -66,4 +80,12 @@ permissions:
   simplespleef.startsingle:
     description: Start the game, even if there is only one person. Good for Ops to test arenas.
     default: op
- 
+  simplespleef.spectate:
+    description: Spectate a game (teleport to spectation area)
+    default: true
+  simplespleef.back:
+    description: Teleport back to original position (player or spectator)
+    default: true
+  simplespleef.admin:
+    description: Administrative commands.
+    default: op 

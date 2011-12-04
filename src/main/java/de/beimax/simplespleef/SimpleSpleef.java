@@ -6,9 +6,11 @@ import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,9 +21,11 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.config.Configuration;
+import org.bukkit.util.config.ConfigurationNode;
 
 import org.bukkit.Server;
-import com.iConomy.iConomy;
+
+import com.fernferret.allpay.AllPay;
 
 /**
  * SimpleSpleef for Bukkit
@@ -41,11 +45,6 @@ public class SimpleSpleef extends JavaPlugin {
 	private static Server Server = null;
 
 	/**
-	 * iConomy
-	 */
-	private static iConomy iConomy;
-
-	/**
 	 * @return BukkitServer
 	 */
 	public static Server getBukkitServer() {
@@ -53,33 +52,16 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * @return iConomy instance or null
+	 * AllPay singleton
 	 */
-	public static iConomy getiConomy() {
-		return iConomy;
-	}
+	private static AllPay allPay = null;
 
 	/**
-	 * @return true if iConomy exists
+	 * @return allPay instance (singleton)
 	 */
-	public static boolean checkiConomy() {
-		if (iConomy != null)
-			return true;
-		return false;
-	}
-
-	/**
-	 * @param plugin
-	 *            iConomy plugin setter
-	 * @return true if set
-	 */
-	public static boolean setiConomy(iConomy plugin) {
-		if (iConomy == null) {
-			iConomy = plugin;
-		} else {
-			return false;
-		}
-		return true;
+	public AllPay getAllPay() {
+		if (SimpleSpleef.allPay == null) SimpleSpleef.allPay = new AllPay(this, "SimpleSpleef: ");
+		return SimpleSpleef.allPay;
 	}
 
 	/**
@@ -142,6 +124,10 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("entryfee", 5);
 			changed = true;
 		}
+		if (conf.getProperty("entryitem") == null) { // define entry item (or -1 for money)
+			conf.setProperty("entryitem", -1);
+			changed = true;
+		}
 		if (conf.getProperty("prizemoney_fixed") == null) { // define fixed prize money
 			conf.setProperty("prizemoney_fixed", 0);
 			changed = true;
@@ -171,13 +157,37 @@ public class SimpleSpleef extends JavaPlugin {
 			changed = true;
 		}
 		if (conf.getProperty("restore_blocks_after_game") == null) { // define if game should keep track of changed blocks and restore them after the game
-			conf.setProperty("restore_blocks_after_game", false);
+			conf.setProperty("restore_blocks_after_game", true);
 			changed = true;
 		}
 		if (conf.getProperty("teleport_players_to_first") == null) { // should the game teleport all players to the first after starting game
 			conf.setProperty("teleport_players_to_first", false);
 			changed = true;
 		}
+		if (conf.getProperty("countdown_from") == null) { // countdown starts at
+			conf.setProperty("countdown_from", 10);
+			changed = true;
+		}		
+		if (conf.getProperty("protect_arena") == null) { // protect arena from being changed by anyone except during games (arena needs to be set up!)
+			conf.setProperty("protect_arena", true);
+			changed = true;
+		}		
+		if (conf.getProperty("disallow_breaking_outside_arena") == null) { // disallow breaking of blocks out of the arena once the game has started (arena needs to be set up!)
+			conf.setProperty("disallow_breaking_outside_arena", true);
+			changed = true;
+		}		
+		if (conf.getProperty("keep_original_locations_seconds") == null) { // remember original locations
+			conf.setProperty("keep_original_locations_seconds", 1200);
+			changed = true;
+		}		
+		if (conf.getProperty("instant_block_destroy") == null) { // turn instant block destruction on or off
+			conf.setProperty("instant_block_destroy", false);
+			changed = true;
+		}		
+		if (conf.getProperty("disallow_block_placing") == null) { // disallow block placing
+			conf.setProperty("disallow_block_placing", true);
+			changed = true;
+		}		
 
 		// config has been changed: save it
 		if (changed) {
@@ -236,7 +246,13 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "prize_money_team: 'Each member of the team received [MONEY] prize money.'\n"
 						+ "prize_item_set: 'Prize has been set to [ITEM].'\n"
 						+ "prize_money_set: 'Prize has been set to [MONEY].'\n"
-						+ "prize_item_money_deleted: 'Prize has been deleted.'\n");
+						+ "prize_item_money_deleted: 'Prize has been deleted.'\n"
+						+ "block_break_prohibited: 'You are not allowed to break this block.'\n"
+						+ "no_spectator_spawn_defined: 'No spectator spawn has been defined.'\n"
+						+ "err_wait_for_game_to_finish: 'Please wait for the game to finish!'\n"
+						+ "err_could_not_find_location: 'Could not find a location to teleport back to - maybe you waited too long!'\n"
+						+ "err_nogameinprogress: 'No game is in progress.'\n"
+						+ "err_you_are_spleefer: 'You are a spleefer, not a spectator!'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_en.yml: "
@@ -294,7 +310,13 @@ public class SimpleSpleef extends JavaPlugin {
 						+ "prize_money_team: 'Jeder Spieler des Teams hat ein Preisgeld in Höhe von [MONEY] gewonnen.'\n"
 						+ "prize_item_set: 'Preis wurde gesetzt: [ITEM].'\n"
 						+ "prize_money_set: 'Preis wurde gesetzt: [MONEY].'\n"
-						+ "prize_item_money_deleted: 'Ausgelobter Preis wurde gelöscht.'\n");
+						+ "prize_item_money_deleted: 'Ausgelobter Preis wurde gelöscht.'\n"
+						+ "block_break_prohibited: 'Du darfst diesen Block nicht zerstören.'\n"
+						+ "no_spectator_spawn_defined: 'Es wurde kein Spawnpunkt für Zuschauer definiert.'\n"
+						+ "err_wait_for_game_to_finish: 'Bitte warte auf das Ende des Spiels!'\n"
+						+ "err_could_not_find_location: 'Konnte keinen Ort für das Zurückteleportieren mehr finden - vielleicht hast du zu lange gewartet!'\n"
+						+ "err_nogameinprogress: 'Momentan kein Spiel.'\n"
+						+ "err_you_are_spleefer: 'Du bist ein Spleefer, kein Zuschauer!'\n");
 				fw.close();
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not write lang_de.yml: "
@@ -335,15 +357,17 @@ public class SimpleSpleef extends JavaPlugin {
 				Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
 				Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener,
+				Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, // deaths are handled by entity
 				Priority.Normal, this);
 		
 		// Register block breaks, if accounting is set on
-		if (conf.getBoolean("restore_blocks_after_game", false)) {
+		//if (conf.getBoolean("restore_blocks_after_game", false)) {
 			pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,
 					Priority.Normal, this);
-			System.out.println("[SimpleSpleef] restore_blocks_after_game is enabled - listening to block breaks when game is on.");
-		}
+		//	System.out.println("[SimpleSpleef] restore_blocks_after_game is enabled - listening to block breaks when game is on.");
+		//}
 
 		
 		PluginDescriptionFile pdfFile = this.getDescription();
@@ -428,14 +452,28 @@ public class SimpleSpleef extends JavaPlugin {
 	
 				// check actual commands
 				if (command.equalsIgnoreCase("join")) {
+					// has first player permission on empty game?
+					if (game.isEmpty() && !checkPermission(player, "initialize"))
+						return true;
 					if (!checkPermission(player, "play"))
 						return true; // check permission
 					game.addPlayer(player, null); // join no-team spleef
+				} else if (command.equalsIgnoreCase("announce")) {
+					// announce game without actually joining
+					if (!checkPermission(player, "announce"))
+						return true; // check permission
+					game.announceNewGame(player);
 				} else if (command.equalsIgnoreCase("1")) {
+					// has first player permission on empty game?
+					if (game.isEmpty() && !checkPermission(player, "initializeteam"))
+						return true;
 					if (!checkPermission(player, "team"))
 						return true; // check permission
 					game.addPlayer(player, 1); // add player to team 1
 				} else if (command.equalsIgnoreCase("2")) {
+					// has first player permission on empty game?
+					if (game.isEmpty() && !checkPermission(player, "initializeteam"))
+						return true;
 					if (!checkPermission(player, "team"))
 						return true; // check permission
 					game.addPlayer(player, 2); // add player to team 2
@@ -464,6 +502,14 @@ public class SimpleSpleef extends JavaPlugin {
 					if (!checkPermission(player, "delete"))
 						return true; // check permission
 					game.deleteGame(player); // delete a game
+				} else if (command.equalsIgnoreCase("spectate")) {
+					if (!checkPermission(player, "spectate"))
+						return true; // check permission
+					game.spectateGame(player); // jump to spectation spawn point
+				} else if (command.equalsIgnoreCase("back")) {
+					if (!checkPermission(player, "back"))
+						return true; // check permission
+					game.teleportPlayerBack(player); // jump back to saved point
 				} else if (command.equalsIgnoreCase("reload")) {
 					if (!checkPermission(player, "reload"))
 						return true; // check permission
@@ -494,6 +540,69 @@ public class SimpleSpleef extends JavaPlugin {
 							return false;
 						}
 					}
+				} else if (command.equalsIgnoreCase("admin")) {
+					if (!checkPermission(player, "admin"))
+						return true; // check permission
+					// get second argument
+					String second = args[1];
+					if (second.equalsIgnoreCase("setspawn")) {
+						try {
+							conf.setProperty("spawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spleef spawn could not be saved!");
+					} else if (second.equalsIgnoreCase("setbluespawn")) {
+						try {
+							conf.setProperty("bluespawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef blue spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef blue spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spleef blue spawn could not be saved!");						
+					} else if (second.equalsIgnoreCase("setredspawn")) {
+						try {
+							conf.setProperty("redspawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef red spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef red spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spleef red spawn could not be saved!");
+					} else if (second.equalsIgnoreCase("a")) {
+						try {
+							conf.setProperty("arenaa", getStandingOnLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef arena point could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef arena point set.");
+						else player.sendMessage(ChatColor.RED + "Spleef arena point could not be saved!");
+					} else if (second.equalsIgnoreCase("b")) {
+						try {
+							conf.setProperty("arenab", getStandingOnLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spleef arena point could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spleef arena point set.");
+						else player.sendMessage(ChatColor.RED + "Spleef arena point could not be saved!");
+					} else if (second.equalsIgnoreCase("spectatorspawn")) {
+						try {
+							conf.setProperty("spectatorspawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Spectator spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Spectator spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Spectator spawn could not be saved!");						
+					} else if (second.equalsIgnoreCase("loungespawn")) {
+						try {
+							conf.setProperty("loungespawn", getExactLocation(player.getLocation()));
+						} catch (Exception e) {
+							player.sendMessage(ChatColor.RED + "Lounge spawn could not be set!");
+						}
+						if (conf.save()) player.sendMessage(ChatColor.GREEN + "Lounge spawn location set.");
+						else player.sendMessage(ChatColor.RED + "Lounge spawn could not be saved!");						
+					} else
+						return false;
 				} else
 					return false;
 			}
@@ -501,6 +610,38 @@ public class SimpleSpleef extends JavaPlugin {
 		return true;
 	}
 	
+	/**
+	 * get an exact location
+	 * @param location
+	 * @return
+	 */
+	private Map<String, Object> getExactLocation(Location location) {
+		ConfigurationNode locNode = Configuration.getEmptyNode();
+		locNode.setProperty("world", location.getWorld().getName());
+		locNode.setProperty("x", location.getX());
+		locNode.setProperty("y", location.getY());
+		locNode.setProperty("z", location.getZ());
+		locNode.setProperty("yaw", location.getYaw());
+		locNode.setProperty("pitch", location.getPitch());
+		
+		return locNode.getAll();
+	}
+
+	/**
+	 * get an exact location
+	 * @param location
+	 * @return
+	 */
+	private Map<String, Object> getStandingOnLocation(Location location) {
+		ConfigurationNode locNode = Configuration.getEmptyNode();
+		locNode.setProperty("world", location.getWorld().getName());
+		locNode.setProperty("x", location.getBlockX());
+		locNode.setProperty("y", location.getBlockY() - 1); // one below
+		locNode.setProperty("z", location.getBlockZ());
+		
+		return locNode.getAll();
+	}
+
 	/**
 	 * reload configuration
 	 * @param Player player calling reload
@@ -516,6 +657,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// reload configuration
 		conf = new Configuration(confFile);
 		conf.load();
+		game.loadFromConfiguration(); // reload stuff
 		player.sendMessage(ChatColor.GOLD + "Spleef configuration refreshed.");
 	}
 

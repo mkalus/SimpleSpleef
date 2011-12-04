@@ -5,19 +5,27 @@ package de.beimax.simplespleef;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.iConomy.iConomy;
-import com.iConomy.system.*;
+import org.bukkit.util.config.ConfigurationNode;
+
+import com.fernferret.allpay.GenericBank;
 
 /**
  * @author mkalus
@@ -33,8 +41,6 @@ public class SimpleSpleefGame {
 	 * random gifts
 	 */
 	private static Material[] randomWins;
-
-	// TODO: Does it make sense to make randomWins static?
 
 	/**
 	 * return next random element from Material Array
@@ -105,6 +111,33 @@ public class SimpleSpleefGame {
 	 * <code>plugin.conf.getBoolean("restore_blocks_after_game", true);</code>
 	 */
 	private boolean restoreBlocksAfterGame;
+	
+	/**
+	 * saved coordinates of the arena
+	 */
+	private int arenaMinX;
+	private int arenaMinY;
+	private int arenaMinZ;
+	private int arenaMaxX;
+	private int arenaMaxY;
+	private int arenaMaxZ;
+	private World arenaWorld;
+	
+	/**
+	 * true if arena is defiend
+	 */
+	private boolean arenaDefined = false;
+	
+	/**
+	 * true if arena should be protected outside games
+	 */
+	private boolean protectArena;
+	
+	/**
+	 * true if spleefers may only break stuff inside the arena while playing
+	 */
+	private boolean disallowBreakingOutsideArena;
+	
 	/**
 	 * remembers blocks broken
 	 */
@@ -125,13 +158,54 @@ public class SimpleSpleefGame {
 		started = false;
 		countdown = null;
 		SimpleSpleefGame.randomWins = randomWins;
+		loadFromConfiguration();
+	}
+	
+	/**
+	 * load defaults from configuration
+	 */
+	public void loadFromConfiguration() {
 		// to make this work faster
 		alsoLooseInLava = plugin.conf.getBoolean("also_loose_in_lava", true);
 		restoreBlocksAfterGame = plugin.conf.getBoolean("restore_blocks_after_game", false);
 		// remember blocks broken, if config says so - create hashset to remember
 		if (restoreBlocksAfterGame) brokenBlocks = new HashMap<Block, RememberedBlock>();
 		else brokenBlocks = null;
-}
+		protectArena = plugin.conf.getBoolean("protect_arena", true);
+		disallowBreakingOutsideArena = plugin.conf.getBoolean("disallow_breaking_outside_arena", true);
+		// check if arena is defined
+		defineArena();		
+	}
+	
+	/**
+	 * Define arena to make cube checks faster later
+	 */
+	private void defineArena() {
+		ConfigurationNode a = plugin.conf.getNode("arenaa");
+		ConfigurationNode b = plugin.conf.getNode("arenab");
+		if (b == null || a == null) return; // one of them is undefined
+		// same world?
+		if (b.getString("world") == null || !b.getString("world").equals(a.getString("world"))) return; //nope
+		arenaWorld = plugin.getServer().getWorld(a.getString("world"));
+		if (arenaWorld == null) return;
+		// define minimums to make checks faster later
+		arenaMinX = Math.min(a.getInt("x", 0), b.getInt("x", 0));
+		arenaMinY = Math.min(a.getInt("y", 0), b.getInt("y", 0));
+		arenaMinZ = Math.min(a.getInt("z", 0), b.getInt("z", 0));
+		arenaMaxX = Math.max(a.getInt("x", 0), b.getInt("x", 0));
+		arenaMaxY = Math.max(a.getInt("y", 0), b.getInt("y", 0));
+		arenaMaxZ = Math.max(a.getInt("z", 0), b.getInt("z", 0));
+		arenaDefined = true;
+	}
+	
+	/**
+	 * returns true, if there are no spleefers present in the game
+	 * @return
+	 */
+	public boolean isEmpty() {
+		if (spleefers == null) return true;
+		return false;
+	}
 
 	/**
 	 * return team name
@@ -142,6 +216,31 @@ public class SimpleSpleefGame {
 		String teamname = team == 1 ? "blue" : "red";
 		return plugin.ll.getString("team" + teamname, teamname);
 	}
+	
+	/**
+	 * Announce a new game without actually joining
+	 */
+	public void announceNewGame(Player player) {
+		// game started, countdown, game already declared?
+		if (started || countdown != null || spleefers != null) {
+			player.sendMessage(ChatColor.RED
+					+ plugin.ll
+							.getString("err_gameinprogress",
+									"A game is already in progress! Please wait until it is finished."));
+			return;
+		}
+		
+		// create a new game
+		spleefers = new HashSet<Player>();
+		plugin.getServer()
+				.broadcastMessage(
+						ChatColor.GOLD
+								+ plugin.ll
+										.getString("announce_noteam",
+												"[PLAYER] has announced a new spleef game - you are all invited to join!")
+										.replaceAll("\\[PLAYER\\]",
+												player.getName()));
+	}
 
 	/**
 	 * Add a player to a team
@@ -151,7 +250,6 @@ public class SimpleSpleefGame {
 	 * @param team
 	 *            to add the player to - may be null
 	 */
-	@SuppressWarnings("static-access")
 	public void addPlayer(Player player, Integer team) {
 		if (started || countdown != null) {
 			player.sendMessage(ChatColor.RED
@@ -249,32 +347,45 @@ public class SimpleSpleefGame {
 			}
 		} else { // add new player to spleefers, if he or she has enough money
 			// check account of player
-			if (SimpleSpleef.checkiConomy()) {
-				double fee = plugin.conf.getDouble("entryfee", 5.0);
-				if (fee != 0) {
-					iConomy iConomy = SimpleSpleef.getiConomy();
-					Holdings holdings = iConomy.getAccount(player.getName())
-							.getHoldings();
-					if (holdings.hasEnough(fee)) {
-						holdings.subtract(fee);
-						player.sendMessage(ChatColor.AQUA
-								+ plugin.ll.getString("fee_entry",
-										"You paid an entry fee of [MONEY].")
-										.replaceAll("\\[MONEY\\]",
-												iConomy.format(fee)));
-					} else {
-						player.sendMessage(ChatColor.RED
-								+ plugin.ll
-										.getString("fee_entry_err",
-												"Insufficient funds - you need at least [MONEY].")
-										.replaceAll("\\[MONEY\\]",
-												iConomy.format(fee)));
-						return;
-					}
+			double fee = plugin.conf.getDouble("entryfee", 5.0);
+			int feeitem = plugin.conf.getInt("entryitem", -1);
+			if (fee != 0) {
+				GenericBank bank = plugin.getAllPay().getEconPlugin();
+				if (bank.hasEnough(player, fee, feeitem, null)) {
+					bank.pay(player, fee, feeitem);
+					player.sendMessage(ChatColor.AQUA
+							+ plugin.ll.getString("fee_entry",
+									"You paid an entry fee of [MONEY].")
+									.replaceAll("\\[MONEY\\]",
+											bank.getFormattedAmount(player, fee, feeitem)));					
+				} else {
+					player.sendMessage(ChatColor.RED
+							+ plugin.ll
+									.getString("fee_entry_err",
+											"Insufficient funds - you need at least [MONEY].")
+									.replaceAll("\\[MONEY\\]",
+											bank.getFormattedAmount(player, fee, feeitem)));
+					// team empty after this?
+					if (spleefers.size() == 0)
+						spleefers = null; // to prevent exploit that people with insufficient funds actually create empty games
+					return;
 				}
 			}
 
+			//save player's original position - or update timestamp if playing again...
+			addOriginalLocation(player);
+			
+			// add player to spleefer list
 			spleefers.add(player);
+
+			//teleport to lounge, if point is set
+			Location loungespawn = getExactLocationFromNode("loungespawn");
+			if (loungespawn != null)
+				player.teleport(loungespawn);
+
+			// add first player if empty
+			if (firstPlayer == null)
+				firstPlayer = player;
 			// also add to team?
 			if (team != null) {
 				if (teams == null) { // if empty create new hash map set
@@ -635,17 +746,10 @@ public class SimpleSpleefGame {
 	 * @param event
 	 */
 	public void checkPlayerMove(PlayerMoveEvent event) {
-		// no checks, if no game has started
-		if (!started)
-			return;
-		// check, if player is in spleef list - if not, return
+		// need to check?
 		Player player = event.getPlayer();
-		if (!spleefers.contains(player))
-			return;
-		// already on looser list?
-		if (lost != null && lost.contains(player))
-			return;
-
+		if (!needCheck(player)) return;
+		
 		// check current spleefer if he/she has touched water... and maybe lava
 		Material touchedBlock = event.getTo().getBlock().getType();
 		if (touchedBlock.compareTo(Material.STATIONARY_WATER) == 0
@@ -654,6 +758,64 @@ public class SimpleSpleefGame {
 			// Ha, lost!
 			playerLoses(player, touchedBlock);
 		}
+	}
+
+	/**
+	 * check player interactions
+	 * 
+	 * @param event
+	 */
+	public void checkPlayerInteract(PlayerInteractEvent event) {
+		// need to check?
+		Player player = event.getPlayer();
+		if (!needCheck(player)) return;
+		
+		// player's action
+		Action action = event.getAction();
+		
+		// check if block placing is disallowed
+		if (plugin.conf.getBoolean("disallow_block_placing", true) && (action.compareTo(Action.RIGHT_CLICK_BLOCK) == 0 || action.compareTo(Action.RIGHT_CLICK_AIR) == 0)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		// check instant destruction of blocks
+		if (plugin.conf.getBoolean("instant_block_destroy", false) && action.compareTo(Action.LEFT_CLICK_BLOCK) == 0) {
+			// check if block is inside arena
+			Block clickedBlock = event.getClickedBlock();
+			if (checkInsideArena(clickedBlock.getLocation())) {
+				// remember block
+				if (restoreBlocksAfterGame) {
+					RememberedBlock rBlock = new RememberedBlock();
+					rBlock.material = clickedBlock.getType();
+					rBlock.data = clickedBlock.getData();
+					brokenBlocks.put(clickedBlock, rBlock);
+				}
+				clickedBlock.setType(Material.AIR);
+				clickedBlock.setData((byte) 0);
+			}
+			if (!disallowBreakingOutsideArena) return;
+			// disallow event outside arena and inside to avoid complications
+			event.setCancelled(true);
+		}
+	}
+	
+	/**
+	 * Helper to check whether check function should be checked at all
+	 * @param player
+	 * @return
+	 */
+	private boolean needCheck(Player player) {
+		// no checks, if no game has started
+		if (!started)
+			return false;
+		// check, if player is in spleef list - if not, return
+		if (!spleefers.contains(player))
+			return false;
+		// already on looser list?
+		if (lost != null && lost.contains(player))
+			return false;
+		return true;
 	}
 
 	/**
@@ -715,20 +877,17 @@ public class SimpleSpleefGame {
 	 */
 	private void declareVictory(int team) {
 		// do we have to calculate prize money?
-		double win;
-		if (SimpleSpleef.checkiConomy()) { // get prize money
-			// fixed for this game?
-			if (prizeMoney > 0) {
-				win = (double) prizeMoney;
-				prizeMoney = 0; // reset prize money
-			} else {
-				double fixed = plugin.conf.getDouble("prizemoney_fixed", 0.0);
-				double perplayer = plugin.conf.getDouble(
-						"prizemoney_perplayer", 5.0);
-				win = fixed + perplayer * numberOfPlayers;
-			}
-		} else
-			win = 0; // no prize money
+		double win = 0;
+		GenericBank bank = plugin.getAllPay().getEconPlugin();
+		if (prizeMoney > 0) {
+			win = (double) prizeMoney;
+			prizeMoney = 0; // reset prize money
+		} else {
+			double fixed = plugin.conf.getDouble("prizemoney_fixed", 0.0);
+			double perplayer = plugin.conf.getDouble(
+					"prizemoney_perplayer", 5.0);
+			win = fixed + perplayer * numberOfPlayers;
+		}
 
 		if (team == 0) {
 			// who has won?
@@ -743,7 +902,7 @@ public class SimpleSpleefGame {
 													.replaceAll("\\[PLAYER\\]",
 															player.getName()));
 					// give gift
-					giveRandomGift(player);
+					if (plugin.conf.getBoolean("giveprizes", true)) giveRandomGift(player);
 					// player wins all the money
 					if (win > 0) {
 						plugin.getServer()
@@ -758,8 +917,8 @@ public class SimpleSpleefGame {
 																player.getName())
 														.replaceAll(
 																"\\[MONEY\\]",
-																iConomy.format(win)));
-						payWin(player, win);
+																bank.getFormattedAmount(player, win, -1)));
+						bank.give(player, win, -1);
 					}
 					break;
 				}
@@ -780,11 +939,11 @@ public class SimpleSpleefGame {
 			win = win / teams.get(team).size();
 
 			// give gifts, if activated in config
-			if (plugin.conf.getBoolean("prizes", true))
+			if (plugin.conf.getBoolean("giveprizes", true) && plugin.conf.getBoolean("prizes", true))
 				for (Player player : teams.get(team)) {
 					giveRandomGift(player);
 					// give money
-					payWin(player, win);
+					bank.give(player, win, -1);
 				}
 			if (win > 0)
 				plugin.getServer()
@@ -794,9 +953,18 @@ public class SimpleSpleefGame {
 												.getString("prize_money_team",
 														"Each member of the team received [MONEY] prize money.")
 												.replaceAll("\\[MONEY\\]",
-														iConomy.format(win)));
+														bank.getFormattedAmount(this.firstPlayer, win, -1))); // bot so nice to have the first player here, but what the heck...
 		}
 
+		//update players' original position timestamps
+		long maxTime = plugin.conf.getInt("keep_original_locations_seconds", 1200);
+		if (maxTime > 0) { // only if setting is higher than -1
+			// prune locations first
+			pruneOriginalLocations();
+			for (Player player : spleefers)
+				updateOriginalLocationTimestamp(player);
+		}
+		
 		// remove shovels if needed
 		playersLooseShovels();
 
@@ -814,22 +982,6 @@ public class SimpleSpleefGame {
 		spleefers = null;
 		lost = null;
 		numberOfPlayers = 0;
-	}
-
-	/**
-	 * puts an amount of money on the player's account
-	 * 
-	 * @param player
-	 * @param win
-	 */
-	private void payWin(Player player, double win) {
-		// sanity check
-		if (win <= 0 || !SimpleSpleef.checkiConomy())
-			return;
-		iConomy iConomy = SimpleSpleef.getiConomy();
-		@SuppressWarnings("static-access")
-		Holdings holdings = iConomy.getAccount(player.getName()).getHoldings();
-		holdings.add(win);
 	}
 
 	/**
@@ -985,43 +1137,96 @@ public class SimpleSpleefGame {
 	 * @param event
 	 */
 	public void checkBlockBreak(BlockBreakEvent event) {
-		// no checks, if no game has started or no block breaking should be remembered
-		if (!started || !restoreBlocksAfterGame)
-			return;
-		// check, if player is in spleef list - if not, return
-		Player player = event.getPlayer();
-		if (!spleefers.contains(player))
-			return;
-		// already on looser list?
-		if (lost != null && lost.contains(player))
-			return;
+		// check if arena is defined and has to be protected
+		if (arenaDefined && protectArena) {
+			// check if block is inside arena
+			if (checkInsideArena(event.getBlock().getLocation())) {
+				// inside: check if a game is running and the player is spleefer
+				if (!started || spleefers == null || spleefers.size() == 0 || !spleefers.contains(event.getPlayer()) || (lost != null && lost.contains(event.getPlayer()))) {
+					event.getPlayer().sendMessage(ChatColor.RED + plugin.ll.getString("block_break_prohibited",
+						"You are not allowed to break this block."));
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
 		
-		// remember block
-		Block block = event.getBlock();
-		RememberedBlock rBlock = new RememberedBlock();
-		rBlock.material = block.getType();
-		rBlock.data = block.getData();
-		brokenBlocks.put(block, rBlock);
+		// check if arena is defined and game is running and spleefers may not change outside blocks
+		if (arenaDefined && started && disallowBreakingOutsideArena && spleefers.contains(event.getPlayer()) && (lost == null || !lost.contains(event.getPlayer()))) {
+			if (!checkInsideArena(event.getBlock().getLocation())) {
+				event.getPlayer().sendMessage(ChatColor.RED + plugin.ll.getString("block_break_prohibited",
+					"You are not allowed to break this block."));
+				event.setCancelled(true);
+				return;
+			}
+		}
+		
+		// no checks, if no game has started or no block breaking should be remembered
+		if (started && restoreBlocksAfterGame) {
+			// check, if player is in spleef list - if not, return
+			Player player = event.getPlayer();
+			if (!spleefers.contains(player))
+				return;
+			// already on looser list?
+			if (lost != null && lost.contains(player))
+				return;
+			
+			// remember block
+			Block block = event.getBlock();
+			RememberedBlock rBlock = new RememberedBlock();
+			rBlock.material = block.getType();
+			rBlock.data = block.getData();
+			brokenBlocks.put(block, rBlock);
+		}
 	}
 	
 	/**
-	 * Restore blocks after the game
+	 * main checking routine if location is within the arena
+	 * @param location
+	 * @return
+	 */
+	private boolean checkInsideArena(Location location) {
+		if (location.getWorld() != arenaWorld) return false;
+		int x = location.getBlockX();
+		int y = location.getBlockY();
+		int z = location.getBlockZ();
+		if (arenaMinX <= x && x <= arenaMaxX && arenaMinY <= y && y <= arenaMaxY && arenaMinZ <= z && z <= arenaMaxZ) return true;
+		return false;
+	}
+	
+	/**
+	 * Restore blocks after the game - starts waiter thread only
 	 */
 	protected void restoreBlocks() {
 		if (!restoreBlocksAfterGame) return;
-		for (Entry<Block, RememberedBlock> entry : brokenBlocks.entrySet()) {
-			Block block = entry.getKey();
-			RememberedBlock rBlock = entry.getValue();
-			block.setType(rBlock.material);
-			block.setData(rBlock.data);
-		}
-		brokenBlocks = new HashMap<Block, SimpleSpleefGame.RememberedBlock>(); // create new
+		// start a new game by starting countdown
+		BlockRestoreWaiter blockRestorer = new BlockRestoreWaiter();
+		blockRestorer.start();
 	}
 	
 	/**
-	 * teleport players to first one if set so in configuration
+	 * teleport players to first one or to spawn points if set so in configuration
 	 */
-	protected void teleportPlayersToFirst() {
+	protected void teleportPlayers() {
+		// check spawn points
+		if (teams != null) { // teleport team players to spawn
+			Location bluespawn = getExactLocationFromNode("bluespawn");
+			Location redspawn = getExactLocationFromNode("redspawn");
+			if (redspawn != null && bluespawn != null) {
+				for (Player cPlayer : teams.get(1))
+					cPlayer.teleport(bluespawn);
+				for (Player cPlayer : teams.get(2))
+					cPlayer.teleport(redspawn);
+				return;
+			}
+		} else { // teleport single player
+			Location spawn = getExactLocationFromNode("spawn");
+			if (spawn != null)
+				for (Player cPlayer : spleefers)
+					cPlayer.teleport(spawn);
+			return;
+		}
+		
 		// check configuration
 		if (!plugin.conf.getBoolean("teleport_players_to_first", false)) return;
 		// sanity check
@@ -1033,6 +1238,26 @@ public class SimpleSpleefGame {
 				cPlayer.teleport(firstPlayer);
 			}
 		}
+	}
+	
+	/**
+	 * Get an exact location from a node name
+	 * @param nodeName
+	 * @return
+	 */
+	private Location getExactLocationFromNode(String nodeName) {
+		ConfigurationNode node = plugin.conf.getNode(nodeName);
+		if (node != null) {
+			Location location;
+			try {
+				location = new Location(plugin.getServer().getWorld(node.getString("world")), node.getDouble("x", 0.0), node.getDouble("y", 0.0),
+						node.getDouble("z", 0.0), (float) node.getDouble("yaw", 0.0), (float) node.getDouble("pitch", 0.0));
+				return location;
+			} catch (Exception e) {
+				plugin.getServer().broadcastMessage(ChatColor.RED + "Could not load spawn location from config node " + nodeName + ". Error in config!");
+			}
+		}
+		return null;		
 	}
 	
 	/**
@@ -1052,6 +1277,64 @@ public class SimpleSpleefGame {
 		}
 		
 		firstPlayer = null; // set first player to null, if none was found
+	}
+	
+	/**
+	 * Jump to spectation point
+	 * @param spectator
+	 */
+	public void spectateGame(Player spectator) {
+		Location spectatorspawn = getExactLocationFromNode("spectatorspawn");
+		if (spectatorspawn == null) {
+			spectator.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("block_break_prohibited",
+							"No spectator spawn has been defined."));
+			return;
+		}
+		// is there a game in progress or has started? Prohibit spectation if there is no game
+		if (spleefers == null) {
+			spectator.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_nogameinprogress",
+							"No game is in progress."));
+			return;
+		}
+		// players may not spectate...
+		if (spleefers.contains(spectator)) {
+			spectator.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_you_are_spleefer",
+							"You are a spleefer, not a spectator!"));
+			return;
+		}
+		
+		// save spectator's original position
+		addOriginalLocation(spectator);
+		
+		// teleport spectator to specation point 
+		spectator.teleport(spectatorspawn);
+	}
+	
+	/**
+	 * Teleport player back to where he/she started, provided the point is not too old
+	 * @param player
+	 */
+	public void teleportPlayerBack(Player player) {
+		// is the player a spleefer and the game has started?
+		if (spleefers != null && spleefers.contains(player)) {
+			player.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_wait_for_game_to_finish",
+							"Please wait for the game to finish!"));
+			return;
+		}
+		// either game is finished or the player has left the game or he/she is a spectator
+		Location loc = getAndRemoveOriginalLocation(player);
+		if (loc == null) {
+			player.sendMessage(ChatColor.RED
+					+ plugin.ll.getString("err_could_not_find_location",
+							"Could not find a location to teleport back to - maybe you waited too long!"));
+			return;
+		}
+		// everything ok => teleport back
+		player.teleport(loc);
 	}
 
 	/**
@@ -1077,7 +1360,7 @@ public class SimpleSpleefGame {
 		}
 
 		/**
-		 * Thread class
+		 * Thread method
 		 */
 		public void run() {
 			plugin.getServer()
@@ -1087,11 +1370,11 @@ public class SimpleSpleefGame {
 											.getString("countdown_start",
 													"Starting spleef game. There can only be one!"));
 			
-			teleportPlayersToFirst();
+			teleportPlayers();
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;
-			int count = 10;
+			int count = plugin.conf.getInt("countdown_from", 10);
 			boolean started = false; // start flag
 
 			do {
@@ -1141,5 +1424,108 @@ public class SimpleSpleefGame {
 	private class RememberedBlock {
 		Material material;
 		byte data;
+	}
+
+	/**
+	 * Class that waits 2 secs before blocks are restored
+	 * 
+	 * @author mkalus
+	 */
+	private class BlockRestoreWaiter extends Thread {
+		/**
+		 * Thread method
+		 */
+		public void run() {
+			try {
+				sleep(2000);
+			} catch (InterruptedException e) {
+			}
+
+			for (Entry<Block, RememberedBlock> entry : brokenBlocks.entrySet()) {
+				Block block = entry.getKey();
+				RememberedBlock rBlock = entry.getValue();
+				block.setType(rBlock.material);
+				block.setData(rBlock.data);
+			}
+			brokenBlocks = new HashMap<Block, SimpleSpleefGame.RememberedBlock>(); // create new
+		}
+	}
+	
+	/**
+	 * Simple keeper class for timestamps and locations of players
+	 * @author mkalus
+	 *
+	 */
+	private class PlayerOriginalLocation {
+		long timestamp;
+		
+		Location location;
+	}
+
+	/**
+	 * Keeps data of players teleported
+	 */
+	private HashMap<String, PlayerOriginalLocation> playerOriginalLocations = new HashMap<String, SimpleSpleefGame.PlayerOriginalLocation>();
+	
+	/**
+	 * Add an original location - or update old one
+	 * @param player
+	 */
+	public void addOriginalLocation(Player player) {
+		long maxTime = plugin.conf.getInt("keep_original_locations_seconds", 1200);
+		if (maxTime < 0) return; // ignore -1 and lower
+
+		// prune first
+		pruneOriginalLocations();
+		
+		String playerName = player.getName();
+		// already in list? => update old etry
+		if (playerOriginalLocations.containsKey(playerName))
+			updateOriginalLocationTimestamp(player);
+		else {
+			PlayerOriginalLocation loc = new PlayerOriginalLocation();
+			loc.timestamp = System.currentTimeMillis() / 1000;
+			loc.location = player.getLocation().clone();
+			
+			playerOriginalLocations.put(player.getName(), loc);
+		}
+	}
+	
+	/**
+	 * Return original location and remove entry
+	 * @param player
+	 * @return
+	 */
+	public Location getAndRemoveOriginalLocation(Player player) {
+		// prune first
+		pruneOriginalLocations();
+
+		PlayerOriginalLocation loc = playerOriginalLocations.get(player.getName());
+		if (loc == null) return null;
+		playerOriginalLocations.remove(player.getName());
+		return loc.location;
+	}
+	
+	/**
+	 * Update timestamp of of an original location
+	 * @param player
+	 */
+	public void updateOriginalLocationTimestamp(Player player) {
+		PlayerOriginalLocation loc = playerOriginalLocations.get(player.getName());
+		if (loc != null)
+			loc.timestamp = System.currentTimeMillis() / 1000;
+	}
+	
+	/**
+	 * called by above methods to clean out original locations list periodically
+	 */
+	protected void pruneOriginalLocations() {
+		long maxTime = plugin.conf.getInt("keep_original_locations_seconds", 1200);
+		if (maxTime < 0) return; // should not happen...
+		long checkTime = (System.currentTimeMillis() / 1000) - maxTime;
+		for (Map.Entry<String, PlayerOriginalLocation> entry : playerOriginalLocations.entrySet()) {
+			if (entry.getValue().timestamp < checkTime) // remove entries that are too old
+				playerOriginalLocations.remove(entry.getKey());
+		}
 	}
 }

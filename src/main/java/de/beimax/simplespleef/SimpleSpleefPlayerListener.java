@@ -1,5 +1,6 @@
 package de.beimax.simplespleef;
 
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -46,5 +47,13 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 		game.checkPlayerMove(event);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerInteract(org.bukkit.event.player.PlayerInteractEvent)
+	 */
+	@Override
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		game.checkPlayerInteract(event);
 	}
 }

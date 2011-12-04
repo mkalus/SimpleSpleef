@@ -3,10 +3,6 @@ package de.beimax.simplespleef;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
 
-import com.iConomy.iConomy;
-
-import org.bukkit.plugin.Plugin;
-
 /**
  * Listener for server plugin enable events
  * 
@@ -29,20 +25,9 @@ public class PluginListener extends ServerListener {
 	 */
 	@Override
 	public void onPluginEnable(PluginEnableEvent event) {
-		// load iConomy
-		if (SimpleSpleef.getiConomy() == null) {
-			Plugin iConomy = SimpleSpleef.getBukkitServer().getPluginManager()
-					.getPlugin("iConomy");
-
-			if (iConomy != null) {
-				if (iConomy.isEnabled() && iConomy.getClass().getName().equals("com.iConomy.iConomy")) {
-					SimpleSpleef.setiConomy((iConomy) iConomy);
-
-					SimpleSpleef.log
-							.info("[SimpleSpleef] Successfully linked with iConomy.");
-				}
-			}
+		// load allpay economy
+		if (event.getPlugin() instanceof SimpleSpleef) {
+			((SimpleSpleef) event.getPlugin()).getAllPay().loadEconPlugin();
 		}
 	}
-
 }
