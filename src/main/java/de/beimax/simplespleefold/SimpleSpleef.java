@@ -1,4 +1,4 @@
-package de.beimax.simplespleef;
+package de.beimax.simplespleefold;
 
 import java.io.File;
 import java.io.FileOutputStream;

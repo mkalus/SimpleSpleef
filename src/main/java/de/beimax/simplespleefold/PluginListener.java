@@ -1,4 +1,4 @@
-package de.beimax.simplespleef;
+package de.beimax.simplespleefold;
 
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;

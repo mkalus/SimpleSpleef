@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef;
+package de.beimax.simplespleefold;
 
 import java.util.HashMap;
 import java.util.HashSet;

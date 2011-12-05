@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef;
+package de.beimax.simplespleefold;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;

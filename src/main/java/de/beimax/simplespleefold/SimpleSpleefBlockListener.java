@@ -1,4 +1,4 @@
-package de.beimax.simplespleef;
+package de.beimax.simplespleefold;
 
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;

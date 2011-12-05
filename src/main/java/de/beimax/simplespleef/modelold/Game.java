@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef.model;
+package de.beimax.simplespleef.modelold;
 
 import java.util.HashSet;
 

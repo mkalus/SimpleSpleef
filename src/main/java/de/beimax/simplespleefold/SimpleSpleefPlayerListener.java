@@ -1,4 +1,4 @@
-package de.beimax.simplespleef;
+package de.beimax.simplespleefold;
 
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;

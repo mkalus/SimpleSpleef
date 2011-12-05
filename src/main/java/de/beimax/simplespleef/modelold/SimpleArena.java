@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef.model;
+package de.beimax.simplespleef.modelold;
 
 /**
  * Simple arena implementation that mimicks the behavior of SimplesSpleef prior to 2.0
