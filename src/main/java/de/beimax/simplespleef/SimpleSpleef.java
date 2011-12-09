@@ -20,9 +20,15 @@ package de.beimax.simplespleef;
 
 import java.util.logging.Logger;
 
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
+import de.beimax.simplespleef.listeners.*;
 import de.beimax.simplespleef.util.ConfigHelper;
 import de.beimax.simplespleef.util.UpdateChecker;
 
@@ -33,6 +39,18 @@ import de.beimax.simplespleef.util.UpdateChecker;
  */
 public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
+	
+	/**
+	 * reference to command handler
+	 */
+	private SimpleSpleefCommandExecutor commandExecutor;
+
+	/**
+	 * reference to event handlers/listeners
+	 */
+	private SimpleSpleefBlockListener blockListener;
+	private SimpleSpleefPlayerListener playerListener;
+	private SimpleSpleefEntityListener entityListener;
 
 	/**
 	 * Called when enabling plugin
@@ -102,11 +120,25 @@ public class SimpleSpleef extends JavaPlugin {
 	 * Configure event listeners
 	 */
 	protected void registerEvents() {
-		// Register our events
-		PluginManager pm = getServer().getPluginManager();
+		// let my command handler take care of commands
+		this.commandExecutor = new SimpleSpleefCommandExecutor(this);
+		this.getCommand("spleef").setExecutor(commandExecutor);
 
-		//TODO: register events
+		// Prepare listeners
+		PluginManager pm = getServer().getPluginManager();
+		this.blockListener = new SimpleSpleefBlockListener(this);
+		this.entityListener = new SimpleSpleefEntityListener(this);
+		this.playerListener = new SimpleSpleefPlayerListener(this);
 		
-		//TODO: remember that bukkit can't unregister unneeded events...
+		// Register our events
+		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.High, this);
+		
+		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Low, this);
+		
+		pm.registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
+		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Normal, this);
+		pm.registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
+		pm.registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
+		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 	}
 }
