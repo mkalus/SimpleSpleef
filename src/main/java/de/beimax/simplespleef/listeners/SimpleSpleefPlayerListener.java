@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.GameHandler;
 
 /**
  * Handle events for all Player related events
@@ -16,16 +17,16 @@ import de.beimax.simplespleef.SimpleSpleef;
  */
 public class SimpleSpleefPlayerListener extends PlayerListener {
 	/**
-	 * reference to plugin
+	 * reference to game handler
 	 */
-	private final SimpleSpleef plugin;
-
+	private final GameHandler gameHandler;
+	
 	/**
 	 * Constructor
-	 * @param plugin reference to plugin
+	 * @param gameHandler reference to game handler
 	 */
-	public SimpleSpleefPlayerListener(SimpleSpleef plugin) {
-		this.plugin = plugin;
+	public SimpleSpleefPlayerListener(GameHandler gameHandler) {
+		this.gameHandler = gameHandler;
 	}
 
 	/* (non-Javadoc)

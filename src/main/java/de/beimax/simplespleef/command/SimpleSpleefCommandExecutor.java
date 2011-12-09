@@ -6,9 +6,8 @@ package de.beimax.simplespleef.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.GameHandler;
 
 /**
  * @author mkalus
@@ -16,16 +15,16 @@ import de.beimax.simplespleef.SimpleSpleef;
  */
 public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
-	 * reference to plugin
+	 * reference to game handler
 	 */
-	private final SimpleSpleef plugin;
+	private final GameHandler gameHandler;
 	
 	/**
 	 * Constructor
-	 * @param plugin reference to plugin
+	 * @param gameHandler reference to game handler
 	 */
-	public SimpleSpleefCommandExecutor(SimpleSpleef plugin) {
-		this.plugin = plugin;
+	public SimpleSpleefCommandExecutor(GameHandler gameHandler) {
+		this.gameHandler = gameHandler;
 	}
 
 	/**

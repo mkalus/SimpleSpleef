@@ -28,6 +28,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
+import de.beimax.simplespleef.game.GameHandler;
 import de.beimax.simplespleef.listeners.*;
 import de.beimax.simplespleef.util.ConfigHelper;
 import de.beimax.simplespleef.util.UpdateChecker;
@@ -40,6 +41,11 @@ import de.beimax.simplespleef.util.UpdateChecker;
 public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	
+	/**
+	 * reference to game handler
+	 */
+	private GameHandler gameHandler;
+
 	/**
 	 * reference to command handler
 	 */
@@ -64,6 +70,9 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// check updates, if turned on
 		checkForUpdate();
+		
+		// create game handler
+		this.gameHandler = new GameHandler(this);
 		
 		// add plugin listeners to listen to the registry of other plugins
 		registerPluginListener();
@@ -121,14 +130,14 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	protected void registerEvents() {
 		// let my command handler take care of commands
-		this.commandExecutor = new SimpleSpleefCommandExecutor(this);
+		this.commandExecutor = new SimpleSpleefCommandExecutor(this.gameHandler);
 		this.getCommand("spleef").setExecutor(commandExecutor);
 
 		// Prepare listeners
 		PluginManager pm = getServer().getPluginManager();
-		this.blockListener = new SimpleSpleefBlockListener(this);
-		this.entityListener = new SimpleSpleefEntityListener(this);
-		this.playerListener = new SimpleSpleefPlayerListener(this);
+		this.blockListener = new SimpleSpleefBlockListener(this.gameHandler);
+		this.entityListener = new SimpleSpleefEntityListener(this.gameHandler);
+		this.playerListener = new SimpleSpleefPlayerListener(this.gameHandler);
 		
 		// Register our events
 		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.High, this);

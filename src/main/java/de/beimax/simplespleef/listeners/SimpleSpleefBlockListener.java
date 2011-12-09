@@ -4,6 +4,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.GameHandler;
 
 /**
  * Listener for block breaks
@@ -13,16 +14,16 @@ import de.beimax.simplespleef.SimpleSpleef;
  */
 public class SimpleSpleefBlockListener extends BlockListener {
 	/**
-	 * reference to plugin
+	 * reference to game handler
 	 */
-	private final SimpleSpleef plugin;
-
+	private final GameHandler gameHandler;
+	
 	/**
 	 * Constructor
-	 * @param plugin reference to plugin
+	 * @param gameHandler reference to game handler
 	 */
-	public SimpleSpleefBlockListener(SimpleSpleef plugin) {
-		this.plugin = plugin;
+	public SimpleSpleefBlockListener(GameHandler gameHandler) {
+		this.gameHandler = gameHandler;
 	}
 	
 	/* (non-Javadoc)
