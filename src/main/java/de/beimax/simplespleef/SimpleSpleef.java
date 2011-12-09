@@ -18,17 +18,13 @@
  **/
 package de.beimax.simplespleef;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.logging.Logger;
-import java.util.zip.CRC32;
 
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.beimax.simplespleef.util.ConfigHelper;
+import de.beimax.simplespleef.util.UpdateChecker;
 
 /**
  * SimpleSpleef for Bukkit
@@ -47,6 +43,9 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// configure plugin (configuration stuff)
 		configurePlugin();
+		
+		// check updates, if turned on
+		checkForUpdate();
 		
 		// add plugin listeners to listen to the registry of other plugins
 		registerPluginListener();
@@ -77,6 +76,18 @@ public class SimpleSpleef extends JavaPlugin {
 		ConfigHelper configHelper = new ConfigHelper(this);
 		// update sample config, if needed
 		configHelper.updateSampleConfig();
+	}
+
+	protected void checkForUpdate() {
+		if (!this.getConfig().getBoolean("settings.updateNotificationOnStart", true)) return;
+		
+		UpdateChecker checker = new UpdateChecker();
+		try {
+			if (checker.checkForUpdate(this.getDescription().getVersion()))
+				log.info("[SimpleSpleef] Update found for SimpleSpleef - please go to http://dev.bukkit.org/server-mods/simple-spleef/ to download newest version!");
+		} catch (Exception e) {
+			log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
+		}
 	}
 
 	/**
