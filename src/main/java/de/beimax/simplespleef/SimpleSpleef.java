@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.beimax.simplespleef.util.ConfigHelper;
@@ -43,9 +44,15 @@ public class SimpleSpleef extends JavaPlugin {
 	public void onEnable() {
 		// initialize plugin
 		log.info(this.toString() + " is loading.");
-
-		// configure plugin
+		
+		// configure plugin (configuration stuff)
 		configurePlugin();
+		
+		// add plugin listeners to listen to the registry of other plugins
+		registerPluginListener();
+		
+		// add event listeners
+		registerEvents();
 	}
 
 	/**
@@ -70,5 +77,25 @@ public class SimpleSpleef extends JavaPlugin {
 		ConfigHelper configHelper = new ConfigHelper(this);
 		// update sample config, if needed
 		configHelper.updateSampleConfig();
+	}
+
+	/**
+	 * adds a plugin listener to listen to the registry of other plugins
+	 */
+	protected void registerPluginListener() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Configure event listeners
+	 */
+	protected void registerEvents() {
+		// Register our events
+		PluginManager pm = getServer().getPluginManager();
+
+		//TODO: register events
+		
+		//TODO: remember that bukkit can't unregister unneeded events...
 	}
 }

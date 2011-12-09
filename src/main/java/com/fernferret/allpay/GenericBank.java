@@ -70,7 +70,8 @@ public abstract class GenericBank {
 
     protected final void payItem(Player player, double amount, int type) {
         int removed = 0;
-        HashMap<Integer, ItemStack> items = (HashMap<Integer, ItemStack>) player.getInventory().all(type);
+        @SuppressWarnings("unchecked")
+		HashMap<Integer, ItemStack> items = (HashMap<Integer, ItemStack>) player.getInventory().all(type);
         for (int i : items.keySet()) {
             if (removed >= amount) {
                 break;
