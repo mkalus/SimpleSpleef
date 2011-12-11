@@ -1376,6 +1376,7 @@ public class SimpleSpleefGame {
 			long start = System.currentTimeMillis() + 1000;
 			int count = plugin.conf.getInt("countdown_from", 10);
 			boolean started = false; // start flag
+			boolean silent = plugin.conf.getBoolean("silent_countdown", true);
 
 			do {
 				if (System.currentTimeMillis() >= start) {
@@ -1385,12 +1386,16 @@ public class SimpleSpleefGame {
 					// set next countdown event
 					else {
 						start = start + 1000;
+						String message = ChatColor.BLUE
+								+ plugin.ll.getString("countdown_prefix",
+										"Spleef: ") + count;
+						if (silent) { // send countdown to spleefers only
+							for (Player player : spleefers) {
+								player.sendMessage(message);
+							}
+						} else
 						// Broadcast countdown
-						plugin.getServer().broadcastMessage(
-								ChatColor.BLUE
-										+ plugin.ll.getString(
-												"countdown_prefix", "Spleef: ")
-										+ count);
+							plugin.getServer().broadcastMessage(message);
 						count--;
 					}
 				}

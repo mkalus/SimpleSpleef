@@ -188,6 +188,10 @@ public class SimpleSpleef extends JavaPlugin {
 			conf.setProperty("disallow_block_placing", true);
 			changed = true;
 		}		
+		if (conf.getProperty("silent_countdown") == null) { // show countdown only to players
+			conf.setProperty("silent_countdown", true);
+			changed = true;
+		}		
 
 		// config has been changed: save it
 		if (changed) {
