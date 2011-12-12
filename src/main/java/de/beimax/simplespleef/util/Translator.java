@@ -4,6 +4,9 @@
 package de.beimax.simplespleef.util;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -62,5 +65,23 @@ public class Translator {
 			translated = translated.replace(replacers[i], replacers[i+1]);
 		}
 		return translated;
+	}
+
+	/**
+	 * Get translation section list
+	 * @param section
+	 * @return
+	 */
+	public Map<String, String> lls(String section) {
+		// sanity check
+		if (!lang.isConfigurationSection(section)) return null;
+		// get keys
+		Set<String> keys = lang.getConfigurationSection(section).getKeys(true);
+		Map<String, String> map = new HashMap<String, String>();
+		for (String key : keys) {
+			map.put(key, lang.getString(section + "." + key));
+		}
+
+		return map;
 	}
 }

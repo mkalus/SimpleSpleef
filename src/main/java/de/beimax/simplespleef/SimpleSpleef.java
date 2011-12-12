@@ -18,6 +18,7 @@
  **/
 package de.beimax.simplespleef;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.event.Event.Priority;
@@ -217,5 +218,14 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public String ll(String key, String... replacers) {
 		return lang.ll(key, replacers);
+	}
+	
+	/**
+	 * Get translation section list
+	 * @param key
+	 * @return
+	 */
+	public Map<String, String> lls(String section) {
+		return lang.lls(section);
 	}
 }

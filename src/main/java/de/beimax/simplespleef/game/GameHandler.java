@@ -25,6 +25,12 @@ public class GameHandler {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * @return the plugin
+	 */
+	public SimpleSpleef getPlugin() {
+		return plugin;
+	}
 
 	//TODO game handling itself
 }

@@ -1,10 +1,12 @@
 # Sprachdatei Deutsch (Language file German)
 command:
-    help: 'Zeige Hilfe'
-    announce: 'Neues Spiel ankündigen (in Arena)'
-    join: 'Mitspielen (in Arena)'
-    arenas: 'Arenen auflisten'
-    info: 'Zeige Infos (zur Arena)'
-    list: 'Liste Spleefers (in arena)'
-    start: 'Starte Spiel (für Spleefer)'
-    countdown: 'Starte Countdown (in Arena)'
+    help: 'help|Zeige Hilfe'
+    announce: 'announce [arena]|Neues Spiel ankündigen (in Arena)'
+    join: 'join [arena]|Mitspielen (in Arena)'
+    arenas: 'arenas|Arenen auflisten'
+    info: 'info [arena]|Zeige Infos (zur Arena)'
+    list: 'list [arena]|Liste Spleefers (in arena)'
+    start: 'start|Starte Spiel (für Spleefer)'
+    countdown: 'countdown [arena]|Starte Countdown (in Arena)'
+permissions:
+    noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'

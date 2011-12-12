@@ -1,10 +1,12 @@
 # Language file English
 command:
-    help: Display help
-    announce: 'Announce a new game (in arena)'
-    join: 'Join a dog-eats-dog game (in arena)'
-    arenas: 'List available arenas'
-    info: 'Show information (on arena)'
-    list: 'List spleefers (in arena)'
-    start: 'Start game (spleefers only)'
-    countdown: 'Start count down (of arena)'
+    help: 'help|Display help'
+    announce: 'announce [arena]|Announce a new game (in arena)'
+    join: 'join [arena]|Join a dog-eats-dog game (in arena)'
+    arenas: 'arenas|List available arenas'
+    info: 'info [arena]|Show information (on arena)'
+    list: 'list [arena]|List spleefers (in arena)'
+    start: 'start|Start game (spleefers only)'
+    countdown: 'countdown [arena]|Start count down (of arena)'
+permissions:
+    noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
