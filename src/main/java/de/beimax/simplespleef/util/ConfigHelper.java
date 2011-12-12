@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import de.beimax.simplespleef.SimpleSpleef;
 
 /**
@@ -17,6 +20,11 @@ import de.beimax.simplespleef.SimpleSpleef;
  * @author mkalus
  */
 public class ConfigHelper {
+	/**
+	 * available languages
+	 */
+	public final static String[] languagesAvailable = {"en", "de"};
+	
 	/**
 	 * reference to plugin
 	 */
@@ -92,5 +100,32 @@ public class ConfigHelper {
 		is.close();
 		
 		return crc.getValue();
+	}
+	
+	/**
+	 * update language files to comply to defaults
+	 */
+	public void updateLanguageFiles() {
+		// load language files one by one
+		for (String language : ConfigHelper.languagesAvailable) {
+			// load saved file from data folder
+			File languageFile = new File(this.plugin.getDataFolder(), "lang_" + language + ".yml");
+			FileConfiguration languageConfig = YamlConfiguration.loadConfiguration(languageFile);
+			
+			// get default config from resource
+			InputStream languageConfigStream = this.plugin.getResource("lang_" + language + ".yml");
+		    if (languageConfigStream != null) {
+		        YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(languageConfigStream);
+		        // update config
+		        languageConfig.setDefaults(defConfig);
+		        languageConfig.options().copyDefaults(true); // copy defaults, too
+		        try {
+		        	// save updated config
+		        	languageConfig.save(languageFile);
+		        } catch (Exception e) {
+		        	SimpleSpleef.log.warning("[SimpleSpleef] Warning: Could not write lang_" + language + ".yml - reason: " + e.getMessage());
+		        }
+		    }
+		}
 	}
 }

@@ -1,0 +1,10 @@
+# Sprachdatei Deutsch (Language file German)
+command:
+    help: 'Zeige Hilfe'
+    announce: 'Neues Spiel ankündigen (in Arena)'
+    join: 'Mitspielen (in Arena)'
+    arenas: 'Arenen auflisten'
+    info: 'Zeige Infos (zur Arena)'
+    list: 'Liste Spleefers (in arena)'
+    start: 'Starte Spiel (für Spleefer)'
+    countdown: 'Starte Countdown (in Arena)'

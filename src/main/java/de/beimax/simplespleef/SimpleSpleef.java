@@ -22,15 +22,15 @@ import java.util.logging.Logger;
 
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.beimax.simplespleef.admin.SimpleSpleefAdmin;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
 import de.beimax.simplespleef.game.GameHandler;
 import de.beimax.simplespleef.listeners.*;
 import de.beimax.simplespleef.util.ConfigHelper;
+import de.beimax.simplespleef.util.Translator;
 import de.beimax.simplespleef.util.UpdateChecker;
 
 /**
@@ -47,9 +47,19 @@ public class SimpleSpleef extends JavaPlugin {
 	private GameHandler gameHandler;
 
 	/**
+	 * reference to admin class
+	 */
+	private SimpleSpleefAdmin admin;
+
+	/**
 	 * reference to command handler
 	 */
 	private SimpleSpleefCommandExecutor commandExecutor;
+
+	/**
+	 * reference to translator
+	 */
+	private Translator lang;
 
 	/**
 	 * reference to event handlers/listeners
@@ -57,7 +67,7 @@ public class SimpleSpleef extends JavaPlugin {
 	private SimpleSpleefBlockListener blockListener;
 	private SimpleSpleefPlayerListener playerListener;
 	private SimpleSpleefEntityListener entityListener;
-
+	
 	/**
 	 * Called when enabling plugin
 	 */
@@ -71,8 +81,9 @@ public class SimpleSpleef extends JavaPlugin {
 		// check updates, if turned on
 		checkForUpdate();
 		
-		// create game handler
+		// create new handlers
 		this.gameHandler = new GameHandler(this);
+		this.admin = new SimpleSpleefAdmin(this);
 		
 		// add plugin listeners to listen to the registry of other plugins
 		registerPluginListener();
@@ -103,6 +114,11 @@ public class SimpleSpleef extends JavaPlugin {
 		ConfigHelper configHelper = new ConfigHelper(this);
 		// update sample config, if needed
 		configHelper.updateSampleConfig();
+		// update language files
+		configHelper.updateLanguageFiles();
+		
+		// initialize the translator
+		lang = new Translator(this, this.getConfig().getString("language", "en"));
 	}
 
 	protected void checkForUpdate() {
@@ -149,5 +165,56 @@ public class SimpleSpleef extends JavaPlugin {
 		pm.registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
+	}
+
+	/**
+	 * @return the gameHandler
+	 */
+	public GameHandler getGameHandler() {
+		return gameHandler;
+	}
+
+	/**
+	 * @return the admin
+	 */
+	public SimpleSpleefAdmin getAdminClass() {
+		return admin;
+	}
+
+	/**
+	 * @return the commandExecutor
+	 */
+	public SimpleSpleefCommandExecutor getCommandExecutor() {
+		return commandExecutor;
+	}
+
+	/**
+	 * @return the blockListener
+	 */
+	public SimpleSpleefBlockListener getBlockListener() {
+		return blockListener;
+	}
+
+	/**
+	 * @return the playerListener
+	 */
+	public SimpleSpleefPlayerListener getPlayerListener() {
+		return playerListener;
+	}
+
+	/**
+	 * @return the entityListener
+	 */
+	public SimpleSpleefEntityListener getEntityListener() {
+		return entityListener;
+	}
+
+	/**
+	 * @param key of translation file
+	 * @param replacers an even number of key/value pairs to replace key entries
+	 * @return translated string
+	 */
+	public String ll(String key, String... replacers) {
+		return lang.ll(key, replacers);
 	}
 }

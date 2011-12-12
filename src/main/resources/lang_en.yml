@@ -1,0 +1,10 @@
+# Language file English
+command:
+    help: Display help
+    announce: 'Announce a new game (in arena)'
+    join: 'Join a dog-eats-dog game (in arena)'
+    arenas: 'List available arenas'
+    info: 'Show information (on arena)'
+    list: 'List spleefers (in arena)'
+    start: 'Start game (spleefers only)'
+    countdown: 'Start count down (of arena)'

@@ -9,83 +9,38 @@ commands:
     description: Control your spleef games
     aliases: [spl]
     usage: |
-      /<command> join Join a dog-eats-dog game.
-      /<command> 1 o. blue Join team blue
-      /<command> 2 o. red Join team red
-      /<command> start Start game
-      /<command> stop Stop game
-      /<command> delete Delete current game
-      /<command> leave Leave game
-      /<command> list Show game information
-      /<command> prize money 1000 The next winner receives 1000 money (admin command).
-      /<command> prize 322 The next winner receives a golden apple (item id) (admin command).
-      /<command> reload Reload configuration
-      /<command> startsingle Op command to test game start with only one person
-      /<command> spectate Spectate the game
-      /<command> back Teleport back (player of spectator)
+      /<command> help - Display help
+      /<command> announce [arena] - Announce a new game (in arena)
+      /<command> join [arena] - Join a game (in arena)
+      /<command> arenas - List available arenas
+      /<command> info [arena] - Show information (on arena)
+      /<command> list [arena] - List spleefers (in arena)
+      /<command> start - Start game (spleefers only)
+      /<command> countdown [arena] - Start count down (of arena)
 
 permissions:
-  simplespleef.*:
-    description: Access to all spleef commands
-    children:
-      simplespleef.list: true
-      simplespleef.play: true
-      simplespleef.team: true
-      simplespleef.initialize: true
-      simplespleef.initializeteam: true
-      simplespleef.leave: true
-      simplespleef.start: true
-      simplespleef.stop: true
-      simplespleef.delete: true
-      simplespleef.reload: true
-      simplespleef.prize: true
-      simplespleef.spectate: true
-      simplespleef.startsingle: true
-  simplespleef.list:
-    description: List command
-    default: true
-  simplespleef.play:
-    description: Join dog-eats-dog command.
+  simplespleef.help:
+    description: Display help
     default: true
   simplespleef.announce:
-    description: Announce a new dog-eats-dog game people can join.
-    default: op
-  simplespleef.team:
-    description: Join team commands.
+    description: Announce a new game (in arena)
     default: true
-  simplespleef.initialize:
-    description: Join dog-eats-dog command (initialize game).
+  simplespleef.join:
+    description: List available arenas
     default: true
-  simplespleef.initializeteam:
-    description: Join team commands (initialize game).
+  simplespleef.arenas:
+    description: List available arenas
     default: true
-  simplespleef.leave:
-    description: Leave command.
+  simplespleef.info:
+    description: Show information (on arena)
+    default: true
+  simplespleef.list:
+    description: List spleefers (in arena)
     default: true
   simplespleef.start:
-    description: Start game.
+    description: Start game (spleefers only)
     default: true
-  simplespleef.stop:
-    description: Stop game.
+  simplespleef.countdown:
+    description: Start count down (of arena)
     default: true
-  simplespleef.delete:
-    description: Delete game.
-    default: true
-  simplespleef.reload:
-    description: Reload configuration file.
-    default: op
-  simplespleef.prize:
-    description: Use the prize command to set a prize for the next winner (money or item id).
-    default: op
-  simplespleef.startsingle:
-    description: Start the game, even if there is only one person. Good for Ops to test arenas.
-    default: op
-  simplespleef.spectate:
-    description: Spectate a game (teleport to spectation area)
-    default: true
-  simplespleef.back:
-    description: Teleport back to original position (player or spectator)
-    default: true
-  simplespleef.admin:
-    description: Administrative commands.
-    default: op 
+ 
