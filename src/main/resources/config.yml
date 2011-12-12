@@ -26,6 +26,8 @@ settings:
     announceWin: true
 # globally announce the prize won by a player
     announcePrize: true
+# prevent players from teleporting into/out of the arena during the game
+    preventTeleportingDuringGames: true
 # arena specific settings
 arenas:
 # "special" default arena

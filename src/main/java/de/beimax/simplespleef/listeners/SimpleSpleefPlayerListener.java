@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.GameHandler;
@@ -77,4 +78,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		//TODO implement
 	}
 
+	/* (non-Javadoc)
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerTeleport(org.bukkit.event.player.PlayerTeleportEvent)
+	 */
+	@Override
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		// TODO Auto-generated method stub
+	}
 }
