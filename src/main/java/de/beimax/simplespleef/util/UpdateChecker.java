@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import de.beimax.simplespleef.SimpleSpleef;
+
 /**
  * @author mkalus Helper class that checks for updates.
  */
@@ -31,5 +33,13 @@ public class UpdateChecker {
 		if (inputLine != null && inputLine.equals(version)) return false;
 
 		return true;
+	}
+
+	/**
+	 * Update configuration files, if needed.
+	 * @param simpleSpleef
+	 */
+	public void updateConfigurationVersion(SimpleSpleef simpleSpleef) {
+		// right now, nothing is done here - in the future, check version number in config file, update stuff, increase version number
 	}
 }

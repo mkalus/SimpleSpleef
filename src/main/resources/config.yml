@@ -1,4 +1,6 @@
 # Simple Spleef configuration
+# Version number of configuration - do not touch! It is used for automatic updates of configuration settings. 
+version: 1
 # Language - reads configuration from specific language file
 language: en
 settings:
