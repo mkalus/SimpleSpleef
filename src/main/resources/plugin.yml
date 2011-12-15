@@ -11,12 +11,17 @@ commands:
     usage: |
       /<command> help - Display help
       /<command> announce [arena] - Announce a new game (in arena)
-      /<command> join [arena] - Join a game (in arena)
+      /<command> join [arena|free] - Join a game (in arena - freestyle game)
       /<command> arenas - List available arenas
       /<command> info [arena] - Show information (on arena)
       /<command> list [arena] - List spleefers (in arena)
       /<command> start - Start game (spleefers only)
       /<command> countdown [arena] - Start count down (of arena)
+      /<command> leave - Leave a game
+      /<command> stop - Stop a game
+      /<command> delete - Delete a game
+      /<command> reset [arena] - Reset a game (admin/moderator delete game)
+      /<command> spectate [arena] - Spectate a game (in arena)
 
 permissions:
   simplespleef.help:
@@ -43,4 +48,18 @@ permissions:
   simplespleef.countdown:
     description: Start count down (of arena)
     default: true
- 
+  simplespleef.leave:
+    description: Leave a game
+    default: true
+  simplespleef.stop:
+    description: Stop a game
+    default: true
+  simplespleef.delete:
+    description: Delete a game
+    default: true
+  simplespleef.reset:
+    description: Reset a game (admin/moderator delete game)
+    default: op
+  simplespleef.spectate:
+    description: Spectate a game
+    default: true

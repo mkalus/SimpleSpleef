@@ -2,11 +2,16 @@
 command:
     help: 'help|Zeige Hilfe'
     announce: 'announce [arena]|Neues Spiel ankündigen (in Arena)'
-    join: 'join [arena]|Mitspielen (in Arena)'
+    join: 'join [arena|free]|Mitspielen (in Arena - Freestyle-Spiel)'
     arenas: 'arenas|Arenen auflisten'
     info: 'info [arena]|Zeige Infos (zur Arena)'
     list: 'list [arena]|Liste Spleefers (in arena)'
     start: 'start|Starte Spiel (für Spleefer)'
     countdown: 'countdown [arena]|Starte Countdown (in Arena)'
+    leave: 'leave|Verlasse das Spiel'
+    stop: 'stop|Beende ein Spiel'
+    delete: 'delete|Lösche ein Spiel'
+    reset: 'reset arena|Lösche ein Spiel in einer Arena (für Admins/Moderatoren)'
+    spectate: 'spectate [arena]|Schaue bei einem Spiel (in Arena) zu'
 permissions:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'

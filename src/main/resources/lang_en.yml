@@ -2,11 +2,16 @@
 command:
     help: 'help|Display help'
     announce: 'announce [arena]|Announce a new game (in arena)'
-    join: 'join [arena]|Join a dog-eats-dog game (in arena)'
+    join: 'join [arena|free]|Join a dog-eats-dog game (in arena - freestyle game)'
     arenas: 'arenas|List available arenas'
     info: 'info [arena]|Show information (on arena)'
     list: 'list [arena]|List spleefers (in arena)'
     start: 'start|Start game (spleefers only)'
     countdown: 'countdown [arena]|Start count down (of arena)'
+    leave: 'leave|Leave a game'
+    stop: 'stop|Stop a game'
+    delete: 'delete|Delete a game'
+    reset: 'reset arena|Reset a game in arena (delete for admins/moderators)'
+    spectate: 'spectate [arena]|Spectate a game (in arena)'
 permissions:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
