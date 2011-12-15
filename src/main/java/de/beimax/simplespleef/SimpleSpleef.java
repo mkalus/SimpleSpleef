@@ -110,7 +110,7 @@ public class SimpleSpleef extends JavaPlugin {
 	protected void configurePlugin() {
 		// define that default config should be copied
 		this.getConfig().options().copyDefaults(true);
-		
+
 		// create config helper
 		ConfigHelper configHelper = new ConfigHelper(this);
 		// update sample config, if needed

@@ -8,20 +8,7 @@ commands:
   spleef:
     description: Control your spleef games
     aliases: [spl]
-    usage: |
-      /<command> help - Display help
-      /<command> announce [arena] - Announce a new game (in arena)
-      /<command> join [arena|free] - Join a game (in arena - freestyle game)
-      /<command> arenas - List available arenas
-      /<command> info [arena] - Show information (on arena)
-      /<command> list [arena] - List spleefers (in arena)
-      /<command> start - Start game (spleefers only)
-      /<command> countdown [arena] - Start count down (of arena)
-      /<command> leave - Leave a game
-      /<command> stop - Stop a game
-      /<command> delete - Delete a game
-      /<command> reset [arena] - Reset a game (admin/moderator delete game)
-      /<command> spectate [arena] - Spectate a game (in arena)
+    usage: /<command> is the SimpleSpleef command - you have no permission to use it at all!
 
 permissions:
   simplespleef.help:
@@ -31,7 +18,7 @@ permissions:
     description: Announce a new game (in arena)
     default: true
   simplespleef.join:
-    description: List available arenas
+    description: Join a game (in arena)
     default: true
   simplespleef.arenas:
     description: List available arenas
@@ -60,6 +47,6 @@ permissions:
   simplespleef.reset:
     description: Reset a game (admin/moderator delete game)
     default: op
-  simplespleef.spectate:
-    description: Spectate a game
+  simplespleef.watch:
+    description: Watch a game
     default: true

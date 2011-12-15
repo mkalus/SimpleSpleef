@@ -12,6 +12,7 @@ command:
     stop: 'stop|Stop a game'
     delete: 'delete|Delete a game'
     reset: 'reset arena|Reset a game in arena (delete for admins/moderators)'
-    spectate: 'spectate [arena]|Spectate a game (in arena)'
-permissions:
+    watch: 'watch [arena]|Watch a game (in arena)'
+errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
+    unknownCommand: 'Unknown command "[COMMAND]"'
