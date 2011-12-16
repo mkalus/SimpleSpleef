@@ -50,7 +50,7 @@ public class GameHandler {
 			// copy array and add new game
 			Game[] newGames = new Game[games.length+1];
 			for (int i = 0; i < games.length; i++) {
-				if (games[i] == game) return false; // one cannot add the same game twice
+				if (games[i] == game || games[i].getName().equals(game.getName())) return false; // one cannot add the same game twice
 				newGames[i] = games[i];
 			}
 			games = newGames;
@@ -59,18 +59,39 @@ public class GameHandler {
 	}
 	
 	/**
+	 * add a game by name
+	 * @param type
+	 * @return
+	 */
+	public boolean addGame(String type) {
+		// let the factory handle the details
+		Game game = GameFactory.createGame(type);
+		if (game == null) return false; // no game created?
+		
+		return addGame(game); // add game
+	}
+	
+	/**
 	 * remove a game from the handler
 	 * @param game
 	 * @return
 	 */
 	public boolean removeGame(Game game) {
+		return removeGame(game.getName());
+	}
+	
+	/**
+	 * remove a game from the handler (by name)
+	 * @param game
+	 * @return
+	 */
+	public boolean removeGame(String game) {
 		if (games == null) return false;
-		// copy array and do not add old game
 		Game[] newGames = new Game[games.length-1];
 		boolean found = false;
 		int pos = 0;
 		for (int i = 0; i < newGames.length; i++) {
-			if (games[i] == game) continue;
+			if (games[i].getName().equals(game)) continue;
 			newGames[pos++] = games[i];
 		}
 		if (found) games = newGames;
