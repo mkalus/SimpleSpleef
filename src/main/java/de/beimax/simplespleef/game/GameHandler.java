@@ -67,7 +67,7 @@ public class GameHandler {
 	 */
 	public boolean addGame(String type) {
 		// let the factory handle the details
-		Game game = GameFactory.createGame(type);
+		Game game = GameFactory.getGame(type);
 		if (game == null) return false; // no game created?
 		
 		return addGame(game); // add game
@@ -109,21 +109,21 @@ public class GameHandler {
 	}
 	
 	/**
-	 * get the default arena
+	 * get the default arena name
 	 * @return
 	 */
-	public Arena getDefaultArena() {
-		return ArenaFactory.getArena(this.getPlugin().getConfig().getString("settings.defaultArena", "default"));
+	public String getDefaultArena() {
+		return this.getPlugin().getConfig().getString("settings.defaultArena", "default");
 	}
 	
 	/**
-	 * get an arena from name
-	 * @param arena name - null will default to "default arena"
+	 * get an game from name
+	 * @param game name - null will default to "default arena"
 	 * @return
 	 */
-	public Arena getArenaFromString(String arena) {
-		if (arena == null) return getDefaultArena();
-		return ArenaFactory.getArena(arena);
+	public Game getGameFromString(String game) {
+		if (game == null) game = getDefaultArena();
+		return GameFactory.getGame(game);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class GameHandler {
 	 * @param sender
 	 * @param arena
 	 */
-	public void announceNewGameInArena(CommandSender sender, Arena arena) {
+	public void announceNewGameInArena(CommandSender sender, Game game) {
 		// TODO Auto-generated method stub
 	}
 

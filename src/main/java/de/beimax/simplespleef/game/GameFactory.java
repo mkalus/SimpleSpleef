@@ -8,7 +8,7 @@ package de.beimax.simplespleef.game;
  * Factory class to create games
  */
 public abstract class GameFactory {
-	public static Game createGame(String type) {
+	public static Game getGame(String type) {
 		//TODO create new instances and return them
 		return null;
 	}

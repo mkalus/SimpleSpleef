@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
 import de.beimax.simplespleef.game.Arena;
+import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -125,10 +126,10 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected void announceCommand(CommandSender sender, String[] args) {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 1)) return;
-		// get arena from 2nd argument
-		Arena arena = this.getArenaFromArgument(sender, args, 1);
-		if (arena != null) { // no errors - then try to announce new game
-			this.gameHandler.announceNewGameInArena(sender, arena);
+		// get game from 2nd argument
+		Game game = this.getGameFromArgument(sender, args, 1);
+		if (game != null) { // no errors - then try to announce new game
+			this.gameHandler.announceNewGameInArena(sender, game);
 		}
 	}
 	
@@ -327,19 +328,21 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	}
 	
 	/**
-	 * get arena from name
+	 * get game name from string
 	 * @param args
 	 * @param index
-	 * @return null, if arena is not found
+	 * @return null, if arena name is not found
 	 */
-	protected Arena getArenaFromArgument(CommandSender sender, String[] args, int index) {
-		Arena arena;
+	protected Game getGameFromArgument(CommandSender sender, String[] args, int index) {
+		String name;
 		// of too short, get the default arena
-		if (args.length <= index) arena = this.gameHandler.getDefaultArena();
-		else arena = this.gameHandler.getArenaFromString(args[index]);
+		if (args.length <= index) name = null;
+		else name = args[index];
+		// get game
+		Game game = this.gameHandler.getGameFromString(name);
 		
 		// error output, if no arena has been found
-		if (arena == null) unknownArena(sender, args.length <= index?"default":args[index]);
-		return arena;
+		if (game == null) unknownArena(sender, name==null?this.gameHandler.getDefaultArena():name);
+		return game;
 	}
 }
