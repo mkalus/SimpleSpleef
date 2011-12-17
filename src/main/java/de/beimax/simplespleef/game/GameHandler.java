@@ -3,6 +3,8 @@
  */
 package de.beimax.simplespleef.game;
 
+import org.bukkit.command.CommandSender;
+
 import de.beimax.simplespleef.SimpleSpleef;
 
 /**
@@ -104,6 +106,33 @@ public class GameHandler {
 	 */
 	public boolean hasGames() {
 		return games != null;
+	}
+	
+	/**
+	 * get the default arena
+	 * @return
+	 */
+	public Arena getDefaultArena() {
+		return ArenaFactory.getArena(this.getPlugin().getConfig().getString("settings.defaultArena", "default"));
+	}
+	
+	/**
+	 * get an arena from name
+	 * @param arena name - null will default to "default arena"
+	 * @return
+	 */
+	public Arena getArenaFromString(String arena) {
+		if (arena == null) return getDefaultArena();
+		return ArenaFactory.getArena(arena);
+	}
+
+	/**
+	 * try to announce a new game in an arena
+	 * @param sender
+	 * @param arena
+	 */
+	public void announceNewGameInArena(CommandSender sender, Arena arena) {
+		// TODO Auto-generated method stub
 	}
 
 	//TODO game handling itself

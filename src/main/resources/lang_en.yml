@@ -16,3 +16,6 @@ command:
 errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
     unknownCommand: 'Unknown command "[COMMAND]"'
+    unknownArena: 'Unknown arena "[ARENA]"'
+    tooFewArguments: 'Too few arguments for this command. Minimum is [MIN].'
+    tooManyArguments: 'Too many arguments for this command. Maximum is [MAX].'

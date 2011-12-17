@@ -16,3 +16,6 @@ command:
 errors:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
     unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
+    unknownArena: 'Unbekannte Arena "[ARENA]"'
+    tooFewArguments: 'Zu wenige Parameter für diesen Befehl. Minimum ist [MIN].'
+    tooManyArguments: 'Zu viele Parameter für diesen Befehl. Maximum ist [MAX].'

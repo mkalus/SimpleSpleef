@@ -5,10 +5,10 @@ package de.beimax.simplespleef.game;
 
 /**
  * @author mkalus
- * Factory class to create games
+ *
  */
-public abstract class GameFactory {
-	public static Game createGame(String type) {
+public abstract class ArenaFactory {
+	public static Arena getArena(String name) {
 		//TODO create new instances and return them
 		return null;
 	}

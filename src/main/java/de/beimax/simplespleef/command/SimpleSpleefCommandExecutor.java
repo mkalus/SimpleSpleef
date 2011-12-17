@@ -12,6 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
+import de.beimax.simplespleef.game.Arena;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -107,12 +108,8 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			if (isConsole(sender) && !isConsoleCommand(command)) continue;
 			// we are cleared and may output the command nicely
 			output = true;
-			String value = commands.get(command);
-			int pos = value.indexOf('|');
-			if (pos == -1) sender.sendMessage(ChatColor.GOLD + value);
-			else
-				sender.sendMessage(ChatColor.GOLD + value.substring(0, pos)
-						+ ": " + ChatColor.WHITE + value.substring(pos + 1));
+			// print command
+			printCommandString(sender, commands.get(command));
 		}
 		// was there output? if not show response
 		if (!output)
@@ -126,8 +123,13 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void announceCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// get arena from 2nd argument
+		Arena arena = this.getArenaFromArgument(sender, args, 1);
+		if (arena != null) { // no errors - then try to announce new game
+			this.gameHandler.announceNewGameInArena(sender, arena);
+		}
 	}
 	
 	/**
@@ -230,6 +232,8 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		//TODO: implement
 	}
 	
+	//TODO: add further commands here...
+	
 	/**
 	 * Shows unknown command error
 	 * @param sender
@@ -238,6 +242,17 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected boolean unknownCommand(CommandSender sender, String command) {
 		sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.unknownCommand", "[COMMAND]", command));
+		return true;
+	}
+
+	/**
+	 * Shows unknown arena error
+	 * @param sender
+	 * @param command
+	 * @return true
+	 */
+	protected boolean unknownArena(CommandSender sender, String arena) {
+		sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
 		return true;
 	}
 
@@ -261,5 +276,70 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			if (c.equals(command)) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Print command string from settings line
+	 * @param sender
+	 * @param commandString comand|description...
+	 */
+	protected void printCommandString(CommandSender sender, String commandString) {
+		int pos = commandString.indexOf('|');
+		if (pos == -1) sender.sendMessage(ChatColor.GOLD + commandString);
+		else
+			sender.sendMessage(ChatColor.GOLD + commandString.substring(0, pos)
+					+ ": " + ChatColor.WHITE + commandString.substring(pos + 1));
+	}
+	
+	/**
+	 * checks for a minimum number of arguments
+	 * @param sender
+	 * @param args
+	 * @param min index
+	 * @return
+	 */
+	protected boolean tooFewArguments(CommandSender sender, String[] args, int min) {
+		if (args.length < min+1) {
+			sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.tooFewArguments", "[MIN]", String.valueOf(min)));
+			String commandString = this.gameHandler.getPlugin().ll("command." + args[0]);
+			if (commandString != null)
+				printCommandString(sender, commandString);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * checks for a maximum number of arguments
+	 * @param args
+	 * @param max
+	 * @return
+	 */
+	protected boolean tooManyArguments(CommandSender sender, String[] args, int max) {
+		if (args.length > max+1) {
+			sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.tooManyArguments", "[MAX]", String.valueOf(max)));
+			String commandString = this.gameHandler.getPlugin().ll("command." + args[0]);
+			if (commandString != null)
+				printCommandString(sender, commandString);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * get arena from name
+	 * @param args
+	 * @param index
+	 * @return null, if arena is not found
+	 */
+	protected Arena getArenaFromArgument(CommandSender sender, String[] args, int index) {
+		Arena arena;
+		// of too short, get the default arena
+		if (args.length <= index) arena = this.gameHandler.getDefaultArena();
+		else arena = this.gameHandler.getArenaFromString(args[index]);
+		
+		// error output, if no arena has been found
+		if (arena == null) unknownArena(sender, args.length <= index?"default":args[index]);
+		return arena;
 	}
 }
