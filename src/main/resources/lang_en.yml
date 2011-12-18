@@ -19,3 +19,9 @@ errors:
     unknownArena: 'Unknown arena "[ARENA]"'
     tooFewArguments: 'Too few arguments for this command. Minimum is [MIN].'
     tooManyArguments: 'Too many arguments for this command. Maximum is [MAX].'
+    arenaExistsAlready: '[ARENA] exists already.'
+    announceBeforeJoin: 'Someone has to announce a game in arena [ARENA] before you can join.'
+broadcasts:
+    announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
+feedback:
+    announce: 'You have announced a new game in arena [ARENA]. You can now invite people to join!'

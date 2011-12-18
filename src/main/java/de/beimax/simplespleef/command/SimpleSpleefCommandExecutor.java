@@ -348,9 +348,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		else name = args[index];
 		
 		// check for the existence of the arena
-		if (!this.gameHandler.gameTypeOrNameExists(name))
+		if (!this.gameHandler.gameTypeOrNameExists(name)) {
 			// error output, if no arena has been found
 			unknownArena(sender, name);
+			return null;
+		}
 		
 		return name;
 	}

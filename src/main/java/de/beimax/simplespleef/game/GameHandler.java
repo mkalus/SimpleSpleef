@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -61,6 +63,8 @@ public class GameHandler {
 				newGames[i] = games[i];
 			}
 			games = newGames;
+			// add the new game, too
+			games[games.length-1] = game;
 		}
 		return true;
 	}
@@ -107,12 +111,26 @@ public class GameHandler {
 
 	/**
 	 * check, if a certain game name exists
-	 * @param game
+	 * @param game name of game
 	 * @return
 	 */
 	public boolean gameExists(String game) {
-		// TODO Auto-generated method stub
-		return false;
+		return getGameByName(game)==null?false:true;
+	}
+
+	/**
+	 * return game by name
+	 * @param game name of game
+	 * @return
+	 */
+	public Game getGameByName(String game) {
+		// no games present
+		if (this.games == null) return null;
+		// try to find game
+		for (int i = 0; i < this.games.length; i++)
+			if (this.games[i].getName().equalsIgnoreCase(game))
+				return this.games[i];
+		return null;
 	}
 
 	/**
@@ -121,8 +139,25 @@ public class GameHandler {
 	 * @return
 	 */
 	public boolean gameTypeOrNameExists(String type) {
-		// TODO Auto-generated method stub
+		Map<String, Boolean> arenas = getPossibleGames();
+		if (arenas == null) return false; // none - unlikely, but possible...
+		// cycle through possible games
+		for (Entry<String, Boolean> arena: arenas.entrySet()) {
+			if (arena.getKey().equalsIgnoreCase(type)) return true;
+		}
+
 		return false;
+	}
+	
+	/**
+	 * returns type of arena from game name
+	 * @param game
+	 * @return
+	 */
+	public String gameNameToType(String game) {
+		if (game.equalsIgnoreCase(this.getPlugin().getConfig().getString("settings.freeStyleArenaName", "freestyle")))
+			return "freestyle";
+		else return "standard";
 	}
 
 	/**
@@ -173,9 +208,22 @@ public class GameHandler {
 	 * try to announce a new game in an arena
 	 * @param sender
 	 * @param arena
+	 * @return announced game or null
 	 */
-	public void announce(CommandSender sender, String arena) {
-		// TODO Auto-generated method stub
+	public Game announce(CommandSender sender, String arena) {
+		Game game = getGameByName(arena);
+		// does the game exist already?
+		if (game != null) {
+			sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.arenaExistsAlready", "[ARENA]", game.getName()));
+			return null;
+		}
+		game = createNewGame(arena);
+		// announce new game globally?
+		if (this.getPlugin().getConfig().getBoolean("settings.announceGame", true))
+			this.getPlugin().getServer().broadcastMessage(ChatColor.GOLD + this.getPlugin().ll("broadcasts.announce", "[PLAYER]", sender.getName(), "[ARENA]", game.getName()));
+		else
+			sender.sendMessage(ChatColor.GOLD + this.getPlugin().ll("feedback.announce", "[ARENA]", game.getName()));
+		return game;
 	}
 	
 	/**
@@ -184,8 +232,41 @@ public class GameHandler {
 	 * @param arena
 	 */
 	public void join(CommandSender sender, String arena) {
+		Game game = getGameByName(arena);
+		arena = arena.toLowerCase();
+		// does the game not exist?
+		if (game == null) {
+			// do players have the right to join unstarted games?
+			if (this.getPlugin().getConfig().getBoolean("arenas." + arena + ".announceOnJoin", true))
+				game = announce(sender, arena);
+			else {
+				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.announceBeforeJoin", "[ARENA]", arena));
+				return;
+			}
+		}
+		//game.getName();
 		// TODO
+		//settings.announceGame
+		//settings.announceJoin
 	}
 
 	//TODO game handling itself
+	
+	/**
+	 * helper to create new game and add it automatically to list
+	 * @param arena
+	 * @return new game added
+	 */
+	protected Game createNewGame(String arena) {
+		// get type of arena
+		String type = gameNameToType(arena);
+		Game game = GameFactory.createGame(type, arena);
+		// if not freestyle - read configuration
+		if (!type.equals("freestyle"))
+			game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + arena));
+		// add game to list
+		addGame(game);
+		// return newly created game
+		return game;
+	}
 }

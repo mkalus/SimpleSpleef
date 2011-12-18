@@ -15,7 +15,7 @@ public abstract class GameFactory {
 	 * @return game or null, if game type does not exist
 	 */
 	public static Game createGame(String type, String name) {
-		//TODO create new instances and return them
-		return null;
+		if (type.equalsIgnoreCase("freestyle")) return new FreestyleGame(name);
+		return new StandardGame(name);
 	}
 }

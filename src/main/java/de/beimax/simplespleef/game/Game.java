@@ -3,6 +3,7 @@
  */
 package de.beimax.simplespleef.game;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 /**
@@ -29,6 +30,9 @@ public abstract class Game {
 	public String getName() {
 		return name;
 	}
+	
+	// read the configuration settings of this arena
+	public abstract void defineSettings(ConfigurationSection conf);
 	
 	/**
 	 * Player issues join command

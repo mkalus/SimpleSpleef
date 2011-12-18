@@ -19,3 +19,9 @@ errors:
     unknownArena: 'Unbekannte Arena "[ARENA]"'
     tooFewArguments: 'Zu wenige Parameter für diesen Befehl. Minimum ist [MIN].'
     tooManyArguments: 'Zu viele Parameter für diesen Befehl. Maximum ist [MAX].'
+    arenaExistsAlready: '[ARENA] existiert bereits.'
+    announceBeforeJoin: 'Jemand muss in der Arena [ARENA] ein Spiel ankündigen, bevor du dort spielen darfst.'
+broadcasts:
+    announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
+feedback:
+    announce: 'Du hast ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Du kannst nun Leute zum Spielen einladen!'
