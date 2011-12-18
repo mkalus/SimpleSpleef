@@ -193,8 +193,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void startCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		this.gameHandler.start(sender);
 	}
 	
 	/**
@@ -203,8 +204,16 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void countdownCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// get game from 2nd argument
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		// if player and no arena defined - arena is unset, so player can start current arena
+		if (arena != null && args.length < 2 && !isConsole(sender))
+			this.gameHandler.start(sender);
+		else if (arena != null) { // no errors - then try to announce new game
+			this.gameHandler.countdown(sender, arena);
+		}
 	}
 	
 	/**
@@ -213,8 +222,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void leaveCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		this.gameHandler.leave(sender);
 	}
 	
 	/**
@@ -223,8 +233,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void stopCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		this.gameHandler.stop(sender);
 	}
 	
 	/**
@@ -233,8 +244,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void deleteCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		this.gameHandler.delete(sender, null);
 	}
 	
 	/**
@@ -243,8 +255,14 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void resetCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// too few arguments?
+		if (tooFewArguments(sender, args, 1)) return;
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		if (arena != null) {
+			this.gameHandler.delete(sender, arena);
+		}
 	}
 	
 	/**
@@ -253,8 +271,13 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void watchCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// get game from 2nd argument
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		if (arena != null) { // no errors - then try to announce new game
+			this.gameHandler.watch(sender, arena);
+		}
 	}
 	
 	//TODO: add further commands here...

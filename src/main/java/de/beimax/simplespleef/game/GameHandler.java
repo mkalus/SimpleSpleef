@@ -267,6 +267,57 @@ public class GameHandler {
 		//settings.announceJoin
 	}
 
+	/**
+	 * Attempt to start a game (spleefers only)
+	 * @param sender
+	 */
+	public void start(CommandSender sender) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Attempt to start countdown of a game
+	 * @param sender
+	 * @param arena (may be null)
+	 */
+	public void countdown(CommandSender sender, String arena) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Attempt to leave a game (spleefers only)
+	 * @param sender
+	 */
+	public void leave(CommandSender sender) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Attempt to stop a game
+	 * @param sender
+	 */
+	public void stop(CommandSender sender) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Attempt to delete a game
+	 * @param sender
+	 * @param arena (may be null)
+	 */
+	public void delete(CommandSender sender, String arena) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Attempt to stop a game
+	 * @param sender
+	 * @param arena (may not be null)
+	 */
+	public void watch(CommandSender sender, String arena) {
+		// TODO Auto-generated method stub
+	}
+
 	//TODO game handling itself
 	
 	/**
