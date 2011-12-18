@@ -6,6 +6,8 @@ language: en
 settings:
 # Allow "arena free" gaming - simply join and play (settings taken from "default" arena) - no arenas required
     allowFreeStylePlaying: true
+# Free style arena name
+    freeStyleArenaName: freestyle
 # Check for updates on server start (output notification to server console, your server has to connect to remote server to check version numbers)
     updateNotificationOnStart: true
 # Check for updates whenever an operator or user with the right simplespleef.admin logs in (your server has to connect to remote server to check version numbers)

@@ -121,7 +121,7 @@ public class GameHandler {
 	 * @param game name - null will default to "default arena"
 	 * @return
 	 */
-	public Game getGameFromString(String game) {
+	public Game XgetGameFromString(String game) {
 		if (game == null) game = getDefaultArena();
 		return GameFactory.getGame(game);
 	}
@@ -131,8 +131,17 @@ public class GameHandler {
 	 * @param sender
 	 * @param arena
 	 */
-	public void announceNewGameInArena(CommandSender sender, Game game) {
+	public void announce(CommandSender sender, String arena) {
 		// TODO Auto-generated method stub
+	}
+	
+	/**
+	 * try to join a game in an arena
+	 * @param sender
+	 * @param arena
+	 */
+	public void join(CommandSender sender, String arena) {
+		// TODO
 	}
 
 	//TODO game handling itself

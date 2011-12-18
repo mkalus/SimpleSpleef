@@ -12,8 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
-import de.beimax.simplespleef.game.Arena;
-import de.beimax.simplespleef.game.Game;
+import de.beimax.simplespleef.game.GameFactory;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -127,9 +126,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 1)) return;
 		// get game from 2nd argument
-		Game game = this.getGameFromArgument(sender, args, 1);
-		if (game != null) { // no errors - then try to announce new game
-			this.gameHandler.announceNewGameInArena(sender, game);
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		if (arena != null) { // no errors - then try to announce new game
+			this.gameHandler.announce(sender, arena);
 		}
 	}
 	
@@ -139,8 +138,13 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void joinCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// get game from 2nd argument
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		if (arena != null) { // no errors - then try to announce new game
+			this.gameHandler.join(sender, arena);
+		}
 	}
 	
 	/**
@@ -333,16 +337,17 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param index
 	 * @return null, if arena name is not found
 	 */
-	protected Game getGameFromArgument(CommandSender sender, String[] args, int index) {
+	protected String getArenaNameFromArgument(CommandSender sender, String[] args, int index) {
 		String name;
 		// of too short, get the default arena
-		if (args.length <= index) name = null;
+		if (args.length <= index) name = this.gameHandler.getDefaultArena();
 		else name = args[index];
-		// get game
-		Game game = this.gameHandler.getGameFromString(name);
 		
-		// error output, if no arena has been found
-		if (game == null) unknownArena(sender, name==null?this.gameHandler.getDefaultArena():name);
-		return game;
+		// check for the existence of the arena
+		if (!GameFactory.gameNameExists(name))
+			// error output, if no arena has been found
+			unknownArena(sender, name);
+		
+		return name;
 	}
 }
