@@ -4,6 +4,7 @@
 package de.beimax.simplespleef.command;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,6 +14,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
+import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -153,11 +155,25 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void arenasCommand(CommandSender sender, String[] args) {
+		//get current games
+		List<String> games = this.gameHandler.getGameNames();
+		// get all possible games
 		Map<String, Boolean> arenas = this.gameHandler.getPossibleGames();
 		if (arenas == null) return; // none - unlikely, but possible...
 		// cycle through possible games
 		for (Entry<String, Boolean> arena: arenas.entrySet()) {
-			sender.sendMessage((arena.getValue()?ChatColor.GREEN:ChatColor.DARK_GRAY) + arena.getKey());
+			// what color?
+			ChatColor color;
+			String game = arena.getKey();
+			if (arena.getValue() == false) color = ChatColor.DARK_GRAY;
+			// game in active list?
+			else if (games.contains(game)) {
+				// game active or still joinable?
+				Game activeGame = this.gameHandler.getGameByName(game);
+				if (activeGame.isJoinable()) color = ChatColor.GREEN; // joinable
+				else color = ChatColor.GOLD; // not joinable - because running
+			} else color = ChatColor.YELLOW;
+			sender.sendMessage(color + game);
 		}
 	}
 	

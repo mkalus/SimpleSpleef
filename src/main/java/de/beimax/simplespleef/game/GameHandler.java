@@ -3,6 +3,7 @@
  */
 package de.beimax.simplespleef.game;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -173,8 +174,23 @@ public class GameHandler {
 	 * @return List of games
 	 */
 	public List<Game> getGames() {
-		//TODO
-		return null;
+		LinkedList<Game> games = new LinkedList<Game>();
+		for (Game game : this.games) {
+			games.add(game);
+		}
+		return games;
+	}
+
+	/**
+	 * get list of games
+	 * @return List of games
+	 */
+	public List<String> getGameNames() {
+		LinkedList<String> games = new LinkedList<String>();
+		for (Game game : this.games) {
+			games.add(game.getName());
+		}
+		return games;
 	}
 
 	/**
@@ -244,6 +260,7 @@ public class GameHandler {
 				return;
 			}
 		}
+		// => game.join(sender)...
 		//game.getName();
 		// TODO
 		//settings.announceGame

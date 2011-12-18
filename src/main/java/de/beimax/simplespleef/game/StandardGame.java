@@ -88,4 +88,9 @@ public class StandardGame extends Game {
 		return false;
 	}
 
+	@Override
+	public boolean isJoinable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

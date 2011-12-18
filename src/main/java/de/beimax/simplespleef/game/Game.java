@@ -78,4 +78,10 @@ public abstract class Game {
 	 * @return boolean successful?
 	 */
 	public abstract boolean spectate();
+
+	/**
+	 * is game joinable?
+	 * @return
+	 */
+	public abstract boolean isJoinable();
 }

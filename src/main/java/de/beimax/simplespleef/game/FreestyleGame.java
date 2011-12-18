@@ -84,4 +84,10 @@ public class FreestyleGame extends Game {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean isJoinable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
