@@ -34,8 +34,10 @@ settings:
     preventTeleportingDuringGames: true
 # arena specific settings
 arenas:
-# "special" default arena
+# default arena
     default:
+# enabled?
+        enabled: false
 # Minimum and maximum players
         minimumPlayers: 0
         maximumPlayers: 0

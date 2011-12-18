@@ -76,7 +76,7 @@ public class Translator {
 		// sanity check
 		if (!lang.isConfigurationSection(section)) return null;
 		// get keys
-		Set<String> keys = lang.getConfigurationSection(section).getKeys(true);
+		Set<String> keys = lang.getConfigurationSection(section).getKeys(false);
 		Map<String, String> map = new HashMap<String, String>();
 		for (String key : keys) {
 			map.put(key, lang.getString(section + "." + key));

@@ -5,6 +5,7 @@ package de.beimax.simplespleef.command;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,7 +13,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
-import de.beimax.simplespleef.game.GameFactory;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -80,7 +80,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			myCommand.invoke(this, xargs);
 			return true;
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			sender.sendMessage("Error in command execution - command was not found in executor. Contact SimpleSpleef programmer!");
 		}
 		// any other stuff -> show help
@@ -153,8 +153,12 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void arenasCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
-		//TODO: implement
+		Map<String, Boolean> arenas = this.gameHandler.getPossibleGames();
+		if (arenas == null) return; // none - unlikely, but possible...
+		// cycle through possible games
+		for (Entry<String, Boolean> arena: arenas.entrySet()) {
+			sender.sendMessage((arena.getValue()?ChatColor.GREEN:ChatColor.DARK_GRAY) + arena.getKey());
+		}
 	}
 	
 	/**
@@ -344,7 +348,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		else name = args[index];
 		
 		// check for the existence of the arena
-		if (!GameFactory.gameNameExists(name))
+		if (!this.gameHandler.gameTypeOrNameExists(name))
 			// error output, if no arena has been found
 			unknownArena(sender, name);
 		

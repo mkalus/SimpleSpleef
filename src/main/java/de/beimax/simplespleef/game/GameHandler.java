@@ -3,6 +3,11 @@
  */
 package de.beimax.simplespleef.game;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.bukkit.command.CommandSender;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -65,9 +70,9 @@ public class GameHandler {
 	 * @param type
 	 * @return
 	 */
-	public boolean addGame(String type) {
+	public boolean addGame(String type, String name) {
 		// let the factory handle the details
-		Game game = GameFactory.getGame(type);
+		Game game = GameFactory.createGame(type, name);
 		if (game == null) return false; // no game created?
 		
 		return addGame(game); // add game
@@ -99,7 +104,27 @@ public class GameHandler {
 		if (found) games = newGames;
 		return found;
 	}
-	
+
+	/**
+	 * check, if a certain game name exists
+	 * @param game
+	 * @return
+	 */
+	public boolean gameExists(String game) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * check, if a certain game type or name exists generally
+	 * @param type
+	 * @return
+	 */
+	public boolean gameTypeOrNameExists(String type) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	 * Check if there are games on the server
 	 * @return
@@ -109,6 +134,34 @@ public class GameHandler {
 	}
 	
 	/**
+	 * get list of games
+	 * @return List of games
+	 */
+	public List<Game> getGames() {
+		//TODO
+		return null;
+	}
+
+	/**
+	 * get list of possible games
+	 * @return Map of arena names with a boolean for active/passive
+	 */
+	public Map<String, Boolean> getPossibleGames() {
+		Map<String, Boolean> map = new TreeMap<String, Boolean>(); // sorting is maintained
+		// freestyle arena allowed?
+		if (this.getPlugin().getConfig().getBoolean("settings.allowFreeStylePlaying", true)) {
+			map.put(this.getPlugin().getConfig().getString("settings.freeStyleArenaName", "freestyle"), true);
+		}
+		// get arenas from config and check if they are enabled
+		Set<String> arenas = this.getPlugin().getConfig().getConfigurationSection("arenas").getKeys(false);
+		for (String arena : arenas) {
+			Boolean enabled = this.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false);
+			map.put(arena, enabled);
+		}
+		return map;
+	}
+
+	/**
 	 * get the default arena name
 	 * @return
 	 */
@@ -116,16 +169,6 @@ public class GameHandler {
 		return this.getPlugin().getConfig().getString("settings.defaultArena", "default");
 	}
 	
-	/**
-	 * get an game from name
-	 * @param game name - null will default to "default arena"
-	 * @return
-	 */
-	public Game XgetGameFromString(String game) {
-		if (game == null) game = getDefaultArena();
-		return GameFactory.getGame(game);
-	}
-
 	/**
 	 * try to announce a new game in an arena
 	 * @param sender
