@@ -15,11 +15,8 @@ public abstract class Game {
 	 * name of the game/arena
 	 */
 	private final String name;
-	
-	/**
-	 * Reference to spleefer list
-	 */
-	SpleeferList spleefers;
+
+	//TODO: add status
 
 	/**
 	 * Constructor
@@ -27,7 +24,6 @@ public abstract class Game {
 	 */
 	public Game(String name) {
 		this.name = name;
-		this.spleefers = new SpleeferList();
 	}
 
 	/**

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
  * @author mkalus
  *
  */
-public class StandardGame extends Game {
+public class StandardGame extends OneTeamGame {
 	/**
 	 * Constructor
 	 * @param name
@@ -25,71 +25,20 @@ public class StandardGame extends Game {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#join(org.bukkit.entity.Player)
-	 */
 	@Override
-	public boolean join(Player player) {
+	public boolean preconditionsJoin(Player player) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#leave(org.bukkit.entity.Player)
-	 */
 	@Override
-	public boolean leave(Player player) {
+	public void postJoin(Player player) {
 		// TODO Auto-generated method stub
-		return false;
+		// remember position, etc.
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#countdown()
-	 */
-	@Override
-	public boolean countdown() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#start()
-	 */
-	@Override
-	public boolean start() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#stop()
-	 */
-	@Override
-	public boolean stop() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#delete()
-	 */
-	@Override
-	public boolean delete() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.Game#spectate()
-	 */
 	@Override
 	public boolean spectate() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isJoinable() {
 		// TODO Auto-generated method stub
 		return false;
 	}
