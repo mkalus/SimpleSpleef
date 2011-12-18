@@ -20,10 +20,15 @@ public class Spleefer {
 	 */
 	private boolean lost = false;
 	
+	//TODO: teams
+	
 	/**
-	 * Team number, if team game
+	 * Constructor
+	 * @param player
 	 */
-	private int team = 0;
+	public Spleefer(Player player) {
+		this.player = player;
+	}
 
 	/**
 	 * @return the player
@@ -42,7 +47,7 @@ public class Spleefer {
 	/**
 	 * @return the lost
 	 */
-	public boolean isLost() {
+	public boolean hasLost() {
 		return lost;
 	}
 
@@ -51,19 +56,5 @@ public class Spleefer {
 	 */
 	public void setLost(boolean lost) {
 		this.lost = lost;
-	}
-
-	/**
-	 * @return the team
-	 */
-	public int getTeam() {
-		return team;
-	}
-
-	/**
-	 * @param team the team to set
-	 */
-	public void setTeam(int team) {
-		this.team = team;
 	}
 }

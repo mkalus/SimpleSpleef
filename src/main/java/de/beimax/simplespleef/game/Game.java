@@ -3,8 +3,6 @@
  */
 package de.beimax.simplespleef.game;
 
-import java.util.LinkedList;
-
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -19,10 +17,9 @@ public abstract class Game {
 	private final String name;
 	
 	/**
-	 *  list of spleefers currently spleefing
-	 *  - Since we have to iterate the list most of the time anyway, we simply use a linked list
+	 * Reference to spleefer list
 	 */
-	private LinkedList<Spleefer> spleefers;
+	SpleeferList spleefers;
 
 	/**
 	 * Constructor
@@ -30,7 +27,7 @@ public abstract class Game {
 	 */
 	public Game(String name) {
 		this.name = name;
-		spleefers = new LinkedList<Spleefer>();
+		this.spleefers = new SpleeferList();
 	}
 
 	/**
@@ -38,50 +35,6 @@ public abstract class Game {
 	 */
 	public String getName() {
 		return name;
-	}
-	
-	/**
-	 * checks if a player is in the list
-	 * @param player
-	 * @return
-	 */
-	public boolean hasSpleefer(Player player) {
-		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Add a spleefer to the game
-	 * @param player
-	 * @param team
-	 * @return boolean, true if successful
-	 */
-	public boolean addSpleefer(Player player, Integer team) {
-		//TODO
-		return false;
-	}
-	
-	/**
-	 * Remove spleefer from game
-	 * @param player
-	 * @param silent
-	 * @return boolean, true if successful
-	 */
-	public boolean removeSpleefer(Player player, boolean silent) {
-		//TODO
-		return false;
-	}
-	
-	/**
-	 * Spleefer leaves game
-	 * @param player
-	 * @return boolean, true if successful
-	 */
-	public boolean leaveSpleefer(Player player) {
-		//TODO
-		return false;
 	}
 
 	// read the configuration settings of this arena
