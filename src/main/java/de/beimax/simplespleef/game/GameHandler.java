@@ -77,7 +77,7 @@ public class GameHandler {
 	 */
 	public boolean addGame(String type, String name) {
 		// let the factory handle the details
-		Game game = GameFactory.createGame(type, name);
+		Game game = GameFactory.createGame(this, type, name);
 		if (game == null) return false; // no game created?
 		
 		return addGame(game); // add game
@@ -156,9 +156,7 @@ public class GameHandler {
 	 * @return
 	 */
 	public String gameNameToType(String game) {
-		if (game.equalsIgnoreCase(this.getPlugin().getConfig().getString("settings.freeStyleArenaName", "freestyle")))
-			return "freestyle";
-		else return "standard";
+		return this.getPlugin().getConfig().getString("arenas." + game + ".type", "standard");
 	}
 
 	/**
@@ -199,10 +197,6 @@ public class GameHandler {
 	 */
 	public Map<String, Boolean> getPossibleGames() {
 		Map<String, Boolean> map = new TreeMap<String, Boolean>(); // sorting is maintained
-		// freestyle arena allowed?
-		if (this.getPlugin().getConfig().getBoolean("settings.allowFreeStylePlaying", true)) {
-			map.put(this.getPlugin().getConfig().getString("settings.freeStyleArenaName", "freestyle"), true);
-		}
 		// get arenas from config and check if they are enabled
 		Set<String> arenas = this.getPlugin().getConfig().getConfigurationSection("arenas").getKeys(false);
 		for (String arena : arenas) {
@@ -328,10 +322,9 @@ public class GameHandler {
 	protected Game createNewGame(String arena) {
 		// get type of arena
 		String type = gameNameToType(arena);
-		Game game = GameFactory.createGame(type, arena);
-		// if not freestyle - read configuration
-		if (!type.equals("freestyle"))
-			game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + arena));
+		Game game = GameFactory.createGame(this, type, arena);
+		// define configuration section for this game
+		game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + arena));
 		// add game to list
 		addGame(game);
 		// return newly created game

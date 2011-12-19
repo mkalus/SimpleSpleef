@@ -2,7 +2,7 @@
 command:
     help: 'help|Zeige Hilfe'
     announce: 'announce [arena]|Neues Spiel ankündigen (in Arena)'
-    join: 'join [arena|free]|Mitspielen (in Arena - Freestyle-Spiel)'
+    join: 'join [arena]|Mitspielen (in Arena)'
     arenas: 'arenas|Arenen auflisten'
     info: 'info [arena]|Zeige Infos (zur Arena)'
     list: 'list [arena]|Liste Spleefers (in arena)'

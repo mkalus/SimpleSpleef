@@ -4,8 +4,6 @@
 language: en
 # global settings
 settings:
-# Allow "arena free" gaming - simply join and play (settings taken from "default" arena) - no arenas required
-    allowFreeStylePlaying: true
 # "default" arena
     defaultArena: default
 # active arena command signs to join/spectate/return/etc.

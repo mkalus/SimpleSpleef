@@ -3,47 +3,54 @@
  */
 package de.beimax.simplespleef.game;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 /**
  * @author mkalus
- *
+ * Simple Game implementation
  */
-public abstract class OneTeamGame extends Game {
+public class GameImpl extends Game {
 	/**
 	 * Reference to spleefer list
 	 */
-	SpleeferList spleefers;
+	protected  SpleeferList spleefers;
+	
+	/**
+	 * Reference to configuration
+	 */
+	protected ConfigurationSection configuration;
 
 	/**
 	 * Constructor
+	 * @param gameHandler
 	 * @param name
 	 */
-	public OneTeamGame(String name) {
-		super(name);
+	public GameImpl(GameHandler gameHandler, String name) {
+		super(gameHandler, name);
 		this.spleefers = new SpleeferList();
 	}
 
 	@Override
+	public String getType() {
+		return "standard";
+	}
+
+	@Override
+	public void defineSettings(ConfigurationSection conf) {
+		this.configuration = conf;
+	}
+
+	@Override
 	public boolean join(Player player) {
-		//TODO: check status
+		//check joinable status
+		if (!isJoinable()) {
+			return false;
+		}
 		// inject joining preconditions (like checking funds)
 		//TODO: player feedback
 		return spleefers.addSpleefer(player);
 	}
-	
-	/**
-	 * check preconditions for joining - like checking funds...
-	 * @param player
-	 * @return
-	 */
-	public abstract boolean preconditionsJoin(Player player);
-	
-	/**
-	 * called after joining a game - do stuff
-	 * @return
-	 */
-	public abstract void postJoin(Player player);
 
 	@Override
 	public boolean leave(Player player) {
@@ -77,9 +84,8 @@ public abstract class OneTeamGame extends Game {
 	}
 
 	@Override
-	public boolean isJoinable() {
+	public boolean spectate() {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

@@ -2,7 +2,7 @@
 command:
     help: 'help|Display help'
     announce: 'announce [arena]|Announce a new game (in arena)'
-    join: 'join [arena|free]|Join a dog-eats-dog game (in arena - freestyle game)'
+    join: 'join [arena]|Join a dog-eats-dog game (in arena)'
     arenas: 'arenas|List available arenas'
     info: 'info [arena]|Show information (on arena)'
     list: 'list [arena]|List spleefers (in arena)'

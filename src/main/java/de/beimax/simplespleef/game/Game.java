@@ -8,30 +8,61 @@ import org.bukkit.entity.Player;
 
 /**
  * @author mkalus
- * Game abstract class
+ *
  */
 public abstract class Game {
+	/**
+	 * game status constants
+	 */
+	protected static final int STATUS_NEW = 1;
+	protected static final int STATUS_COUNTDOWN = 2;
+	protected static final int STATUS_STARTED = 3;
+	protected static final int STATUS_FINISHED = 4;
+
+	/**
+	 * reference on game handler instance
+	 */
+	protected final GameHandler gameHandler;
+
 	/**
 	 * name of the game/arena
 	 */
 	private final String name;
 
-	//TODO: add status
+	/**
+	 * game status
+	 */
+	private int status;
 
 	/**
 	 * Constructor
 	 * @param name
 	 */
-	public Game(String name) {
+	public Game(GameHandler gameHandler, String name) {
+		this.gameHandler = gameHandler;
 		this.name = name;
+		this.status = STATUS_NEW;
 	}
 
 	/**
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
+
+	/**
+	 * @return the name
+	 */
+	public int getStatus() {
+		return this.status;
+	}
+	
+	/**
+	 * get type of arena
+	 * @return
+	 */
+	public abstract String getType();
 
 	// read the configuration settings of this arena
 	public abstract void defineSettings(ConfigurationSection conf);
@@ -49,8 +80,7 @@ public abstract class Game {
 	 * @return boolean successful?
 	 */
 	public abstract boolean leave(Player player);
-	
-	
+
 	/**
 	 * Countdown started
 	 * @return boolean successful?
@@ -83,7 +113,9 @@ public abstract class Game {
 
 	/**
 	 * is game joinable?
-	 * @return
+	 * @return true for joinable
 	 */
-	public abstract boolean isJoinable();
+	public boolean isJoinable() {
+		return this.status == STATUS_NEW;
+	}
 }
