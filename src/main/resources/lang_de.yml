@@ -17,10 +17,14 @@ errors:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
     unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
     unknownArena: 'Unbekannte Arena "[ARENA]"'
+    arenaDisabled: '"[ARENA]" ist nicht aktiviert.'
     tooFewArguments: 'Zu wenige Parameter für diesen Befehl. Minimum ist [MIN].'
     tooManyArguments: 'Zu viele Parameter für diesen Befehl. Maximum ist [MAX].'
     arenaExistsAlready: '[ARENA] existiert bereits.'
     announceBeforeJoin: 'Jemand muss in der Arena [ARENA] ein Spiel ankündigen, bevor du dort spielen darfst.'
+    join: 'Es läuft bereits ein Spiel in Arena [ARENA].'
+    joinMax: 'Arena ist voll! Nur [NUMBER] Spleefer können in der Arena [ARENA] mitspielen.'
+    joinDouble: 'Du spielst bereits in der Arena [ARENA]. Du musst erst dieses Spiel verlassen, um an einem neuen Spiel teilnehmen zu können.'
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
 feedback:

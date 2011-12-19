@@ -118,4 +118,10 @@ public abstract class Game {
 	public boolean isJoinable() {
 		return this.status == STATUS_NEW;
 	}
+
+	/**
+	 * Check if player is in arena X
+	 * @return boolean
+	 */
+	public abstract boolean hasPlayer(Player player);
 }

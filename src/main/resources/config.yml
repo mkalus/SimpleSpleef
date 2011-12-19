@@ -35,7 +35,7 @@ arenas:
 # type - this can contain either standard or a class name like com.mystuff.MySpleefGameImpl
         type: standard
 # enabled?
-        enabled: false
+        enabled: true
 # Minimum and maximum players
         minimumPlayers: 0
         maximumPlayers: 0

@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import de.beimax.simplespleef.SimpleSpleef;
 
@@ -173,6 +174,7 @@ public class GameHandler {
 	 */
 	public List<Game> getGames() {
 		LinkedList<Game> games = new LinkedList<Game>();
+		if (this.games == null) return games; // no games present?
 		for (Game game : this.games) {
 			games.add(game);
 		}
@@ -185,6 +187,7 @@ public class GameHandler {
 	 */
 	public List<String> getGameNames() {
 		LinkedList<String> games = new LinkedList<String>();
+		if (this.games == null) return games; // no games present?
 		for (Game game : this.games) {
 			games.add(game.getName());
 		}
@@ -244,16 +247,31 @@ public class GameHandler {
 	public void join(CommandSender sender, String arena) {
 		Game game = getGameByName(arena);
 		arena = arena.toLowerCase();
+		Player player = (Player) sender; // cast to player
 		// does the game not exist?
 		if (game == null) {
+			// check if game is disabled
+			if (!this.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
+				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
+				return;
+			}
 			// do players have the right to join unstarted games?
 			if (this.getPlugin().getConfig().getBoolean("arenas." + arena + ".announceOnJoin", true))
 				game = announce(sender, arena);
-			else {
+			else { // tell player that he may not announce game
 				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.announceBeforeJoin", "[ARENA]", arena));
 				return;
 			}
 		}
+		// player already joined another arena?
+		for (Game checkGame :  getGames()) {
+			if (checkGame.hasPlayer(player)) {
+				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.joinDouble", "[ARENA]", checkGame.getName()));
+				return;
+			}
+		}
+		// ok, try to join the game itself...
+		if (!game.join(player)) return;
 		// => game.join(sender)...
 		//game.getName();
 		// TODO

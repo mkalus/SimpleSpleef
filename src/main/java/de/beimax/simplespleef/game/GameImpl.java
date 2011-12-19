@@ -3,6 +3,7 @@
  */
 package de.beimax.simplespleef.game;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -14,7 +15,7 @@ public class GameImpl extends Game {
 	/**
 	 * Reference to spleefer list
 	 */
-	protected  SpleeferList spleefers;
+	protected SpleeferList spleefers;
 	
 	/**
 	 * Reference to configuration
@@ -45,11 +46,26 @@ public class GameImpl extends Game {
 	public boolean join(Player player) {
 		//check joinable status
 		if (!isJoinable()) {
+			player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.join", "[ARENA]", getName()));
 			return false;
 		}
-		// inject joining preconditions (like checking funds)
-		//TODO: player feedback
-		return spleefers.addSpleefer(player);
+		// max number of players?
+		int maximumPlayers = configuration.getInt("maximumPlayers", 0);
+		if (maximumPlayers > 0 && spleefers.size() >= maximumPlayers) {
+			player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.joinMax", "[ARENA]", getName(), "[NUMBER]", String.valueOf(maximumPlayers)));
+			return false;
+		}
+		// already joined this game? => is caught by GameHandler, so we do not check this here...
+		// TODO: check funds of player...
+		if (!spleefers.addSpleefer(player)) { // some weird error
+			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
+		}
+		// TODO clear inventory
+		// TODO: add to inventory
+		// TODO: alternatively give shovels
+		// TODO: remember player's last position
+		// TODO: teleport player to lobby
+		return true;
 	}
 
 	@Override
@@ -87,5 +103,10 @@ public class GameImpl extends Game {
 	public boolean spectate() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean hasPlayer(Player player) {
+		return spleefers.hasSpleefer(player);
 	}
 }
