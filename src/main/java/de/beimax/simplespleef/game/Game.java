@@ -45,6 +45,13 @@ public abstract class Game {
 	}
 
 	/**
+	 * @return the id (normaly name to lower case)
+	 */
+	public String getId() {
+		return this.name.toLowerCase();
+	}
+
+	/**
 	 * @return the name
 	 */
 	public String getName() {

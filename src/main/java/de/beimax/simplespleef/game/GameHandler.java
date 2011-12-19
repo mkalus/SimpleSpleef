@@ -61,7 +61,7 @@ public class GameHandler {
 			// copy array and add new game
 			Game[] newGames = new Game[games.length+1];
 			for (int i = 0; i < games.length; i++) {
-				if (games[i] == game || games[i].getName().equals(game.getName())) return false; // one cannot add the same game twice
+				if (games[i] == game || games[i].getId().equals(game.getId())) return false; // one cannot add the same game twice
 				newGames[i] = games[i];
 			}
 			games = newGames;
@@ -90,7 +90,7 @@ public class GameHandler {
 	 * @return
 	 */
 	public boolean removeGame(Game game) {
-		return removeGame(game.getName());
+		return removeGame(game.getId());
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class GameHandler {
 		boolean found = false;
 		int pos = 0;
 		for (int i = 0; i < newGames.length; i++) {
-			if (games[i].getName().equals(game)) continue;
+			if (games[i].getId().equalsIgnoreCase(game)) continue;
 			newGames[pos++] = games[i];
 		}
 		if (found) games = newGames;
@@ -130,7 +130,7 @@ public class GameHandler {
 		if (this.games == null) return null;
 		// try to find game
 		for (int i = 0; i < this.games.length; i++)
-			if (this.games[i].getName().equalsIgnoreCase(game))
+			if (this.games[i].getId().equalsIgnoreCase(game))
 				return this.games[i];
 		return null;
 	}
@@ -190,6 +190,19 @@ public class GameHandler {
 		if (this.games == null) return games; // no games present?
 		for (Game game : this.games) {
 			games.add(game.getName());
+		}
+		return games;
+	}
+
+	/**
+	 * get list of game ids
+	 * @return List of games
+	 */
+	public List<String> getGameIds() {
+		LinkedList<String> games = new LinkedList<String>();
+		if (this.games == null) return games; // no games present?
+		for (Game game : this.games) {
+			games.add(game.getId());
 		}
 		return games;
 	}
@@ -272,11 +285,12 @@ public class GameHandler {
 		}
 		// ok, try to join the game itself...
 		if (!game.join(player)) return;
-		// => game.join(sender)...
-		//game.getName();
-		// TODO
-		//settings.announceGame
-		//settings.announceJoin
+		// now we announce the joining of the player...
+		if (this.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) { // broadcast
+			this.getPlugin().getServer().broadcastMessage(ChatColor.GREEN + this.getPlugin().ll("broadcasts.join", "[PLAYER]", sender.getName(), "[ARENA]", game.getName()));
+		} else { // player only
+			sender.sendMessage(ChatColor.GREEN + this.getPlugin().ll("feedback.join", "[ARENA]", game.getName()));
+		}
 	}
 
 	/**

@@ -32,6 +32,8 @@ settings:
 arenas:
 # default arena
     default:
+# fancy name of arena
+        name: 'Spleef Arena'
 # type - this can contain either standard or a class name like com.mystuff.MySpleefGameImpl
         type: standard
 # enabled?

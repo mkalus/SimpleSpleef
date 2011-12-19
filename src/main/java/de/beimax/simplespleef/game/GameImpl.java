@@ -33,6 +33,15 @@ public class GameImpl extends Game {
 	}
 
 	@Override
+	public String getName() {
+		// get name from config
+		String name = configuration.getString("name");
+		if (name != null) return name;
+		// otherwise return non-fancy name
+		return super.getName();
+	}
+
+	@Override
 	public String getType() {
 		return "standard";
 	}

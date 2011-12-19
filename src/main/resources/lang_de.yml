@@ -27,5 +27,7 @@ errors:
     joinDouble: 'Du spielst bereits in der Arena [ARENA]. Du musst erst dieses Spiel verlassen, um an einem neuen Spiel teilnehmen zu können.'
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
+    join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
 feedback:
     announce: 'Du hast ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Du kannst nun Leute zum Spielen einladen!'
+    join: 'Du nimmst am Spleef in der Arena [ARENA] teil.'
