@@ -21,10 +21,13 @@ package de.beimax.simplespleef;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.fernferret.allpay.AllPay;
 
 import de.beimax.simplespleef.admin.SimpleSpleefAdmin;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
@@ -42,6 +45,24 @@ import de.beimax.simplespleef.util.UpdateChecker;
 public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	
+	/**
+	 * AllPay singleton
+	 */
+	private static AllPay allPay = null;
+
+	/**
+	 * @return allPay instance (singleton)
+	 */
+	public AllPay getAllPay() {
+		if (SimpleSpleef.allPay == null) SimpleSpleef.allPay = new AllPay(this, "SimpleSpleef: ");
+		return SimpleSpleef.allPay;
+	}
+	
+	/**
+	 * plugin listener
+	 */
+	private static PluginListener PluginListener = null;
+
 	/**
 	 * reference to game handler
 	 */
@@ -147,8 +168,11 @@ public class SimpleSpleef extends JavaPlugin {
 	 * adds a plugin listener to listen to the registry of other plugins
 	 */
 	protected void registerPluginListener() {
-		// TODO Auto-generated method stub
-		
+		// register enable events from other plugins
+		PluginListener = new PluginListener();
+
+		getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE,
+				PluginListener, Priority.Monitor, this);
 	}
 
 	/**

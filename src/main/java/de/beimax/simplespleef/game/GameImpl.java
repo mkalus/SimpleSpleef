@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import com.fernferret.allpay.GenericBank;
+
 import de.beimax.simplespleef.SimpleSpleef;
 
 /**
@@ -107,7 +109,19 @@ public class GameImpl extends Game {
 			return false;
 		}
 		// already joined this game? => is caught by GameHandler, so we do not check this here...
-		// TODO: check funds of player...
+		// check funds of player...
+		if (configuration.getDouble("entryFee", 0.0) > 0.0) {
+			GenericBank bank = gameHandler.getPlugin().getAllPay().getEconPlugin();
+			double entryFee = configuration.getDouble("entryFee", 0.0);
+			int entryItem = configuration.getInt("entryItem", -1);
+			if (bank.hasEnough(player, entryFee, entryItem)) {
+				bank.pay(player, entryFee, entryItem);
+				// TODO message to deduct stuff...
+			} else {
+				// TODO: message to say "insufficient funds"
+				return false;
+			}
+		}
 		// check gamemode and change it if needed
 		if (player.getGameMode() != GameMode.SURVIVAL) {
 			//this.gameHandler.getPlugin().getServer().dispatchCommand(this.gameHandler.getPlugin().getServer().getConsoleSender(), "gamemode maxkalus 0");
