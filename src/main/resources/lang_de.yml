@@ -28,6 +28,7 @@ errors:
     joinDouble: 'Du spielst bereits in der Arena [ARENA]. Du musst erst dieses Spiel verlassen, um an einem neuen Spiel teilnehmen zu können.'
     start: 'Du musst an einem Spleef teilnehmen, bevor du ein Spiel starten kannst!'
     startNoSpleefer: 'In dieser Arena darf kein Spieler mit /spl start ein Spiel starten - versuche es mit /spl countdown [ARENA].'
+    teleport: 'Teleportation ist während des Spiels in Arena [ARENA] nicht erlaubt.'
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'

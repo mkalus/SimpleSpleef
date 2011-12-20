@@ -28,6 +28,7 @@ errors:
     joinDouble: 'You are already player in arena [ARENA]. You have to leave this game first before joining another game.'
     start: 'You have to join a game before starting one.'
     startNoSpleefer: 'In this arena you may not start a game by typing /spl start - try: /spl countdown [ARENA].'
+    teleport: 'Teleportation is not allowed during the game in arena [ARENA].'
 broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'

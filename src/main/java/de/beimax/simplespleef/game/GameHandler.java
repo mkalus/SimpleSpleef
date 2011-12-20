@@ -277,12 +277,11 @@ public class GameHandler {
 			}
 		}
 		// player already joined another arena?
-		for (Game checkGame :  getGames()) {
-			if (checkGame.hasPlayer(player)) {
-				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.joinDouble", "[ARENA]", checkGame.getName()));
-				return;
-			}
-		}
+		Game checkGame = checkPlayerInGame(player);
+		if (checkGame != null) {
+			sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.joinDouble", "[ARENA]", checkGame.getName()));
+			return;			
+		} else checkGame = null;
 		// ok, try to join the game itself...
 		if (!game.join(player)) return;
 		// now we announce the joining of the player...
@@ -294,7 +293,7 @@ public class GameHandler {
 			game.sendMessage(broadcastMessage, player); // notify players and spectators
 		}
 	}
-
+	
 	/**
 	 * Attempt to start a game (spleefers only)
 	 * @param sender
@@ -303,16 +302,16 @@ public class GameHandler {
 		// only senders in a game may start a game
 		Player player = (Player) sender; // cast to player
 		// player already joined another arena?
-		for (Game checkGame :  getGames())
-			if (checkGame.hasPlayer(player)) {
-				String arena = checkGame.getId();
-				//is config "spleeferStart" of arena is set to true? - isJoinable added to avoid error message and let game do this instead
-				if (checkGame.isJoinable() && !this.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
-					sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", arena));
-				else // spleeferStart is true: attempt to start countdown
-					countdown(sender, arena);
-				return;
-			}
+		Game checkGame = checkPlayerInGame(player);
+		if (checkGame != null) {
+			String arena = checkGame.getId();
+			//is config "spleeferStart" of arena is set to true? - isJoinable added to avoid error message and let game do this instead
+			if (checkGame.isJoinable() && !this.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
+				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", arena));
+			else // spleeferStart is true: attempt to start countdown
+				countdown(sender, arena);
+			return;
+		}
 		// sender not part of any game
 		sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.start"));
 	}
@@ -374,7 +373,17 @@ public class GameHandler {
 		// TODO Auto-generated method stub
 	}
 
-	//TODO game handling itself
+	/**
+	 * checks whether the player is part of a game or not
+	 * @param player
+	 * @return Game the player is part of or null, if not
+	 */
+	public Game checkPlayerInGame(Player player) {
+		for (Game checkGame :  getGames()) {
+			if (checkGame.hasPlayer(player)) return checkGame;
+		}
+		return null;
+	}
 	
 	/**
 	 * helper to create new game and add it automatically to list

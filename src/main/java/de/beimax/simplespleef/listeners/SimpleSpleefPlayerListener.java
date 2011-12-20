@@ -1,5 +1,6 @@
 package de.beimax.simplespleef.listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -9,6 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -83,6 +85,15 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		// TODO Auto-generated method stub
+		if (gameHandler.hasGames()) {
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			if (game != null) {
+				// check, if arena allows teleportation or not (preventTeleportingDuringGames)
+				if (gameHandler.getPlugin().getConfig().getBoolean("arenas." + game.getId() + ".preventTeleportingDuringGames", true)) {
+					event.getPlayer().sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.teleport", "[ARENA]", game.getName()));
+				}
+			}
+		}
 	}
 }

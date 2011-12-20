@@ -78,9 +78,6 @@ public class GameImpl extends Game {
 		if (!spleefers.addSpleefer(player)) { // some weird error
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
 		}
-		// TODO clear inventory
-		// TODO: add to inventory
-		// TODO: alternatively give shovels
 		// TODO: remember player's last position
 		// TODO: teleport player to lobby
 		return true;
@@ -119,20 +116,51 @@ public class GameImpl extends Game {
 		deleteCountdown();
 		// change game status
 		status = STATUS_STARTED;
-		// TODO start game
-		return false;
+		// possibly clear inventory
+		clearInventories();
+		// optionally add to inventory
+		addToInventories();
+		// and/or give shovels
+		addShovelItems();
+		return true;
 	}
-
+	
 	@Override
 	public boolean stop() {
-		// TODO: change game status
-		// TODO Auto-generated method stub
-		return false;
+		// actually end the game
+		endGame();
+		// TODO: send message
+		return true;
 	}
+	
 
 	@Override
 	public boolean delete() {
-		// TODO Auto-generated method stub
+		// end the game first, if game is started
+		endGame();
+		// TODO: change status to delete
+		// TODO: actually delete game
+		return false;
+	}
+
+	/**
+	 * Do end game maintenance
+	 * @return
+	 */
+	protected boolean endGame() {
+		//TODO => check what the current status is and end game then
+		//isInProgress() 
+		//isJoinable()
+		// + other cases?
+		//TODO kill countdown, if needed
+		// TODO: change game status
+		// possibly take away shovel items
+		removeShovelItems();
+		// possibly restore inventories
+		restoreAllInventories();
+		// TODO: teleport players to lobby
+		// change game status
+		status = STATUS_NEW;
 		return false;
 	}
 
@@ -190,6 +218,60 @@ public class GameImpl extends Game {
 	}
 
 	/**
+	 * if "clearInventory" setting of area is true, clear inventory of player and remember it
+	 * @return
+	 */
+	protected boolean clearInventories() {
+		//TODO implement
+		return false;
+	}
+	
+	/**
+	 * if "clearInventory" setting of area is true, restore saved inventory of all players
+	 * @return
+	 */
+	protected boolean restoreAllInventories() {
+		//TODO implement
+		return false;
+	}
+	
+	/**
+	 * if "clearInventory" setting of area is true, restore saved inventory of single player
+	 * @return
+	 */
+	protected boolean restoreInventory(Player player) {
+		//TODO implement
+		return false;
+	}
+	
+	/**
+	 * if "addToInventory" setting of area is true, add items to inventory of player
+	 * @return
+	 */
+	protected boolean addToInventories() {
+		//TODO implement
+		return false;
+	}
+	
+	/**
+	 * if "playersReceiveShovelAtGameStart" setting of area is true, add shovel to inventory of player
+	 * @return
+	 */
+	protected boolean addShovelItems() {
+		//TODO implement
+		return false;
+	}
+	
+	/**
+	 * if "playersLooseShovelAtGameEnd" setting of area is true, remove shovel from inventory of player
+	 * @return
+	 */
+	protected boolean removeShovelItems() {
+		//TODO implement
+		return false;
+	}
+
+	/**
 	 * Countdown class
 	 * 
 	 * @author mkalus
@@ -239,12 +321,10 @@ public class GameImpl extends Game {
 			} while (!started && !interrupted);
 			// countdown ended due to interruption?
 			if (interrupted) {
-				// change status back
-				status = STATUS_NEW;
-				// TODO: teleport players back to lobby
 				// send message
 				sendMessage(ChatColor.RED + gameHandler.getPlugin().ll("feedback.countdownInterrupted"), broadcast);
-				deleteCountdown();
+				// end the game
+				GameImpl.this.endGame();
 			} else {
 				// send message
 				sendMessage(ChatColor.BLUE + gameHandler.getPlugin().ll("feedback.countdownGo"), broadcast);
