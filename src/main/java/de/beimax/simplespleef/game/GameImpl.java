@@ -4,6 +4,7 @@
 package de.beimax.simplespleef.game;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -81,6 +82,12 @@ public class GameImpl extends Game {
 		}
 		// already joined this game? => is caught by GameHandler, so we do not check this here...
 		// TODO: check funds of player...
+		// check gamemode and change it if needed
+		if (player.getGameMode() != GameMode.SURVIVAL) {
+			//this.gameHandler.getPlugin().getServer().dispatchCommand(this.gameHandler.getPlugin().getServer().getConsoleSender(), "gamemode maxkalus 0");
+			player.setGameMode(GameMode.SURVIVAL);
+			player.sendMessage(ChatColor.YELLOW + this.gameHandler.getPlugin().ll("feedback.gamemodeChanged"));
+		}
 		if (!spleefers.addSpleefer(player)) { // some weird error
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
 		}
@@ -228,6 +235,13 @@ public class GameImpl extends Game {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean playerMayTeleport(Player player) {
+		// TODO - check if the player is on the teleport-ok-list, delete him/her from list and return true
+		// otherwise return preventTeleportingDuringGames for this arena
+		return !configuration.getBoolean("preventTeleportingDuringGames", true);
 	}
 
 	@Override

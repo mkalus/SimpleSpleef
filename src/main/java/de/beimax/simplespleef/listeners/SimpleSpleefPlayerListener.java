@@ -1,6 +1,7 @@
 package de.beimax.simplespleef.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -109,11 +110,27 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 			// player part of a game?
 			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
 			if (game != null) {
-				// check, if arena allows teleportation or not (preventTeleportingDuringGames)
-				if (gameHandler.getPlugin().getConfig().getBoolean("arenas." + game.getId() + ".preventTeleportingDuringGames", true)) {
+				// check, if arena allows the player's teleportation
+				if (!game.playerMayTeleport(event.getPlayer())) {
 					event.getPlayer().sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.teleport", "[ARENA]", game.getName()));
+					event.setCancelled(true); //cancel event
 				}
 			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerGameModeChange(org.bukkit.event.player.PlayerGameModeChangeEvent)
+	 */
+	@Override
+	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		if (gameHandler.hasGames()) {
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			if (game != null) { // generally disallow changes of game modes for spleefers
+				event.getPlayer().sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.gamemodeChange"));
+				event.setCancelled(true); //cancel event
+			}			
 		}
 	}
 }

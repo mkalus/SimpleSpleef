@@ -29,12 +29,14 @@ errors:
     start: 'You have to join a game before starting one.'
     startNoSpleefer: 'In this arena you may not start a game by typing /spl start - try: /spl countdown [ARENA].'
     teleport: 'Teleportation is not allowed during the game in arena [ARENA].'
+    gamemodeChange: 'You cannot change your gamemode while spleefing!'
 broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'
 feedback:
     announce: 'You have announced a new game in arena [ARENA]. You can now invite people to join!'
     join: 'You have joined a game in arena [ARENA].'
+    gamemodeChanged: 'Your game mode was changed.'
     countdownStart: 'Starting spleef game. There can only be one!'
     countdown: '[ARENA]: [COUNT]'
     countdownGo: 'Goooo!'

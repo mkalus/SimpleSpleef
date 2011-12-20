@@ -139,6 +139,14 @@ public abstract class Game {
 	public abstract void onPlayerMove(PlayerMoveEvent event);
 	
 	/**
+	 * Called when a spleefer tries to teleport in this game
+	 * may be called by the game itself in a way, so it should be able to
+	 * teleport the player in certain cases
+	 * @param player
+	 */
+	public abstract boolean playerMayTeleport(Player player);
+	
+	/**
 	 * Called when a spleefer interacts with something in this game
 	 * @param event
 	 */

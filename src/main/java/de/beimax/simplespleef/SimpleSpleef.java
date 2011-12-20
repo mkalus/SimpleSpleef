@@ -176,6 +176,7 @@ public class SimpleSpleef extends JavaPlugin {
 		pm.registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.High, this);
 		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Highest, this);
+		pm.registerEvent(Type.PLAYER_GAME_MODE_CHANGE, playerListener, Priority.Highest, this);
 	}
 
 	/**

@@ -29,12 +29,14 @@ errors:
     start: 'Du musst an einem Spleef teilnehmen, bevor du ein Spiel starten kannst!'
     startNoSpleefer: 'In dieser Arena darf kein Spieler mit /spl start ein Spiel starten - versuche es mit /spl countdown [ARENA].'
     teleport: 'Teleportation ist während des Spiels in Arena [ARENA] nicht erlaubt.'
+    gamemodeChange: 'Du kannst wärend des Spleefens deinen game mode nicht ändern!'
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
 feedback:
     announce: 'Du hast ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Du kannst nun Leute zum Spielen einladen!'
     join: 'Du nimmst am Spleef in der Arena [ARENA] teil.'
+    gamemodeChanged: 'Dein game mode wurde geändert.'
     countdownStart: 'Starte Spleef-Spiel. Es kann nur einen geben!'
     countdown: '[ARENA]: [COUNT]'
     countdownGo: 'LOOOOOS!'
