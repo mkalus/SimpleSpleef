@@ -211,4 +211,9 @@ public abstract class Game {
 	public boolean isInProgress() {
 		return this.status == STATUS_COUNTDOWN || this.status == STATUS_STARTED;
 	}
+
+	/**
+	 * cleaning routine called at end of game
+	 */
+	public abstract void clean();
 }

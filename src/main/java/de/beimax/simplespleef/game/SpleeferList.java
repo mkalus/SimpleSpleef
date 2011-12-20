@@ -83,9 +83,19 @@ public class SpleeferList {
 	 */
 	public boolean hasLost(Player player) {
 		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) return true;
+			if (spleefer.getPlayer() == player) return spleefer.hasLost();
 		}
 		return false;
+	}
+
+	/**
+	 * set player to lost
+	 * @param player
+	 */
+	public void setLost(Player player) {
+		for (Spleefer spleefer : spleefers) {
+			if (spleefer.getPlayer() == player) spleefer.setLost(true);
+		}
 	}
 	
 	/**

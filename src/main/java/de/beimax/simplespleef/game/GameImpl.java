@@ -3,8 +3,13 @@
  */
 package de.beimax.simplespleef.game;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -31,6 +36,11 @@ public class GameImpl extends Game {
 	 * Reference to configuration
 	 */
 	protected ConfigurationSection configuration;
+	
+	/**
+	 * to make game faster:
+	 */
+	protected Set<Material> looseOnTouchMaterial;
 
 	/**
 	 * private countdown class
@@ -65,6 +75,22 @@ public class GameImpl extends Game {
 	@Override
 	public void defineSettings(ConfigurationSection conf) {
 		this.configuration = conf;
+		// define defaults/shortcuts
+		if (conf.getBoolean("looseOnTouchBlocks", true)) {
+			// is looseBlocks a valid list?
+			if (conf.isList("looseBlocks")) { //yes
+				this.looseOnTouchMaterial = new HashSet<Material>();
+				for (String material : conf.getStringList("looseBlocks")) {
+					Material m = Material.getMaterial(material);
+					// check existence of material
+					if (m == null) SimpleSpleef.log.warning("[SimpleSpleef] " + getId() + " configuration warning! Unknown Material in looseBlocks: " + material);
+					else this.looseOnTouchMaterial.add(m);
+				}
+				if (this.looseOnTouchMaterial.size() == 0) this.looseOnTouchMaterial = null; //no
+			} else this.looseOnTouchMaterial = null; //no
+		} else this.looseOnTouchMaterial = null; // reset
+		
+		//TODO: more definitions/shortcuts
 	}
 
 	@Override
@@ -152,7 +178,8 @@ public class GameImpl extends Game {
 		// end the game first, if game is started
 		endGame();
 		// TODO: change status to delete
-		// TODO: actually delete game
+		// call the game handler to tell it that the game is over
+		gameHandler.gameOver(this);
 		return false;
 	}
 
@@ -233,8 +260,19 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		// TODO Auto-generated method stub
+		if (!isInProgress() || spleefers.hasLost(event.getPlayer())) return; // if game is not in progress or player has lost, return
 		
+		//player touched certain block (setting looseOnTouchBlocks)
+		if (looseOnTouchMaterial != null) {
+			Material touchedBlock = event.getTo().getBlock().getType();
+			Material onBlock = event.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
+			if (looseOnTouchMaterial.contains(touchedBlock) || looseOnTouchMaterial.contains(onBlock)) {
+				// TODO: send message
+				// Ha, lost!
+				playerLoses(event.getPlayer());
+			}
+		}
+		//TODO: check location within "loose" cuboid (setting loose)
 	}
 
 	@Override
@@ -279,6 +317,40 @@ public class GameImpl extends Game {
 	public void onBlockBreak(BlockBreakEvent event) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/**
+	 * called when player loses a game
+	 * @param player
+	 */
+	protected void playerLoses(Player player) {
+		// set player to lost
+		spleefers.setLost(player);
+		// TODO Message
+		player.sendMessage("You loose!");
+		// determine if game is over...
+		if (spleefers.inGame() <= configuration.getInt("remainingPlayersWin", 1))
+			gameOver();
+	}
+	
+	/**
+	 * called when game is over - get winners, etc.
+	 */
+	protected void gameOver() {
+		// determine winners
+		for (Spleefer spleefer : spleefers.get()) {
+			if (!spleefer.hasLost()) { // not lost?
+				//this guy is a winner
+				spleefer.getPlayer().sendMessage("You won!");
+				//TODO: winning message!
+				// TODO pay prizes
+			}
+		}
+		
+		// clean up game and end it
+		endGame();
+		// call the game handler to tell it that the game is over
+		gameHandler.gameOver(this);
 	}
 
 	/**
@@ -333,6 +405,16 @@ public class GameImpl extends Game {
 	protected boolean removeShovelItems() {
 		//TODO implement
 		return false;
+	}
+	
+	@Override
+	public void clean() {
+		// dereference stuff
+		this.configuration = null;
+		this.spleefers = null;
+		this.looseOnTouchMaterial = null;
+		this.countdown = null;
+		//TODO add more
 	}
 
 	/**

@@ -101,6 +101,15 @@ public class GameHandler {
 	 */
 	public boolean removeGame(String game) {
 		if (games == null) return false;
+		// only one element left
+		if (games.length == 1) {
+			if (games[0].getId().equalsIgnoreCase(game)) {
+				games = null;
+				return true;
+			}
+			return false;
+		} 
+		// reduce array
 		Game[] newGames = new Game[games.length-1];
 		boolean found = false;
 		int pos = 0;
@@ -396,7 +405,7 @@ public class GameHandler {
 		String type = gameNameToType(arena);
 		Game game = GameFactory.createGame(this, type, arena);
 		// define configuration section for this game
-		game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + arena));
+		game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
 		// add game to list
 		addGame(game);
 		// return newly created game
@@ -410,5 +419,26 @@ public class GameHandler {
 		// TODO Auto-generated method stub
 		// TODO: check if player is a spleefer or not
 		// TODO: otherweise check if player is in protected arena
+	}
+	
+	/**
+	 * reload the configuration of the games
+	 */
+	public void reloadConfig() {
+		for (Game game : getGames()) { //iterate through active games
+			// redefine settings
+			game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
+		}
+	}
+
+	/**
+	 * called by a game that has ended
+	 * @param game
+	 */
+	public void gameOver(Game game) {
+		// call cleaning routine of game
+		game.clean();
+		// remove game from active list
+		removeGame(game);
 	}
 }

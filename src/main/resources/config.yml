@@ -41,6 +41,8 @@ arenas:
 # Minimum and maximum players
         minimumPlayers: 2
         maximumPlayers: 0
+# Number of players still in the game to determine winning (each of these will get a prize)
+        remainingPlayersWin: 1
 # Initiate game on joining (otherwise someone has to "/spleef announce" the arena)
         announceOnJoin: true
 # Start the countdown by typing "/spleef start" - otherwise someone has to "/spleef countdown" the arena)
@@ -90,8 +92,10 @@ arenas:
         prizeMoneyPerPlayer: 5.0
 # Winner gets this amount of price money fixed (toal is per player + fixed)
         prizeMoneyFixed: 0.0
+# Loose game by touching certain blocks?
+        looseOnTouchBlocks: true
 # Loose game by touching these blocks (in them/standing on them - name/id)
-        looseOnTouchBlocks:
+        looseBlocks:
             - STATIONARY_WATER
             - STATIONARY_LAVA
 # Players dying loose
