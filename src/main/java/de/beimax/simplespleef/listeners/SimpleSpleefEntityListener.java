@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 
-import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -34,6 +34,12 @@ public class SimpleSpleefEntityListener extends EntityListener {
 	 */
 	@Override
 	public void onEntityDeath(EntityDeathEvent event) {
-		//TODO implement
+		// check if games are running and the entity is indeed a player
+		if (gameHandler.hasGames() && event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(player);
+			if (game != null) game.onPlayerDeath(player);
+		}
 	}
 }

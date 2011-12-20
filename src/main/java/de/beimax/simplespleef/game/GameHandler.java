@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 
@@ -400,5 +401,14 @@ public class GameHandler {
 		addGame(game);
 		// return newly created game
 		return game;
+	}
+
+	/**
+	 * check block breaks in and outside of game
+	 */
+	public void checkBlockBreak(BlockBreakEvent event) {
+		// TODO Auto-generated method stub
+		// TODO: check if player is a spleefer or not
+		// TODO: otherweise check if player is in protected arena
 	}
 }

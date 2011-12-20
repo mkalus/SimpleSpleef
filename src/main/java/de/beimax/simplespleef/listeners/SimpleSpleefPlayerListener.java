@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.game.GameHandler;
 
@@ -37,7 +36,12 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		// TODO Auto-generated method stub
+		if (gameHandler.hasGames()) {
+			// tell all games about it
+			for (Game game : gameHandler.getGames()) {
+				game.onPlayerJoin(event);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +49,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerKick(PlayerKickEvent event) {
-		// TODO Auto-generated method stub
+		if (gameHandler.hasGames()) {
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			if (game != null) game.onPlayerKick(event);
+		}
 	}
 
 	/*
@@ -57,7 +65,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		//TODO implement
+		if (gameHandler.hasGames()) {
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			if (game != null) game.onPlayerQuit(event);
+		}
 	}	
 
 	/*
@@ -69,7 +81,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		//TODO implement
+		if (gameHandler.hasGames()) {
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			if (game != null) game.onPlayerMove(event);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -77,7 +93,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		//TODO implement
+		if (gameHandler.hasGames()) {
+			// player part of a game?
+			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			if (game != null) game.onPlayerInteract(event);
+		}
 	}
 
 	/* (non-Javadoc)

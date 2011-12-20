@@ -7,6 +7,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 
@@ -215,6 +221,50 @@ public class GameImpl extends Game {
 		// TODO: spectators
 		// send to console, too
 		SimpleSpleef.log.info(message);
+	}
+
+
+	@Override
+	public void onPlayerMove(PlayerMoveEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		// TODO Auto-generated method stub
+		//TODO also check block playing here
+		
+	}
+
+	@Override
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPlayerKick(PlayerKickEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPlayerDeath(Player player) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onBlockBreak(BlockBreakEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**

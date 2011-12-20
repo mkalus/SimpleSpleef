@@ -3,7 +3,6 @@ package de.beimax.simplespleef.listeners;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 
-import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.GameHandler;
 
 /**
@@ -31,6 +30,7 @@ public class SimpleSpleefBlockListener extends BlockListener {
 	 */
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
-		//TODO do something
+		// check block breaks globally, since blocks could be broken from a protected arena
+		gameHandler.checkBlockBreak(event);
 	}
 }

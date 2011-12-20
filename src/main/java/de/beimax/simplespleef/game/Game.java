@@ -6,6 +6,12 @@ package de.beimax.simplespleef.game;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * @author mkalus
@@ -125,6 +131,48 @@ public abstract class Game {
 	 * @return boolean
 	 */
 	public abstract boolean hasPlayer(Player player);
+	
+	/**
+	 * Called when a spleefer moves in this game
+	 * @param event
+	 */
+	public abstract void onPlayerMove(PlayerMoveEvent event);
+	
+	/**
+	 * Called when a spleefer interacts with something in this game
+	 * @param event
+	 */
+	public abstract void onPlayerInteract(PlayerInteractEvent event);
+	
+	/**
+	 * Called when a spleefer quits
+	 * @param event
+	 */
+	public abstract void onPlayerQuit(PlayerQuitEvent event);
+
+	/**
+	 * Called when a spleefer gets kicked
+	 * @param event
+	 */
+	public abstract void onPlayerKick(PlayerKickEvent event);
+	
+	/**
+	 * Called when a player joins - game can check if the player has quit recently, for example
+	 * @param event
+	 */
+	public abstract void onPlayerJoin(PlayerJoinEvent event);
+	
+	/**
+	 * Called when a spleefer dies during this game
+	 * @param event
+	 */
+	public abstract void onPlayerDeath(Player player);
+	
+	/**
+	 * Called when a spleefer breaks a block
+	 * @param event
+	 */
+	public abstract void onBlockBreak(BlockBreakEvent event);
 
 	/**
 	 * Send a message to broadcast, or to players and spectators
