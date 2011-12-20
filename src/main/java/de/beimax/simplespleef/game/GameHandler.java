@@ -258,8 +258,8 @@ public class GameHandler {
 	 * @param arena
 	 */
 	public void join(CommandSender sender, String arena) {
-		Game game = getGameByName(arena);
 		arena = arena.toLowerCase();
+		Game game = getGameByName(arena);
 		Player player = (Player) sender; // cast to player
 		// does the game not exist?
 		if (game == null) {
@@ -286,10 +286,12 @@ public class GameHandler {
 		// ok, try to join the game itself...
 		if (!game.join(player)) return;
 		// now we announce the joining of the player...
+		String broadcastMessage = ChatColor.GREEN + this.getPlugin().ll("broadcasts.join", "[PLAYER]", sender.getName(), "[ARENA]", game.getName());
 		if (this.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) { // broadcast
-			this.getPlugin().getServer().broadcastMessage(ChatColor.GREEN + this.getPlugin().ll("broadcasts.join", "[PLAYER]", sender.getName(), "[ARENA]", game.getName()));
+			this.getPlugin().getServer().broadcastMessage(broadcastMessage);
 		} else { // player only
 			sender.sendMessage(ChatColor.GREEN + this.getPlugin().ll("feedback.join", "[ARENA]", game.getName()));
+			game.sendMessage(broadcastMessage, player); // notify players and spectators
 		}
 	}
 
@@ -298,7 +300,21 @@ public class GameHandler {
 	 * @param sender
 	 */
 	public void start(CommandSender sender) {
-		// TODO Auto-generated method stub
+		// only senders in a game may start a game
+		Player player = (Player) sender; // cast to player
+		// player already joined another arena?
+		for (Game checkGame :  getGames())
+			if (checkGame.hasPlayer(player)) {
+				String arena = checkGame.getId();
+				//is config "spleeferStart" of arena is set to true? - isJoinable added to avoid error message and let game do this instead
+				if (checkGame.isJoinable() && !this.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
+					sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", arena));
+				else // spleeferStart is true: attempt to start countdown
+					countdown(sender, arena);
+				return;
+			}
+		// sender not part of any game
+		sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.start"));
 	}
 
 	/**
@@ -307,7 +323,21 @@ public class GameHandler {
 	 * @param arena (may be null)
 	 */
 	public void countdown(CommandSender sender, String arena) {
-		// TODO Auto-generated method stub
+		arena = arena.toLowerCase();
+		Game game = getGameByName(arena);
+		// does the game not exist?
+		if (game == null) {
+			// check if game is disabled
+			if (!this.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
+				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
+				return;
+			}
+			// game not announced yet...
+			sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.noGameAnnounced", "[ARENA]", arena));
+			return;
+		}
+		// start countdown for game
+		game.countdown(sender);
 	}
 
 	/**

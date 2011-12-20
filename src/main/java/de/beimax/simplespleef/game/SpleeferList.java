@@ -4,6 +4,7 @@
 package de.beimax.simplespleef.game;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -105,5 +106,13 @@ public class SpleeferList {
 	 */
 	public int size() {
 		return spleefers.size();
+	}
+	
+	/**
+	 * get the whole list
+	 * @return
+	 */
+	public List<Spleefer> get() {
+		return spleefers;
 	}
 }

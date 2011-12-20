@@ -39,7 +39,7 @@ arenas:
 # enabled?
         enabled: true
 # Minimum and maximum players
-        minimumPlayers: 0
+        minimumPlayers: 2
         maximumPlayers: 0
 # Initiate game on joining (otherwise someone has to "/spleef announce" the arena)
         announceOnJoin: true

@@ -25,7 +25,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * list of all commands
 	 */
-	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "countdown", "leave", "stop", "delete", "reset", "watch"};
+	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "start", "countdown", "leave", "stop", "delete", "reset", "watch"};
 	/**
 	 * commands possible from the console
 	 */
@@ -156,7 +156,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected void arenasCommand(CommandSender sender, String[] args) {
 		//get current games
-		List<String> games = this.gameHandler.getGameNames();
+		List<String> games = this.gameHandler.getGameIds();
 		// get all possible games
 		Map<String, Boolean> arenas = this.gameHandler.getPossibleGames();
 		if (arenas == null) return; // none - unlikely, but possible...
@@ -171,7 +171,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 				// game active or still joinable?
 				Game activeGame = this.gameHandler.getGameByName(game);
 				if (activeGame.isJoinable()) color = ChatColor.GREEN; // joinable
-				else color = ChatColor.GOLD; // not joinable - because running
+				else color = ChatColor.LIGHT_PURPLE; // not joinable - because running
 			} else color = ChatColor.YELLOW;
 			sender.sendMessage(color + game);
 		}

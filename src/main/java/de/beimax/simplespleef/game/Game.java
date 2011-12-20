@@ -3,6 +3,7 @@
  */
 package de.beimax.simplespleef.game;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -32,7 +33,7 @@ public abstract class Game {
 	/**
 	 * game status
 	 */
-	private int status;
+	protected int status;
 
 	/**
 	 * Constructor
@@ -90,9 +91,10 @@ public abstract class Game {
 
 	/**
 	 * Countdown started
+	 * @param sender
 	 * @return boolean successful?
 	 */
-	public abstract boolean countdown();
+	public abstract boolean countdown(CommandSender sender);
 
 	/**
 	 * Start command issued
@@ -119,6 +121,26 @@ public abstract class Game {
 	public abstract boolean spectate();
 
 	/**
+	 * Check if player is in arena X
+	 * @return boolean
+	 */
+	public abstract boolean hasPlayer(Player player);
+
+	/**
+	 * Send a message to broadcast, or to players and spectators
+	 * @param message
+	 * @param broadcast
+	 */
+	public abstract void sendMessage(String message, boolean broadcast);
+	
+	/**
+	 * Send a message to broadcast, or to players and spectators
+	 * @param message
+	 * @param exception exception - this player does not receive message
+	 */
+	public abstract void sendMessage(String message, Player exception);
+
+	/**
 	 * is game joinable?
 	 * @return true for joinable
 	 */
@@ -127,8 +149,10 @@ public abstract class Game {
 	}
 
 	/**
-	 * Check if player is in arena X
-	 * @return boolean
+	 * is game in progress?
+	 * @return true/false
 	 */
-	public abstract boolean hasPlayer(Player player);
+	public boolean isInProgress() {
+		return this.status == STATUS_COUNTDOWN || this.status == STATUS_STARTED;
+	}
 }
