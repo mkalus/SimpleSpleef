@@ -162,18 +162,32 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		if (arenas == null) return; // none - unlikely, but possible...
 		// cycle through possible games
 		for (Entry<String, Boolean> arena: arenas.entrySet()) {
-			// what color?
+			// color and information on game
 			ChatColor color;
-			String game = arena.getKey();
-			if (arena.getValue() == false) color = ChatColor.DARK_GRAY;
-			// game in active list?
-			else if (games.contains(game)) {
+			String name = arena.getKey(); // id of arena
+			String information;
+			if (arena.getValue() == false) {
+				color = ChatColor.DARK_GRAY; // arena has been disabled in the the config
+				information = this.gameHandler.getPlugin().ll("feedback.arenaDisabled");
+			}
+			else if (games.contains(name)) { // is it an active game?
 				// game active or still joinable?
-				Game activeGame = this.gameHandler.getGameByName(game);
-				if (activeGame.isJoinable()) color = ChatColor.GREEN; // joinable
-				else color = ChatColor.LIGHT_PURPLE; // not joinable - because running
-			} else color = ChatColor.YELLOW;
-			sender.sendMessage(color + game);
+				Game activeGame = this.gameHandler.getGameByName(name);
+				if (activeGame.isJoinable()) {
+					color = ChatColor.GREEN; // joinable
+					information = this.gameHandler.getPlugin().ll("feedback.arenaJoinable");
+				}
+				else {
+					color = ChatColor.LIGHT_PURPLE; // not joinable - because running
+					information = this.gameHandler.getPlugin().ll("feedback.arenaInProgress");
+				}
+				// ok, gather some more information on the game to display
+				information = information + " " + activeGame.getNumberOfPlayers();
+			} else {
+				color = ChatColor.GRAY; // not an active game
+				information = null; // no information
+			}
+			sender.sendMessage(color + name + (information!=null?(ChatColor.GRAY + " - " + information):""));
 		}
 	}
 	

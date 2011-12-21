@@ -199,6 +199,12 @@ public abstract class Game {
 	public abstract void sendMessage(String message, Player exception);
 
 	/**
+	 * Get number of players
+	 * @return something like (1/2)
+	 */
+	public abstract String getNumberOfPlayers();
+
+	/**
 	 * is game joinable?
 	 * @return true for joinable
 	 */

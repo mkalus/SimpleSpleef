@@ -266,6 +266,21 @@ public class GameImpl extends Game {
 		}
 	}
 	
+	@Override
+	public String getNumberOfPlayers() {
+		int active;
+		int max;
+		// shows information depending on state
+		if (isInProgress()) {
+			active = spleefers.inGame();
+			max = spleefers.size();
+		} else { // joinable -> show number of players joined, open places
+			active = spleefers.size();
+			max = configuration.getInt("maximumPlayers", 0);
+		}
+		return "(" + active + "/" + (max>0?max:"-") + ")";
+	}
+	
 	/**
 	 * Send a message to broadcast, or to players and spectators
 	 * @param message

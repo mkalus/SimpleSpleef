@@ -38,6 +38,9 @@ broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'
 feedback:
+    arenaDisabled: disabled
+    arenaJoinable: open
+    arenaInProgress: 'in progress'
     announce: 'You have announced a new game in arena [ARENA]. You can now invite people to join!'
     join: 'You have joined a game in arena [ARENA].'
     joinFee: 'You paid [AMOUNT] to join the game.'

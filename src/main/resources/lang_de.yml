@@ -38,6 +38,9 @@ broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
 feedback:
+    arenaDisabled: abgeschaltet
+    arenaJoinable: offen
+    arenaInProgress: 'Spiel aktiv'
     announce: 'Du hast ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Du kannst nun Leute zum Spielen einladen!'
     join: 'Du nimmst am Spleef in der Arena [ARENA] teil.'
     joinFee: '[AMOUNT] für die Teilnahme am Spiel gezahlt.'
