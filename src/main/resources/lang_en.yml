@@ -26,6 +26,7 @@ errors:
     join: 'There is already a game in progress in arena [ARENA].'
     joinMax: 'Arena ist full! Only [NUMBER] spleefers can join a game in arena [ARENA].'
     joinDouble: 'You are already player in arena [ARENA]. You have to leave this game first before joining another game.'
+    joinFee: 'You do not have the required [AMOUNT] to join the game.'
     start: 'You have to join a game before starting one.'
     startNoSpleefer: 'In this arena you may not start a game by typing /spl start - try: /spl countdown [ARENA].'
     teleport: 'Teleportation is not allowed during the game in arena [ARENA].'
@@ -36,6 +37,7 @@ broadcasts:
 feedback:
     announce: 'You have announced a new game in arena [ARENA]. You can now invite people to join!'
     join: 'You have joined a game in arena [ARENA].'
+    joinFee: 'You paid [AMOUNT] to join the game.'
     gamemodeChanged: 'Your game mode was changed.'
     countdownStart: 'Starting spleef game. There can only be one!'
     countdown: '[ARENA]: [COUNT]'

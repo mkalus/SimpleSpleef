@@ -6,6 +6,8 @@ package de.beimax.simplespleef.game;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.milkbowl.vault.economy.EconomyResponse;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -19,8 +21,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import com.fernferret.allpay.GenericBank;
 
 import de.beimax.simplespleef.SimpleSpleef;
 
@@ -110,15 +110,13 @@ public class GameImpl extends Game {
 		}
 		// already joined this game? => is caught by GameHandler, so we do not check this here...
 		// check funds of player...
-		if (configuration.getDouble("entryFee", 0.0) > 0.0) {
-			GenericBank bank = gameHandler.getPlugin().getAllPay().getEconPlugin();
-			double entryFee = configuration.getDouble("entryFee", 0.0);
-			int entryItem = configuration.getInt("entryItem", -1);
-			if (bank.hasEnough(player, entryFee, entryItem)) {
-				bank.pay(player, entryFee, entryItem);
-				// TODO message to deduct stuff...
-			} else {
-				// TODO: message to say "insufficient funds"
+		double entryFee = configuration.getDouble("entryFee", 0.0);
+		if (entryFee > 0.0) {
+			EconomyResponse response = SimpleSpleef.economy.withdrawPlayer(player.getName(), entryFee);
+			if (response.type == EconomyResponse.ResponseType.SUCCESS) { // ok, tell the player about the amount charged
+				player.sendMessage(this.gameHandler.getPlugin().ll("feedback.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
+			} else { //insufficient funds
+				player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
 				return false;
 			}
 		}

@@ -4,6 +4,7 @@ version: 2.0.0-alpha
 author: maxkalus
 description: >
              Simple Spleef Plugin
+depend: [Vault]
 commands:
   spleef:
     description: Control your spleef games

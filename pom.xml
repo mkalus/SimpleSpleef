@@ -59,6 +59,13 @@
 			<artifactId>MultiCurrency</artifactId>
 			<version>0.09</version>
 		</dependency>
+		<dependency>
+			<groupId>net.milkbowl</groupId>
+			<version>1.1.9</version>
+			<artifactId>vault</artifactId>
+			<systemPath>/home/mkalus/devel/Java/CraftBukkit/plugins/Vault.jar</systemPath>
+			<scope>system</scope>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

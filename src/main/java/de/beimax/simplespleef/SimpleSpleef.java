@@ -21,13 +21,14 @@ package de.beimax.simplespleef;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bukkit.event.Event;
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.fernferret.allpay.AllPay;
 
 import de.beimax.simplespleef.admin.SimpleSpleefAdmin;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
@@ -45,23 +46,8 @@ import de.beimax.simplespleef.util.UpdateChecker;
 public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	
-	/**
-	 * AllPay singleton
-	 */
-	private static AllPay allPay = null;
-
-	/**
-	 * @return allPay instance (singleton)
-	 */
-	public AllPay getAllPay() {
-		if (SimpleSpleef.allPay == null) SimpleSpleef.allPay = new AllPay(this, "SimpleSpleef: ");
-		return SimpleSpleef.allPay;
-	}
-	
-	/**
-	 * plugin listener
-	 */
-	private static PluginListener PluginListener = null;
+	public static Economy economy = null;
+    public static Chat chat = null;
 
 	/**
 	 * reference to game handler
@@ -107,8 +93,9 @@ public class SimpleSpleef extends JavaPlugin {
 		this.gameHandler = new GameHandler(this);
 		this.admin = new SimpleSpleefAdmin(this);
 		
-		// add plugin listeners to listen to the registry of other plugins
-		registerPluginListener();
+		// register vault stuff
+		setupChat();
+		setupEconomy();
 		
 		// add event listeners
 		registerEvents();
@@ -162,17 +149,6 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// also check for updates in the configuration files and update them, if needed
 		checker.updateConfigurationVersion(this);
-	}
-
-	/**
-	 * adds a plugin listener to listen to the registry of other plugins
-	 */
-	protected void registerPluginListener() {
-		// register enable events from other plugins
-		PluginListener = new PluginListener();
-
-		getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE,
-				PluginListener, Priority.Monitor, this);
 	}
 
 	/**
@@ -261,5 +237,27 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public Map<String, String> lls(String section) {
 		return lang.lls(section);
+	}
+
+	private Boolean setupChat() {
+		RegisteredServiceProvider<Chat> chatProvider = getServer()
+				.getServicesManager().getRegistration(
+						net.milkbowl.vault.chat.Chat.class);
+		if (chatProvider != null) {
+			chat = chatProvider.getProvider();
+		}
+
+		return (chat != null);
+	}
+
+	private Boolean setupEconomy() {
+		RegisteredServiceProvider<Economy> economyProvider = getServer()
+				.getServicesManager().getRegistration(
+						net.milkbowl.vault.economy.Economy.class);
+		if (economyProvider != null) {
+			economy = economyProvider.getProvider();
+		}
+
+		return (economy != null);
 	}
 }

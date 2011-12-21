@@ -54,9 +54,8 @@ arenas:
         addInventoryItems:
             - 1:BOW
             - 64:ARROW
-# Fees to join (money or items)
+# Fees to join (money)
         entryFee: 5.0
-        entryItem: -1
 # Turn prizes of items on/off
         giveItemPrizes: true
 # Prizes (name/id): amount:item or amount:item:subid
