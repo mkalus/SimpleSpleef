@@ -311,7 +311,7 @@ public class GameHandler {
 	public void start(CommandSender sender) {
 		// only senders in a game may start a game
 		Player player = (Player) sender; // cast to player
-		// player already joined another arena?
+		// find player in arena
 		Game checkGame = checkPlayerInGame(player);
 		if (checkGame != null) {
 			String arena = checkGame.getId();
@@ -362,7 +362,14 @@ public class GameHandler {
 	 * @param sender
 	 */
 	public void stop(CommandSender sender) {
-		// TODO Auto-generated method stub
+		// only senders in a game may start a game
+		Player player = (Player) sender; // cast to player
+		// find player in arena
+		Game checkGame = checkPlayerInGame(player);
+		if (checkGame != null) {
+			checkGame.stop(player); // stop game
+		} else //print error, since player not part of a game
+			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.stopNoPlaying"));
 	}
 
 	/**
@@ -371,7 +378,30 @@ public class GameHandler {
 	 * @param arena (may be null)
 	 */
 	public void delete(CommandSender sender, String arena) {
-		// TODO Auto-generated method stub
+		Game game;
+		// if arena is null, get it from sender
+		if (arena == null) {
+			Player player;
+			try {
+				player = (Player) sender; // cast to player
+			} catch (Exception e) { // handle possible cast error
+				sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
+				return;
+			}
+			game = checkPlayerInGame(player);
+			if (game == null) {
+				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.deleteNoPlaying"));
+				return;
+			}
+		} else { // otherwise try to get arena by name
+			game = getGameByName(arena);
+			if (game == null) {
+				// print error, arena was not found
+				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.unknownArena", "[ARENA]", arena));
+				return;
+			}
+		}
+		game.delete(sender); // delete game
 	}
 
 	/**

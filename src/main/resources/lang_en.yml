@@ -29,6 +29,9 @@ errors:
     joinFee: 'You do not have the required [AMOUNT] to join the game.'
     start: 'You have to join a game before starting one.'
     startNoSpleefer: 'In this arena you may not start a game by typing /spl start - try: /spl countdown [ARENA].'
+    stop: 'No game in progress in arena [ARENA].'
+    stopNoPlaying: 'You have not joined a game in any arena. Nothing stopped.'
+    deleteNoPlaying: 'You have not joined a game in any arena. Nothing deleted.'
     teleport: 'Teleportation is not allowed during the game in arena [ARENA].'
     gamemodeChange: 'You cannot change your gamemode while spleefing!'
 broadcasts:
@@ -43,3 +46,5 @@ feedback:
     countdown: '[ARENA]: [COUNT]'
     countdownGo: 'Goooo!'
     countdownInterrupted: 'Countdown interrupted.'
+    stop: 'Spleef in arena [ARENA] was stopped by [PLAYER].'
+    delete: 'Spleef in arena [ARENA] was stopped and deleted by [PLAYER].'

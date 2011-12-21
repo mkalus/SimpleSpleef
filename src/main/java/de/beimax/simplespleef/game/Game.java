@@ -110,15 +110,17 @@ public abstract class Game {
 
 	/**
 	 * Stop command issued
+	 * @param player
 	 * @return boolean successful?
 	 */
-	public abstract boolean stop();
+	public abstract boolean stop(Player player);
 
 	/**
 	 * Delete/reset command issued
+	 * @param sender
 	 * @return boolean successful?
 	 */
-	public abstract boolean delete();
+	public abstract boolean delete(CommandSender sender);
 
 	/**
 	 * Spectate game

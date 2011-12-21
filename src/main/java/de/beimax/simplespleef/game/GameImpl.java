@@ -129,6 +129,7 @@ public class GameImpl extends Game {
 		if (!spleefers.addSpleefer(player)) { // some weird error
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
 		}
+		// TODO: inform/broadcast join
 		// TODO: remember player's last position
 		// TODO: teleport player to lobby
 		return true;
@@ -177,22 +178,31 @@ public class GameImpl extends Game {
 	}
 	
 	@Override
-	public boolean stop() {
+	public boolean stop(Player player) {
+		// game is not in progress!
+		if (!isInProgress()) {
+			player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.stop", "[ARENA]", getName()));
+			return false;
+		}
 		// actually end the game
-		endGame();
-		// TODO: send message
+		if (!endGame()) return false;
+		// send message
+		sendMessage(this.gameHandler.getPlugin().ll("feedback.stop", "[ARENA]", getName(), "[PLAYER]", player.getDisplayName()),
+				this.gameHandler.getPlugin().getConfig().getBoolean("settings.announceStop", true));
 		return true;
 	}
 	
 
 	@Override
-	public boolean delete() {
+	public boolean delete(CommandSender sender) {
 		// end the game first, if game is started
-		endGame();
-		// TODO: change status to delete
+		if (!endGame()) return false;
+		// send message
+		sendMessage(this.gameHandler.getPlugin().ll("feedback.delete", "[ARENA]", getName(), "[PLAYER]", sender.getName()),
+				this.gameHandler.getPlugin().getConfig().getBoolean("settings.announceStop", true));
 		// call the game handler to tell it that the game is over
 		gameHandler.gameOver(this);
-		return false;
+		return true;
 	}
 
 	/**
@@ -204,8 +214,11 @@ public class GameImpl extends Game {
 		//isInProgress() 
 		//isJoinable()
 		// + other cases?
-		//TODO kill countdown, if needed
-		// TODO: change game status
+		// still in countdown? if yes, kill it!
+		if (countdown != null)
+			countdown.interrupted = true;
+		// change game status
+		status = STATUS_FINISHED;
 		// possibly take away shovel items
 		removeShovelItems();
 		// possibly restore inventories
@@ -213,7 +226,7 @@ public class GameImpl extends Game {
 		// TODO: teleport players to lobby
 		// change game status
 		status = STATUS_NEW;
-		return false;
+		return true;
 	}
 
 	@Override
@@ -353,7 +366,7 @@ public class GameImpl extends Game {
 		for (Spleefer spleefer : spleefers.get()) {
 			if (!spleefer.hasLost()) { // not lost?
 				//this guy is a winner
-				spleefer.getPlayer().sendMessage("You won!");
+				spleefer.getPlayer().sendMessage("You won!"); //TODO
 				//TODO: winning message!
 				// TODO pay prizes
 			}

@@ -29,6 +29,9 @@ errors:
     joinFee: 'Du hast nicht die nötigen [AMOUNT], um am Spiel teilzunehmen.'
     start: 'Du musst an einem Spleef teilnehmen, bevor du ein Spiel starten kannst!'
     startNoSpleefer: 'In dieser Arena darf kein Spieler mit /spl start ein Spiel starten - versuche es mit /spl countdown [ARENA].'
+    stop: 'Kein aktives Spiel in Arena [ARENA].'
+    stopNoPlaying: 'Du spielst kein Spleef. Kein Spiel gestoppt!'
+    deleteNoPlaying: 'Du spielst kein Spleef. Kein Spiel gelöscht!'
     teleport: 'Teleportation ist während des Spiels in Arena [ARENA] nicht erlaubt.'
     gamemodeChange: 'Du kannst wärend des Spleefens deinen game mode nicht ändern!'
 broadcasts:
@@ -43,3 +46,5 @@ feedback:
     countdown: '[ARENA]: [COUNT]'
     countdownGo: 'LOOOOOS!'
     countdownInterrupted: 'Countdown abgebrochen.'
+    stop: '[PLAYER] stoppte das Spleef in der Arena [ARENA].'
+    delete: 'Das Spiel in der  Arena [ARENA] wurde durch [PLAYER] gestoppt und gelöscht.'

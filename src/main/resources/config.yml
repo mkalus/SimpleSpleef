@@ -18,6 +18,10 @@ settings:
     announceJoin: true
 # globally announce when game starts
     announceStart: true
+# globally announce when game stops
+    announceStop: true
+# globally announce when game is deleted
+    announceDelete: true
 # globally announce countdown
     announceCountdown: false
 # globally announce when players loose
