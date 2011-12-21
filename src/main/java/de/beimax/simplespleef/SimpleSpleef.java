@@ -21,7 +21,6 @@ package de.beimax.simplespleef;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.event.Event.Priority;
@@ -47,7 +46,6 @@ public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	
 	public static Economy economy = null;
-    public static Chat chat = null;
 
 	/**
 	 * reference to game handler
@@ -94,7 +92,6 @@ public class SimpleSpleef extends JavaPlugin {
 		this.admin = new SimpleSpleefAdmin(this);
 		
 		// register vault stuff
-		setupChat();
 		setupEconomy();
 		
 		// add event listeners
@@ -239,17 +236,10 @@ public class SimpleSpleef extends JavaPlugin {
 		return lang.lls(section);
 	}
 
-	private Boolean setupChat() {
-		RegisteredServiceProvider<Chat> chatProvider = getServer()
-				.getServicesManager().getRegistration(
-						net.milkbowl.vault.chat.Chat.class);
-		if (chatProvider != null) {
-			chat = chatProvider.getProvider();
-		}
-
-		return (chat != null);
-	}
-
+	/**
+	 * set up economy - see http://dev.bukkit.org/server-mods/vault/
+	 * @return
+	 */
 	private Boolean setupEconomy() {
 		RegisteredServiceProvider<Economy> economyProvider = getServer()
 				.getServicesManager().getRegistration(
