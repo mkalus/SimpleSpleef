@@ -188,24 +188,6 @@ arenas:
             x: 0.0
             y: 0.0
             z: 0.0
-# Teleport point where players are sent to after starting game (team red)
-        redTeamSpawn:
-            enabled: false
-            world: world
-            pitch: 0.0
-            yaw: 0.0
-            x: 0.0
-            y: 0.0
-            z: 0.0
-# Teleport point where players are sent to after starting game (team blue)
-        blueTeamSpawn:
-            enabled: false
-            world: world
-            pitch: 0.0
-            yaw: 0.0
-            x: 0.0
-            y: 0.0
-            z: 0.0
 # Teleport point where spectators can watch from
         spectatorSpawn:
             enabled: false

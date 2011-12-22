@@ -13,6 +13,21 @@ command:
     delete: 'delete|Delete a game'
     reset: 'reset arena|Reset a game in arena (delete for admins/moderators)'
     watch: 'watch [arena]|Watch a game (in arena)'
+    admin: 'admin [cammand]|Execute an admin command.'
+admin:
+    help: |
+      Admin Commands (/spl admin...)
+      help|Display admin help.
+      selected|Print current arena and list arenas.
+      setarena arena|Set current arena.
+      addarena arena|Create new arena.
+      delarena arena|Delete arena.
+      arena a/b|Define point a/b of arena cube.
+      floor a/b|Define point a/b of the floor cube.
+      loose a/b|Define point a/b of loose cube.
+      spawn lounge/game/spectator/loose|Set spawn point.
+      enable/disable|Enable/disable arena.
+      set x y|Set variable x to y.
 errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
     unknownCommand: 'Unknown command "[COMMAND]"'

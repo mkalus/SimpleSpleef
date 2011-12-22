@@ -25,12 +25,25 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * list of all commands
 	 */
-	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "start", "countdown", "leave", "stop", "delete", "reset", "watch"};
+	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "admin" };
 	/**
 	 * commands possible from the console
 	 */
 	private final static String[] consoleCommands = {"help", "announce", "arenas", "info", "list", "countdown", "reset"};
 
+	/**
+	 * Print command string from settings line
+	 * @param sender
+	 * @param commandString comand|description...
+	 */
+	public static void printCommandString(CommandSender sender, String commandString) {
+		int pos = commandString.indexOf('|');
+		if (pos == -1) sender.sendMessage(ChatColor.GOLD + commandString);
+		else
+			sender.sendMessage(ChatColor.GOLD + commandString.substring(0, pos)
+					+ ": " + ChatColor.WHITE + commandString.substring(pos + 1));
+	}
+	
 	/**
 	 * reference to game handler
 	 */
@@ -294,6 +307,16 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		}
 	}
 	
+	/**
+	 * Admin commands
+	 * @param sender
+	 * @param args
+	 */
+	protected void adminCommand(CommandSender sender, String[] args) {
+		// delegate all further stuff to admin class
+		this.gameHandler.getPlugin().getAdminClass().executeCommand(sender, args);
+	}
+	
 	//TODO: add further commands here...
 	
 	/**
@@ -338,19 +361,6 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			if (c.equals(command)) return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Print command string from settings line
-	 * @param sender
-	 * @param commandString comand|description...
-	 */
-	protected void printCommandString(CommandSender sender, String commandString) {
-		int pos = commandString.indexOf('|');
-		if (pos == -1) sender.sendMessage(ChatColor.GOLD + commandString);
-		else
-			sender.sendMessage(ChatColor.GOLD + commandString.substring(0, pos)
-					+ ": " + ChatColor.WHITE + commandString.substring(pos + 1));
 	}
 	
 	/**

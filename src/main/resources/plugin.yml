@@ -51,3 +51,6 @@ permissions:
   simplespleef.watch:
     description: Watch a game
     default: true
+  simplespleef.admin:
+    description: Admin commands
+    default: op
