@@ -3,6 +3,11 @@
  */
 package de.beimax.simplespleef.admin;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -19,11 +24,17 @@ public class SimpleSpleefAdmin {
 	private final SimpleSpleef plugin;
 	
 	/**
+	 * saves which command senders have selected which arena as current one
+	 */
+	private HashMap<CommandSender, String> selectedArenas;
+	
+	/**
 	 * Constructor
 	 * @param plugin reference to plugin
 	 */
 	public SimpleSpleefAdmin(SimpleSpleef plugin) {
 		this.plugin = plugin;
+		selectedArenas = new HashMap<CommandSender, String>();
 	}
 
 	/**
@@ -32,8 +43,6 @@ public class SimpleSpleefAdmin {
 	 * @param args
 	 */
 	public void executeCommand(CommandSender sender, String[] args) {
-		//TODO get or define currently selected arena
-		
 		// only /spl admin entered
 		if (args.length < 2) {
 			helpCommand(sender);
@@ -86,7 +95,26 @@ public class SimpleSpleefAdmin {
 	 * @param sender
 	 */
 	protected void selectedCommand(CommandSender sender) {
-		//TODO
+		// get all possible games
+		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames();
+		// get selected arena
+		String selected = getSelectedArena(sender);
+		for (Entry<String, Boolean> arena: arenas.entrySet()) {
+			sender.sendMessage((arena.getValue()?ChatColor.DARK_BLUE:ChatColor.GRAY) + arena.getKey() + (selected.equals(arena.getKey())?ChatColor.WHITE + " *":""));
+		}
 	}
-	// TODO: implement actions
+	
+	/**
+	 * gets or defines currently selected arena
+	 * @param sender
+	 * @return
+	 */
+	public String getSelectedArena(CommandSender sender) {
+		String arena = selectedArenas.get(sender);
+		
+		// if not found, define default arena as current one
+		if (arena == null)
+			return this.plugin.getGameHandler().getDefaultArena();
+		return arena;
+	}
 }
