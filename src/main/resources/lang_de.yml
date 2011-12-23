@@ -14,19 +14,6 @@ command:
     reset: 'reset arena|Lösche ein Spiel in einer Arena (für Admins/Moderatoren)'
     watch: 'watch [arena]|Schaue bei einem Spiel (in Arena) zu'
     admin: 'admin [kommando]|Führt ein Admin-Kommando aus'
-    help: |
-      Adminkommandos (/spl admin...)
-      help|Zeige Admin-Hilfe.
-      selected|Zeige aktuelle Arena + Liste.
-      setarena arena|Setze aktuelle Arena.
-      addarena arena|Erstelle neue Arena.
-      delarena arena|Lösche Arena.
-      arena a/b|Definiere Punkt a/b der Arena.
-      floor a/b|Definiere Punkt a/b des Bodens.
-      loose a/b|Definiere Punkt a/b des Loose-Kubus.
-      spawn lounge/game/spectator/loose|Setze Spawnpunkt.
-      disable/enable arena|(De)aktiviere Arena.
-      set x y|Setze variable x auf y.
 errors:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
     unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
@@ -65,3 +52,24 @@ feedback:
     countdownInterrupted: 'Countdown abgebrochen.'
     stop: '[PLAYER] stoppte das Spleef in der Arena [ARENA].'
     delete: 'Das Spiel in der  Arena [ARENA] wurde durch [PLAYER] gestoppt und gelöscht.'
+admin:
+    help: |
+      Adminkommandos (/spl admin...)
+      help|Zeige Admin-Hilfe.
+      selected|Zeige aktuelle Arena + Liste.
+      setarena arena|Setze aktuelle Arena.
+      addarena arena|Erstelle neue Arena.
+      delarena arena|Lösche Arena.
+      arena a/b|Definiere Punkt a/b der Arena.
+      floor a/b|Definiere Punkt a/b des Bodens.
+      loose a/b|Definiere Punkt a/b des Loose-Kubus.
+      spawn lounge/game/spectator/loose|Setze Spawnpunkt.
+      disable/enable arena|(De)aktiviere Arena.
+      set x y|Setze variable x auf y.
+adminerrors:
+    oneArgument: '[COMMAND] erwartet genau einen Parameter - Name/Id einer Arena'
+    addarenaArenaExists: 'Arena [ARENA] existiert bereits.'
+adminfeedback:
+    setarena: 'Arena [ARENA] ausgewählt!'
+    addarena: 'Arena [ARENA] erstellt!'
+    delarena: 'Arena [ARENA] gelöscht!'

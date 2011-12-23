@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -36,6 +37,51 @@ public class ConfigHelper {
 	 */
 	public ConfigHelper(SimpleSpleef plugin) {
 		this.plugin = plugin;
+	}
+	
+	/**
+	 * Create a new arena configuration section.
+	 * This method does not check if the arena exists already (done in simple speef admin e.g.)!
+	 * Might want to change this in the future...
+	 * @param id lowercase key of arena
+	 * @param name full name
+	 * @return
+	 */
+	public boolean createNewArena(String id, String name) {
+		// get sample config from ressource
+		try {
+			// input default file
+			InputStream is = this.plugin.getResource("config.yml");
+			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(is);
+			
+			// create new configuration section in main config
+			ConfigurationSection newSection = this.plugin.getConfig().createSection("arenas." + id);
+
+			// get default arena
+			ConfigurationSection section = defConfig.getConfigurationSection("arenas.default");
+			// cycle through sections
+			for (String key: section.getKeys(true)) {
+				if (key.equals("name")) // name set here
+					newSection.set(key, name);
+				else if (key.equals("arena") || key.startsWith("arena.")) continue; // ignore
+				else if (key.equals("floor") || key.startsWith("floor.")) continue; // ignore
+				else if (key.equals("loose") || key.startsWith("loose.")) continue; // ignore
+				else if (key.equals("loungeSpawn") || key.startsWith("loungeSpawn.")) continue; // ignore
+				else if (key.equals("gameSpawn") || key.startsWith("gameSpawn.")) continue; // ignore
+				else if (key.equals("loungeSpawn") || key.startsWith("loungeSpawn.")) continue; // ignore
+				else if (key.equals("spectatorSpawn") || key.startsWith("spectatorSpawn.")) continue; // ignore
+				else if (key.equals("looseSpawn") || key.startsWith("looseSpawn.")) continue; // ignore
+				else newSection.set(key, section.get(key)); // copy into the newly created section
+			}
+
+			// save configuration now
+			this.plugin.saveConfig();
+		} catch (Exception e) {
+			e.printStackTrace();
+			SimpleSpleef.log.severe("[SimpleSpleef] Could not load sample arena due to exception: " + e.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	/**
