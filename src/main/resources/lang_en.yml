@@ -18,6 +18,7 @@ errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
     unknownCommand: 'Unknown command "[COMMAND]"'
     unknownArena: 'Unknown arena "[ARENA]"'
+    notAPlayer: '[PLAYER] is not a player entity.'
     arenaDisabled: '"[ARENA]" is disabled.'
     tooFewArguments: 'Too few arguments for this command. Minimum is [MIN].'
     tooManyArguments: 'Too many arguments for this command. Maximum is [MAX].'
@@ -68,8 +69,12 @@ admin:
       set x y|Set variable x to y.
 adminerrors:
     oneArgument: '[COMMAND] expects one parameter - name/id of arena'
+    aOrB: '[COMMAND] expects one parameter a or b.'
     addarenaArenaExists: 'Arena [ARENA] exists already.'
+    oneArgumentSpawn: 'spawn expects one parameter named lounge, game, spectator, or loose.'
 adminfeedback:
     setarena: 'Arena [ARENA] selected!'
     addarena: 'Arena [ARENA] created!'
     delarena: 'Arena [ARENA] deleted!'
+    defineArenaPoint: 'Set point [POINT] of [SECTION] in arena [ARENA].'
+    defineSpawnPoint: 'Set spawn [SPAWN] in arena [ARENA].'

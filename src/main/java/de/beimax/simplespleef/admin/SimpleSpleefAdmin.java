@@ -9,10 +9,13 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
 import de.beimax.simplespleef.util.ConfigHelper;
+import de.beimax.simplespleef.util.LocationHelper;
 
 /**
  * @author mkalus
@@ -50,6 +53,8 @@ public class SimpleSpleefAdmin {
 			return;
 		}
 		
+		// check arena definition after command
+		boolean checkArena = false;
 		// get admin command
 		String adminCommand = args[1].toLowerCase();
 		if (adminCommand.equals("help")) {
@@ -58,33 +63,27 @@ public class SimpleSpleefAdmin {
 			selectedCommand(sender);
 		} else if (adminCommand.equals("setarena")) {
 			// check argument length
-			if (args.length != 3) {
-				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
-				return;
-			}
-			setarenaCommand(sender, args[2]);
+			if (checkThreeArgs(sender, args, adminCommand))
+				setarenaCommand(sender, args[2]);
 		} else if (adminCommand.equals("addarena")) {
 			// check argument length
-			if (args.length != 3) {
-				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
-				return;
-			}
-			addarenaCommand(sender, args[2]);
+			if (checkThreeArgs(sender, args, adminCommand))
+				addarenaCommand(sender, args[2]);
 		} else if (adminCommand.equals("delarena")) {
 			// check argument length
-			if (args.length != 3) {
-				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
-				return;
+			if (checkThreeArgs(sender, args, adminCommand))
+				delarenaCommand(sender, args[2]);
+		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose")) {
+			// check a/b
+			if (checkThirdAB(sender, args, adminCommand)) {
+				defineArenaPoint(sender, args[2], adminCommand);
+				checkArena = true;
 			}
-			delarenaCommand(sender, args[2]);
-		} else if (adminCommand.equals("arena")) {
-			//TODO
-		} else if (adminCommand.equals("floor")) {
-			//TODO
-		} else if (adminCommand.equals("loose")) {
-			//TODO
 		} else if (adminCommand.equals("spawn")) {
-			//TODO
+			if (checkThirdSpawnName(sender, args, adminCommand)) {
+				defineSpawnPoint(sender, args[2], adminCommand);
+				checkArena = true;
+			}
 		} else if (adminCommand.equals("enable")) {
 			//TODO
 		} else if (adminCommand.equals("disable")) {
@@ -93,8 +92,65 @@ public class SimpleSpleefAdmin {
 			//TODO
 		} else // unknown command feedback
 			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.unknownCommand", "[COMMAND]", adminCommand));
+		
+		// should arena definition be checked?
+		if (checkArena) checkArena(sender);
+	}
+
+	/**
+	 * checks, if there are exactly three arguments in the list 
+	 * @param sender
+	 * @param args
+	 * @param adminCommand
+	 * @return
+	 */
+	protected boolean checkThreeArgs(CommandSender sender, String[] args, String adminCommand) {
+		// check argument length
+		if (args.length != 3) {
+			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
+			return false;
+		}
+		return true;
 	}
 	
+	/**
+	 * checks, if the spawn name is set and defined
+	 * @param sender
+	 * @param args
+	 * @param adminCommand
+	 * @return
+	 */
+	protected boolean checkThirdSpawnName(CommandSender sender, String[] args, String adminCommand) {
+		// check argument length
+		if (!checkThreeArgs(sender, args, adminCommand)) return false;
+		// check third argument
+		String spawn = args[2].toLowerCase();
+		if (spawn.equals("lounge") || spawn.equals("game") || spawn.equals("spectator") || spawn.equals("loose"))
+			return true;
+		// error feedback
+		sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgumentSpawn"));
+		return false;		
+	}
+	
+	/**
+	 * check wheter the thrid argumen is a or b
+	 * @param sender
+	 * @param args
+	 * @param adminCommand
+	 * @return
+	 */
+	protected boolean checkThirdAB(CommandSender sender, String[] args,
+			String adminCommand) {
+		if (args.length != 3) {
+			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
+			return false;
+		}
+		
+		if (args[2].equalsIgnoreCase("a") || args[2].equalsIgnoreCase("b")) return true;
+		sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.aOrB", "[COMMAND]", adminCommand));
+		return false;
+	}
+
 	/**
 	 * print admin help
 	 * @param sender
@@ -205,7 +261,88 @@ public class SimpleSpleefAdmin {
 		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.delarena", "[ARENA]", arena));
 	}
 
+	/**
+	 * define an arena point depending on point and position of player
+	 * @param sender
+	 * @param aOrB
+	 * @param adminCommand
+	 */
+	protected void defineArenaPoint(CommandSender sender, String aOrB,
+			String adminCommand) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			return;
+		}
+		
+		// correct case
+		aOrB = aOrB.toLowerCase();
+		adminCommand = adminCommand.toLowerCase();
+		
+		// get player location and arena
+		String arena = getSelectedArena(sender);
+
+		// get arena section
+		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);
+		
+		// create section, if needed
+		if (!arenaSection.isConfigurationSection(adminCommand))
+			arenaSection.createSection(adminCommand);
+		// get this section
+		ConfigurationSection mySection = arenaSection.getConfigurationSection(adminCommand);
+		// enable section
+		mySection.set("enabled", true);
+		// create section with location stuff
+		mySection.createSection(aOrB, LocationHelper.getXYZLocation(((Player) sender).getEyeLocation()));
+		
+		// save config to file
+		this.plugin.saveConfig();
+		
+		// feedback to player
+		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.defineArenaPoint", "[ARENA]", arena, "[POINT]", aOrB, "[SECTION]", adminCommand));
+	}
+
+	/**
+	 * Define a spawn point for the current arena depending on point and position of player
+	 * @param sender
+	 * @param spawn
+	 * @param adminCommand
+	 */
+	protected void defineSpawnPoint(CommandSender sender, String spawn,
+			String adminCommand) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			return;
+		}
+		
+		// correct case
+		spawn = spawn.toLowerCase();
+		adminCommand = adminCommand.toLowerCase();
+		
+		// get player location and arena
+		String arena = getSelectedArena(sender);
+
+		// get arena section
+		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);
+
+		// create section
+		arenaSection.createSection(adminCommand, LocationHelper.getExactLocation(((Player) sender).getEyeLocation(), true));
+
+		// save config to file
+		this.plugin.saveConfig();
+		
+		// feedback to player
+		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.defineSpawnPoint", "[ARENA]", arena, "[SPAWN]", spawn));
+	}
+
 	// TODO add new commands here
+
+	/**
+	 * check arena changed by sender
+	 */
+	protected void checkArena(CommandSender sender) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/**
 	 * gets or defines currently selected arena
