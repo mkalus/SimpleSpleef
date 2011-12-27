@@ -186,7 +186,7 @@ public class SimpleSpleefAdmin {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// get all possible games
-		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames();
+		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames();  //TODO: write method to do this!
 		for (Entry<String, Boolean> checkArena: arenas.entrySet()) {
 			if (checkArena.getKey().equals(id)) {
 				// set new default arena
@@ -280,6 +280,7 @@ public class SimpleSpleefAdmin {
 		
 		// get player location and arena
 		String arena = getSelectedArena(sender);
+		//TODO: check arena existence
 
 		// get arena section
 		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);
@@ -320,6 +321,7 @@ public class SimpleSpleefAdmin {
 		
 		// get player location and arena
 		String arena = getSelectedArena(sender);
+		//TODO: check arena existence
 
 		// get arena section
 		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);

@@ -62,6 +62,15 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
+		// spleef admin short command?
+		if (label.equalsIgnoreCase("spla")) {
+			// expand arguments by prepending admin
+			String[] expandargs = new String[args.length+1];
+			expandargs[0] = "admin";
+			for (int i = 0; i < args.length; i++)
+				expandargs[i+1] = args[i];
+			args = expandargs;
+		}
 		
 		// how many arguments?
 		if (args.length == 0 || args[0].equalsIgnoreCase("help")) return helpCommand(sender);

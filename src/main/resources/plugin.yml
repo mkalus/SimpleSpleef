@@ -8,7 +8,7 @@ depend: [Vault]
 commands:
   spleef:
     description: Control your spleef games
-    aliases: [spl]
+    aliases: [spl,spla]
     usage: /<command> is the SimpleSpleef command - you have no permission to use it at all!
 
 permissions:
