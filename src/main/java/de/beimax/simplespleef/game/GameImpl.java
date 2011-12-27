@@ -4,6 +4,9 @@
 package de.beimax.simplespleef.game;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -27,13 +30,18 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.listeners.MaterialHelper;
+import de.beimax.simplespleef.util.MaterialHelper;
 
 /**
  * @author mkalus
  * Simple Game implementation
  */
 public class GameImpl extends Game {
+	/**
+	 * static reference to random generator
+	 */
+	private static Random generator = new Random();
+	
 	/**
 	 * Reference to spleefer list
 	 */
@@ -371,24 +379,31 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
+		// remove shovel of player, if needed
+		removeShovelItem(event.getPlayer(), true);
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onPlayerKick(PlayerKickEvent event) {
+		// remove shovel of player, if needed
+		removeShovelItem(event.getPlayer(), true);
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		// TODO: restore shovel item, if player is autojoined again
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onPlayerDeath(Player player) {
+		// remove shovel of player, if needed
+		removeShovelItem(player, true);
 		// TODO Auto-generated method stub
 		
 	}
@@ -401,13 +416,15 @@ public class GameImpl extends Game {
 
 	/**
 	 * called when player loses a game
+	 * (broadcast message has to be sent by calling method)
 	 * @param player
 	 */
 	protected void playerLoses(Player player) {
 		// set player to lost
 		spleefers.setLost(player);
-		// TODO Message
-		player.sendMessage("You loose!");
+		// message to player
+		player.sendMessage(ChatColor.RED + this.gameHandler.getPlugin().ll("feedback.lost"));
+		// broadcast message has to be sent by calling method
 		// shovel lost, too
 		removeShovelItem(player, true);
 		// teleport player to loose spawn
@@ -422,19 +439,77 @@ public class GameImpl extends Game {
 	 */
 	protected void gameOver() {
 		// determine winners
+		LinkedList<Player> winners = new LinkedList<Player>();
 		for (Spleefer spleefer : spleefers.get()) {
 			if (!spleefer.hasLost()) { // not lost?
-				//this guy is a winner
-				spleefer.getPlayer().sendMessage("You won!"); //TODO
-				//TODO: winning message!
-				// TODO pay prizes
+				Player player = spleefer.getPlayer();
+				//this guy is a winner - send a message
+				player.sendMessage(ChatColor.DARK_GREEN + this.gameHandler.getPlugin().ll("feedback.won"));
+				winners.add(player); // aggregate the winners to broadcast them later on
+				// pay prizes
+				payPrizeMoney(player);
+				payPrizeItems(player);
 			}
 		}
+		//TODO: winning message! <= get the total winners from winners list
 		
 		// clean up game and end it
 		endGame();
 		// call the game handler to tell it that the game is over
 		gameHandler.gameOver(this);
+	}
+
+	/**
+	 * Pay a prize in money
+	 * @param player
+	 */
+	protected void payPrizeMoney(Player player) {
+		// get prizes
+		double prizeMoneyFixed = configuration.getDouble("prizeMoneyFixed", 0.0);
+		double prizeMoneyPerPlayer = configuration.getDouble("prizeMoneyPerPlayer", 5.0);
+		double win = prizeMoneyFixed + prizeMoneyPerPlayer * spleefers.size();
+		if (win == 0) return; // if no prize money is payed, return without telling anybody
+		String formated = SimpleSpleef.economy.format(win);
+		// give money to player
+		SimpleSpleef.economy.depositPlayer(player.getName(), win);
+		// player gets message
+		player.sendMessage(ChatColor.AQUA + gameHandler.getPlugin().ll("feeback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
+		// broadcast prize?
+		String broadcastMessage = ChatColor.AQUA + gameHandler.getPlugin().ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
+		if (gameHandler.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
+			gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		} else {
+			sendMessage(broadcastMessage, player); // send message to all receivers
+		}
+	}
+
+	/**
+	 * Pay a prize in items
+	 * @param player
+	 */
+	protected void payPrizeItems(Player player) {
+		if (!configuration.getBoolean("giveItemPrizes", true)) return; // disabled?
+		if (!configuration.isList("itemPrizes")) { // check if this is a list
+			SimpleSpleef.log.warning("[SimpleSpleef] Item winning list is arena " + getId() + " is not a valid list!");
+			return;
+		}
+		// get list
+		List<String> prizes = configuration.getStringList("itemPrizes");
+		// random entry...
+		String prize = prizes.get(generator.nextInt(prizes.size() - 1));
+		// interpret line to Item Stack
+		ItemStack itemStack = MaterialHelper.getItemStackFromString(prize);
+		// give prizes to player
+		player.getInventory().addItem(itemStack);
+		// player gets message
+		player.sendMessage(ChatColor.AQUA + gameHandler.getPlugin().ll("feeback.prizeItems", "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount())));
+		// broadcast prize?
+		String broadcastMessage = ChatColor.AQUA + gameHandler.getPlugin().ll("broadcasts.prizeItems", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount()));
+		if (gameHandler.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
+			gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		} else {
+			sendMessage(broadcastMessage, player); // send message to all receivers
+		}
 	}
 
 	/**

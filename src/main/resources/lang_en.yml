@@ -42,6 +42,8 @@ broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'
     lostByTouching: '[PLAYER] has touched [MATERIAL] and fell out of game [ARENA].'
+    prizeMoney: '[PLAYER] has received [MONEY] as prize money in arena [ARENA].'
+    prizeItems: '[PLAYER] has received [AMOUNT] [ITEM] as prize in arena [ARENA].'
 feedback:
     arenaDisabled: disabled
     arenaJoinable: open
@@ -56,6 +58,10 @@ feedback:
     countdownInterrupted: 'Countdown interrupted.'
     stop: 'Spleef in arena [ARENA] was stopped by [PLAYER].'
     delete: 'Spleef in arena [ARENA] was stopped and deleted by [PLAYER].'
+    won: 'You won a spleef game - congratulations!'
+    lost: 'You lost your spleef game!'
+    prizeMoney: 'You have received [MONEY] as prize money in arena [ARENA].'
+    prizeItems: 'You have received [AMOUNT] [ITEM] as prize in arena [ARENA].'
 admin:
     help: |
       Admin Commands (/spl admin...)
