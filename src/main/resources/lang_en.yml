@@ -31,6 +31,8 @@ errors:
     joinFee: 'You do not have the required [AMOUNT] to join the game.'
     start: 'You have to join a game before starting one.'
     startNoSpleefer: 'In this arena you may not start a game by typing /spl start - try: /spl countdown [ARENA].'
+    startMin: 'You need a minimum of [NUMBER] players to start a game in arena [ARENA].'
+    startDouble: 'There is already a game in progress in arena [ARENA].'
     stop: 'No game in progress in arena [ARENA].'
     stopNoPlaying: 'You have not joined a game in any arena. Nothing stopped.'
     deleteNoPlaying: 'You have not joined a game in any arena. Nothing deleted.'
@@ -39,6 +41,7 @@ errors:
 broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'
+    lostByTouching: '[PLAYER] has touched [MATERIAL] and fell out of game [ARENA].'
 feedback:
     arenaDisabled: disabled
     arenaJoinable: open

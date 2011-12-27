@@ -327,7 +327,7 @@ public class SimpleSpleefAdmin {
 		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);
 
 		// create section
-		arenaSection.createSection(adminCommand, LocationHelper.getExactLocation(((Player) sender).getEyeLocation(), true));
+		arenaSection.createSection(spawn + "Spawn", LocationHelper.getExactLocation(((Player) sender).getLocation(), true));
 
 		// save config to file
 		this.plugin.saveConfig();

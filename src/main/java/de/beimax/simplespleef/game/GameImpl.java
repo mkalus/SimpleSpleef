@@ -10,7 +10,9 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -48,6 +50,11 @@ public class GameImpl extends Game {
 	 * private countdown class
 	 */
 	private Countdown countdown;
+	
+	/**
+	 * list of players which may be teleported - used by teleportPlayer and playerMayTeleport
+	 */
+	private Set<Player> teleportOkList;
 
 	/**
 	 * Constructor
@@ -58,6 +65,7 @@ public class GameImpl extends Game {
 		super(gameHandler, name);
 		this.spleefers = new SpleeferList();
 		this.countdown = null;
+		this.teleportOkList = new HashSet<Player>();
 	}
 
 	@Override
@@ -122,16 +130,17 @@ public class GameImpl extends Game {
 		}
 		// check gamemode and change it if needed
 		if (player.getGameMode() != GameMode.SURVIVAL) {
-			//this.gameHandler.getPlugin().getServer().dispatchCommand(this.gameHandler.getPlugin().getServer().getConsoleSender(), "gamemode maxkalus 0");
 			player.setGameMode(GameMode.SURVIVAL);
 			player.sendMessage(ChatColor.YELLOW + this.gameHandler.getPlugin().ll("feedback.gamemodeChanged"));
 		}
 		if (!spleefers.addSpleefer(player)) { // some weird error
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
+			return false;
 		}
-		// TODO: inform/broadcast join
+		// inform/broadcast join is done by the game handler
 		// TODO: remember player's last position
-		// TODO: teleport player to lobby
+		// teleport player to lounge
+		teleportPlayer(player, "lounge");
 		return true;
 	}
 
@@ -146,11 +155,16 @@ public class GameImpl extends Game {
 	public boolean countdown(CommandSender sender) {
 		// game started already?
 		if (isInProgress() || countdown != null) { // avoid possible memory leak
-			//TODO: meaningful
+			sender.sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.startDouble", "[ARENA]", getName()));
 			return false;
 		}
-		// TODO: minimum number of players?
-		// TODO: start countdown, if setting is 0 or higher
+		// minimum number of players?
+		int minimumPlayers = configuration.getInt("minimumPlayers", 0);
+		if (minimumPlayers > 0 && spleefers.size() < minimumPlayers) {
+			sender.sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.startMin", "[ARENA]", getName(), "[NUMBER]", String.valueOf(minimumPlayers)));
+			return false;
+		}
+		// start countdown, if setting is 0 or higher
 		if (configuration.getInt("countdownFrom", 10) == 0) {
 			start(); // if countdown is null, start game right away
 		} else {
@@ -223,7 +237,11 @@ public class GameImpl extends Game {
 		removeShovelItems();
 		// possibly restore inventories
 		restoreAllInventories();
-		// TODO: teleport players to lobby
+		// teleport remaining players to lounge
+		for (Spleefer spleefer : spleefers.get()) {
+			if (!spleefer.hasLost())
+				teleportPlayer(spleefer.getPlayer(), "lounge");
+		}
 		// change game status
 		status = STATUS_NEW;
 		return true;
@@ -300,16 +318,31 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if (!isInProgress() || spleefers.hasLost(event.getPlayer())) return; // if game is not in progress or player has lost, return
+		Player player = event.getPlayer();
+		if (!isInProgress() || spleefers.hasLost(player)) return; // if game is not in progress or player has lost, return
 		
 		//player touched certain block (setting looseOnTouchBlocks)
 		if (looseOnTouchMaterial != null) {
 			Material touchedBlock = event.getTo().getBlock().getType();
-			Material onBlock = event.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
-			if (looseOnTouchMaterial.contains(touchedBlock) || looseOnTouchMaterial.contains(onBlock)) {
-				// TODO: send message
+			Material onBlock = player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
+			// what happened exactly?
+			boolean lostByTouching = looseOnTouchMaterial.contains(touchedBlock);
+			boolean lostByStandingOn = looseOnTouchMaterial.contains(onBlock);
+			if (lostByTouching || lostByStandingOn) {
+				// Block name
+				String blockName;
+				if (lostByTouching) blockName = touchedBlock.name();
+				else blockName = onBlock.name();
+				// broadcast message of somebody loosing
+				String broadcastMessage = ChatColor.GREEN + gameHandler.getPlugin().ll("broadcasts.lostByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MATERIAL]", blockName);
+				if (gameHandler.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+					gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+				} else {
+					// send message to all receivers
+					sendMessage(broadcastMessage, player);
+				}
 				// Ha, lost!
-				playerLoses(event.getPlayer());
+				playerLoses(player);
 			}
 		}
 		//TODO: check location within "loose" cuboid (setting loose)
@@ -317,7 +350,11 @@ public class GameImpl extends Game {
 
 	@Override
 	public boolean playerMayTeleport(Player player) {
-		// TODO - check if the player is on the teleport-ok-list, delete him/her from list and return true
+		// check if the player is on the teleport-ok-list, delete him/her from list and return true
+		if (this.teleportOkList.contains(player)) {
+			this.teleportOkList.remove(player);
+			return true;
+		}
 		// otherwise return preventTeleportingDuringGames for this arena
 		return !configuration.getBoolean("preventTeleportingDuringGames", true);
 	}
@@ -368,6 +405,8 @@ public class GameImpl extends Game {
 		spleefers.setLost(player);
 		// TODO Message
 		player.sendMessage("You loose!");
+		// teleport player to loose spawn
+		teleportPlayer(player, "loose");
 		// determine if game is over...
 		if (spleefers.inGame() <= configuration.getInt("remainingPlayersWin", 1))
 			gameOver();
@@ -446,7 +485,37 @@ public class GameImpl extends Game {
 		//TODO implement
 		return false;
 	}
-	
+
+	/**
+	 * teleport a player to named spawn, if it exists and it is enabled
+	 * @param player
+	 * @param string
+	 */
+	protected void teleportPlayer(Player player, String spawn) {
+		if (!configuration.isConfigurationSection(spawn + "Spawn") || !configuration.getBoolean(spawn + "Spawn.enabled", false))
+			return; // just ignore, if not set or not enabled
+		// everything ok -> teleport player
+		Location teleportTo = configToExactLocation(configuration.getConfigurationSection(spawn + "Spawn"));
+		if (teleportTo == null) SimpleSpleef.log.warning("[SimpleSpleef] Teleport error - location was null!");
+		// add player to teleport ok list
+		this.teleportOkList.add(player);
+		player.teleport(teleportTo);
+	}
+
+	/**
+	 * get exact location from config section
+	 * @param config
+	 * @return
+	 */
+	private Location configToExactLocation(ConfigurationSection config) {
+		try {
+			World world = gameHandler.getPlugin().getServer().getWorld(config.getString("world"));
+			return new Location(world, config.getDouble("x"), config.getDouble("y"), config.getDouble("z"), (float) config.getDouble("yaw"), (float) config.getDouble("pitch"));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	@Override
 	public void clean() {
 		// dereference stuff
@@ -454,6 +523,7 @@ public class GameImpl extends Game {
 		this.spleefers = null;
 		this.looseOnTouchMaterial = null;
 		this.countdown = null;
+		this.teleportOkList = null;
 		//TODO add more
 	}
 
@@ -479,7 +549,10 @@ public class GameImpl extends Game {
 			boolean broadcast = gameHandler.getPlugin().getConfig().getBoolean("settings.announceCountdown", true);
 			sendMessage(ChatColor.BLUE + gameHandler.getPlugin().ll("feedback.countdownStart"), broadcast);
 			
-			// TODO: teleport players to arena
+			// teleport players to arena
+			for (Spleefer spleefer : spleefers.get()) {
+				teleportPlayer(spleefer.getPlayer(), "game");
+			}
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;

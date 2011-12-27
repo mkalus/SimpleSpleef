@@ -31,6 +31,8 @@ errors:
     joinFee: 'Du hast nicht die nötigen [AMOUNT], um am Spiel teilzunehmen.'
     start: 'Du musst an einem Spleef teilnehmen, bevor du ein Spiel starten kannst!'
     startNoSpleefer: 'In dieser Arena darf kein Spieler mit /spl start ein Spiel starten - versuche es mit /spl countdown [ARENA].'
+    startMin: 'Du brauchst mindestens [NUMBER] Spieler, um ein Spiel in Arena [ARENA] starten zu können.'
+    startDouble: 'Das Spiel läuft bereits in der Arena [ARENA].'
     stop: 'Kein aktives Spiel in Arena [ARENA].'
     stopNoPlaying: 'Du spielst kein Spleef. Kein Spiel gestoppt!'
     deleteNoPlaying: 'Du spielst kein Spleef. Kein Spiel gelöscht!'
@@ -39,6 +41,7 @@ errors:
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
+    lostByTouching: '[PLAYER] hat [MATERIAL] berührt und ist damit aus dem Spiel in [ARENA].'
 feedback:
     arenaDisabled: abgeschaltet
     arenaJoinable: offen
