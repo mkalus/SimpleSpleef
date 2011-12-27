@@ -23,8 +23,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.listeners.MaterialHelper;
 
 /**
  * @author mkalus
@@ -405,6 +408,8 @@ public class GameImpl extends Game {
 		spleefers.setLost(player);
 		// TODO Message
 		player.sendMessage("You loose!");
+		// shovel lost, too
+		removeShovelItem(player, true);
 		// teleport player to loose spawn
 		teleportPlayer(player, "loose");
 		// determine if game is over...
@@ -473,8 +478,37 @@ public class GameImpl extends Game {
 	 * @return
 	 */
 	protected boolean addShovelItems() {
-		//TODO implement
-		return false;
+		// check setting first
+		if (!configuration.getBoolean("playersReceiveShovelAtGameStart", true)) return false; // no shovels lost
+		// if yes, add shovels to all players
+		for (Spleefer spleefer : spleefers.get()) {
+			addShovelItem(spleefer.getPlayer(), false); // add shovel without checking setting again
+		}
+		return true;
+	}
+	
+	/**
+	 * remove shovel item from single player
+	 * @param player
+	 * @param checkSetting - if true, setting playersReceiveShovelAtGameStart is checked before addition
+	 * @return
+	 */
+	protected boolean addShovelItem(Player player, boolean checkSetting) {
+		// should setting be checked first?
+		if (checkSetting && !configuration.getBoolean("playersReceiveShovelAtGameStart", true)) return false; // no shovel added
+		// get material
+		Material shovelItem = MaterialHelper.getMaterialFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		if (shovelItem == null) {
+			SimpleSpleef.log.warning("[SimpleSpleef] shovelItem of arena " + getId() + " is not a correct item id/name!");
+			return false;
+		}
+		// create an item stack
+		ItemStack itemStack = new ItemStack(shovelItem);
+		itemStack.setAmount(1);
+		// give it to the player
+		player.getInventory().addItem(itemStack);
+		
+		return true;
 	}
 	
 	/**
@@ -482,8 +516,46 @@ public class GameImpl extends Game {
 	 * @return
 	 */
 	protected boolean removeShovelItems() {
-		//TODO implement
-		return false;
+		// check setting first
+		if (!configuration.getBoolean("playersLooseShovelAtGameEnd", true)) return false; // no shovels lost
+		// if yes, remove shovels from remaining players
+		for (Spleefer spleefer : spleefers.get()) {
+			if (!spleefer.hasLost())
+				removeShovelItem(spleefer.getPlayer(), false); // remove shovel without checking setting again
+		}
+		return true;
+	}
+	
+	/**
+	 * remove shovel item from single player
+	 * @param player
+	 * @param checkSetting - if true, setting playersLooseShovelAtGameEnd is checked before removal
+	 * @return
+	 */
+	protected boolean removeShovelItem(Player player, boolean checkSetting) {
+		// should setting be checked first?
+		if (checkSetting && !configuration.getBoolean("playersLooseShovelAtGameEnd", true)) return false; // no shovel lost
+		// get material
+		Material shovelItem = MaterialHelper.getMaterialFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		if (shovelItem == null) {
+			SimpleSpleef.log.warning("[SimpleSpleef] shovelItem of arena " + getId() + " is not a correct item id/name!");
+			return false;
+		}
+		// take if, if player still has it - yes, there are exploits, but I do
+		// not want to handle them ;-)
+		Inventory inventory = player.getInventory();
+		if (inventory.contains(shovelItem)) {
+			int index = inventory.first(shovelItem);
+			// get the first stack
+			ItemStack stack = inventory.getItem(index);
+			if (stack.getAmount() > 1) { // shovels should only come in packs of one, but who knows?
+				stack.setAmount(stack.getAmount() - 1); // reduce amount by one
+				inventory.setItem(index, stack);
+			} else
+				inventory.setItem(index, null); // remove item
+		}
+		
+		return true;
 	}
 
 	/**

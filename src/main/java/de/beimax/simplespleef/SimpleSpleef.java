@@ -79,8 +79,8 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public void onEnable() {
 		// initialize plugin
-		log.info(this.toString() + " is loading.");
-		
+		log.info(this.toString() + " is loading.");	
+
 		// configure plugin (configuration stuff)
 		configurePlugin();
 		
