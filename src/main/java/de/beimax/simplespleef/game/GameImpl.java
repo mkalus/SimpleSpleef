@@ -572,16 +572,13 @@ public class GameImpl extends Game {
 		// should setting be checked first?
 		if (checkSetting && !configuration.getBoolean("playersReceiveShovelAtGameStart", true)) return false; // no shovel added
 		// get material
-		Material shovelItem = MaterialHelper.getMaterialFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
 		if (shovelItem == null) {
 			SimpleSpleef.log.warning("[SimpleSpleef] shovelItem of arena " + getId() + " is not a correct item id/name!");
 			return false;
 		}
-		// create an item stack
-		ItemStack itemStack = new ItemStack(shovelItem);
-		itemStack.setAmount(1);
 		// give it to the player
-		player.getInventory().addItem(itemStack);
+		player.getInventory().addItem(shovelItem);
 		
 		return true;
 	}
@@ -611,7 +608,7 @@ public class GameImpl extends Game {
 		// should setting be checked first?
 		if (checkSetting && !configuration.getBoolean("playersLooseShovelAtGameEnd", true)) return false; // no shovel lost
 		// get material
-		Material shovelItem = MaterialHelper.getMaterialFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
 		if (shovelItem == null) {
 			SimpleSpleef.log.warning("[SimpleSpleef] shovelItem of arena " + getId() + " is not a correct item id/name!");
 			return false;

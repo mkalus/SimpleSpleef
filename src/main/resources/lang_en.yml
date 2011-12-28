@@ -18,6 +18,7 @@ errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
     unknownCommand: 'Unknown command "[COMMAND]"'
     unknownArena: 'Unknown arena "[ARENA]"'
+    noDig: 'You may not dig here!'
     notAPlayer: '[PLAYER] is not a player entity.'
     arenaDisabled: '"[ARENA]" is disabled.'
     tooFewArguments: 'Too few arguments for this command. Minimum is [MIN].'

@@ -344,6 +344,8 @@ public class SimpleSpleefAdmin {
 	protected void checkArena(CommandSender sender) {
 		// TODO Auto-generated method stub
 		
+		// reload the configuration of everything
+		this.plugin.getGameHandler().reloadConfig();
 	}
 
 	/**

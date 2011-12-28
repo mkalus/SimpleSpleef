@@ -18,6 +18,7 @@ errors:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
     unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
     unknownArena: 'Unbekannte Arena "[ARENA]"'
+    noDig: 'Du darfst hier nicht graben!'
     notAPlayer: '[PLAYER] ist kein Spieler!'
     arenaDisabled: '"[ARENA]" ist nicht aktiviert.'
     tooFewArguments: 'Zu wenige Parameter für diesen Befehl. Minimum ist [MIN].'

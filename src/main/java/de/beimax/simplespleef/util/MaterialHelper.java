@@ -12,13 +12,11 @@ import org.bukkit.inventory.ItemStack;
  */
 public abstract class MaterialHelper {
 	/**
-	 * Returns material for entry (simple material like DIAMOND_SPADE or 277)
+	 * Returns material for entry (simple material like DIAMOND_SPADE or 277 - no damage numbers here!)
 	 * @param material
 	 * @return
 	 */
 	public static Material getMaterialFromString(String material) {
-		//TODO: implement damage numbers!
-		
 		Material m;
 		// try to convert material from number
 		try {
@@ -30,19 +28,30 @@ public abstract class MaterialHelper {
 		return m;
 	}
 	
+	/**
+	 * 
+	 * @param line
+	 * @return
+	 */
 	public static ItemStack getItemStackFromString(String line) {
 		// split string to stack
 		String[] parts = line.split(":");
 		int number;
 		String item;
+		short dmg = -1;
 		if (parts.length > 3) return null; //syntax error
-		else if (parts.length == 3) {
+		else if (parts.length == 3) { // with damage number!
 			try {
 				number = Integer.valueOf(parts[0]);
 			} catch (Exception e) {
 				return null; //syntax error
 			}
-			item = parts[1] + parts[2]; // damage number included
+			item = parts[1];
+			try { // get damage number
+				dmg = Short.valueOf(parts[2]);
+			} catch (Exception e) {
+				return null; //syntax error
+			}
 		} else if (parts.length == 2) {
 			try {
 				number = Integer.valueOf(parts[0]);
@@ -58,8 +67,9 @@ public abstract class MaterialHelper {
 		Material material = getMaterialFromString(item);
 		if (material == null) return null; //syntax error
 		// create stack
-		ItemStack stack = new ItemStack(material);
-		stack.setAmount(number);
+		ItemStack stack;
+		if (dmg > 0) stack = new ItemStack(material, number, dmg);
+		else stack = new ItemStack(material, number);
 		
 		return stack;
 	}

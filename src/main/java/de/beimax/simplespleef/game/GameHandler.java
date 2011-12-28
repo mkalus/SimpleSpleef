@@ -11,11 +11,15 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.util.Cuboid;
 
 /**
  * @author mkalus
@@ -32,7 +36,10 @@ public class GameHandler {
 	 */
 	private Game[] games;
 	
-	//TODO states that can be called from listeners/commands
+	/**
+	 * List of cuboids for arenas - help check arena protection
+	 */
+	private List<Cuboid> arenaCubes;
 	
 	/**
 	 * Constructor
@@ -40,6 +47,7 @@ public class GameHandler {
 	 */
 	public GameHandler(SimpleSpleef plugin) {
 		this.plugin = plugin;
+		updateGameHandlerData();
 	}
 
 	/**
@@ -47,6 +55,22 @@ public class GameHandler {
 	 */
 	public SimpleSpleef getPlugin() {
 		return plugin;
+	}
+	
+	/**
+	 * Initialize game handler - mainly read arena cubes and update game data
+	 */
+	public void updateGameHandlerData() {
+		// define cubes as linked list
+		arenaCubes = new LinkedList<Cuboid>();
+		// get possible games
+		for (String game : getPossibleGames().keySet()) {
+			Cuboid cuboid = configToCuboid(game, "arena");
+			if (cuboid != null)
+				arenaCubes.add(cuboid); // add to list
+			else
+				SimpleSpleef.log.warning("[SimpleSpleef] Unable to load coordinates of arena for arena " + game);
+		}
 	}
 	
 	/**
@@ -446,16 +470,76 @@ public class GameHandler {
 	 * check block breaks in and outside of game
 	 */
 	public void checkBlockBreak(BlockBreakEvent event) {
-		// TODO Auto-generated method stub
-		// TODO: check if player is a spleefer or not
-		// TODO: otherweise check if player is in protected arena
+		Player player = event.getPlayer();
+		// check if player is a spleefer or not
+		Game game = checkPlayerInGame(player);
+		if (game != null) { // game is spleefer!
+			//send block break to game
+			game.onBlockBreak(event);
+		} else if (inProtectedArenaCube(player)) {
+			// cancel event
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.noDig"));
+		}
 	}
 	
+	/**
+	 * create a cuboid from a section
+	 * @param arena
+	 * @param section
+	 * @return
+	 */
+	public Cuboid configToCuboid(String arena, String section) {
+		FileConfiguration conf = this.plugin.getConfig();
+		arena = arena.toLowerCase();
+		section = section.toLowerCase();
+		// is arena protected? If not, ignore to save resources
+		if (!conf.getBoolean("arenas." + arena + ".protectArena", true)) return null;
+		// get arena cube, if possible
+		if (!conf.isConfigurationSection("arenas." + arena + "." + section) ||
+				!conf.getBoolean("arenas." + arena + ".arena.enabled", false)) return null;
+		// now, check sane coords
+		World firstWorld = this.plugin.getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".a.world"));
+		World secondWorld = this.plugin.getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".b.world"));
+		if (firstWorld == null || secondWorld == null || firstWorld != secondWorld) return null; // non-sane worlds
+		int firstX = conf.getInt("arenas." + arena + "." + section + ".a.x", 0);
+		int firstY = conf.getInt("arenas." + arena + "." + section + ".a.y", 0);
+		int firstZ = conf.getInt("arenas." + arena + "." + section + ".a.z", 0);
+		int secondX = conf.getInt("arenas." + arena + "." + section + ".b.x", 0);
+		int secondY = conf.getInt("arenas." + arena + "." + section + ".b.y", 0);
+		int secondZ = conf.getInt("arenas." + arena + "." + section + ".b.z", 0);
+		if (firstX == 0 && firstY == 0 && firstZ == 0 && secondX == 0 && secondY == 0 && secondZ == 0) return null;
+		// create cube
+		return new Cuboid(firstWorld, (firstX<secondX?firstX:secondX), (firstY<secondY?firstY:secondY), (firstZ<secondZ?firstZ:secondZ),
+				(firstX>secondX?firstX:secondX), (firstY>secondY?firstY:secondY), (firstZ>secondZ?firstZ:secondZ));
+	}
+	
+	/**
+	 * Check if player is in protected arena
+	 * @param player
+	 * @return
+	 */
+	public boolean inProtectedArenaCube(Player player) {
+		if (arenaCubes == null) return false;
+		Location playerLoc = player.getLocation();
+		for (Cuboid cuboid : arenaCubes) {
+			// check world
+			if (!cuboid.onWorld(playerLoc.getWorld())) continue;
+			// check position, if on same world
+			if (cuboid.contains(playerLoc)) return true; // in protected cube!
+		}
+		
+		return false;
+	}
+
 	/**
 	 * reload the configuration of the games
 	 */
 	public void reloadConfig() {
-		for (Game game : getGames()) { //iterate through active games
+		// update game handler data
+		updateGameHandlerData();
+		// iterate through active games
+		for (Game game : getGames()) {
 			// redefine settings
 			game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
 		}
