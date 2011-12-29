@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -183,6 +184,12 @@ public abstract class Game {
 	 * @param event
 	 */
 	public abstract void onBlockBreak(BlockBreakEvent event);
+	
+	/**
+	 * Called when a spleefer places a block
+	 * @param event
+	 */
+	public abstract void onBlockPlace(BlockPlaceEvent event);
 
 	/**
 	 * Send a message to broadcast, or to players and spectators

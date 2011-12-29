@@ -18,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.util.Cuboid;
@@ -468,7 +469,8 @@ public class GameHandler {
 	}
 
 	/**
-	 * check block breaks in and outside of game
+	 * check block breaks in- and outside of game
+	 * @param event
 	 */
 	public void checkBlockBreak(BlockBreakEvent event) {
 		Player player = event.getPlayer();
@@ -481,6 +483,24 @@ public class GameHandler {
 			// cancel event
 			event.setCancelled(true);
 			player.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.noDig"));
+		}
+	}
+	
+	/**
+	 * check block placement in- and outside of game
+	 * @param event
+	 */
+	public void checkBlockPlace(BlockPlaceEvent event) {
+		Player player = event.getPlayer();
+		// check if player is a spleefer or not
+		Game game = checkPlayerInGame(player);
+		if (game != null) { // game is spleefer!
+			//send block place to game
+			game.onBlockPlace(event);
+		} else if (inProtectedArenaCube(event.getBlock())) {
+			// cancel event
+			event.setCancelled(true);
+			player.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.noPlacement"));
 		}
 	}
 	

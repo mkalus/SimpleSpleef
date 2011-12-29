@@ -19,6 +19,7 @@ errors:
     unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
     unknownArena: 'Unbekannte Arena "[ARENA]"'
     noDig: 'Du darfst hier nicht graben!'
+    noPlacement: 'Du darfst hier keine Blöcke setzen!'
     notAPlayer: '[PLAYER] ist kein Spieler!'
     arenaDisabled: '"[ARENA]" ist nicht aktiviert.'
     tooFewArguments: 'Zu wenige Parameter für diesen Befehl. Minimum ist [MIN].'

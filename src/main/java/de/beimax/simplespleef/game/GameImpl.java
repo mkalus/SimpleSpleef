@@ -23,6 +23,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -443,7 +444,7 @@ public class GameImpl extends Game {
 			event.getClickedBlock().setData((byte) 0);
 		}
 		
-		//TODO also check block placing here		
+		//TODO do sign interactions here
 	}
 
 	@Override
@@ -493,6 +494,17 @@ public class GameImpl extends Game {
 			// set block to air
 			block.setType(Material.AIR);
 			block.setData((byte) 0);
+		}
+	}
+	
+	@Override
+	public void onBlockPlace(BlockPlaceEvent event) {
+		// joined players may not place blocks as long as game has not started
+		// also, if allowBlockPlacing is false, disallow block placing during game
+		if (!isInGame() || !configuration.getBoolean("allowBlockPlacing", false)) {
+			// cancel event
+			event.setCancelled(true);
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.noPlacement"));
 		}
 	}
 

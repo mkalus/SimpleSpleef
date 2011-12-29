@@ -164,6 +164,7 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// Register our events
 		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.High, this);
+		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.High, this);
 		
 		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Low, this);
 		
