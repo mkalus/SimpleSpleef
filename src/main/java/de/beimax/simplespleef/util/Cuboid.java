@@ -52,7 +52,7 @@ public class Cuboid implements Serializable {
 	 * @param world
 	 * @return
 	 */
-	public boolean onWorld(World world) {
+	protected boolean onWorld(World world) {
 		if (this.world == world) return true;
 		return false;
 	}
@@ -65,10 +65,10 @@ public class Cuboid implements Serializable {
 	 * @param Z
 	 * @return
 	 */
-	public boolean contains(int X, int Y, int Z) {
-		System.out.println(coords[0] + "/" + coords[3] + " - " + X);
-		System.out.println(coords[1] + "/" + coords[4] + " - " + Y);
-		System.out.println(coords[2] + "/" + coords[5] + " - " + Z);
+	protected boolean contains(int X, int Y, int Z) {
+		//System.out.println(coords[0] + "/" + coords[3] + " - " + X);
+		//System.out.println(coords[1] + "/" + coords[4] + " - " + Y);
+		//System.out.println(coords[2] + "/" + coords[5] + " - " + Z);
 		if (X >= coords[0] && X <= coords[3] && Z >= coords[2]
 				&& Z <= coords[5] && Y >= coords[1] && Y <= coords[4])
 			return true;
@@ -83,7 +83,7 @@ public class Cuboid implements Serializable {
 	 * @param Z
 	 * @return
 	 */
-	public boolean contains(float X, float Y, float Z) {
+	protected boolean contains(float X, float Y, float Z) {
 		return contains((int) X, (int) Y, (int) Z);
 	}
 
@@ -95,7 +95,7 @@ public class Cuboid implements Serializable {
 	 * @param Z
 	 * @return
 	 */
-	public boolean contains(double X, double Y, double Z) {
+	protected boolean contains(double X, double Y, double Z) {
 		return contains((int) X, (int) Y, (int) Z);
 	}
 	
@@ -108,6 +108,6 @@ public class Cuboid implements Serializable {
 	 * @return
 	 */
 	public boolean contains(Location location) {
-		return contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		return onWorld(location.getWorld()) && contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}
 }

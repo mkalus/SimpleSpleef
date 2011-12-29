@@ -43,6 +43,7 @@ broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
     lostByTouching: '[PLAYER] hat [MATERIAL] berührt und ist damit aus dem Spiel in [ARENA].'
+    lostByCuboid: '[PLAYER] ist aus dem Spiel in [ARENA].'
     prizeMoney: '[PLAYER] hat [MONEY] als Preisgeld in Arena [ARENA] erhalten.'
     prizeItems: '[PLAYER] hat [AMOUNT] [ITEM] in Arena [ARENA] gewonnen.'
 feedback:

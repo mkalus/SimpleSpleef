@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -429,7 +430,7 @@ public class GameHandler {
 	}
 
 	/**
-	 * Attempt to stop a game
+	 * Attempt to watch a game
 	 * @param sender
 	 * @param arena (may not be null)
 	 */
@@ -476,7 +477,7 @@ public class GameHandler {
 		if (game != null) { // game is spleefer!
 			//send block break to game
 			game.onBlockBreak(event);
-		} else if (inProtectedArenaCube(player)) {
+		} else if (inProtectedArenaCube(event.getBlock())) {
 			// cancel event
 			event.setCancelled(true);
 			player.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.noDig"));
@@ -515,19 +516,16 @@ public class GameHandler {
 	}
 	
 	/**
-	 * Check if player is in protected arena
-	 * @param player
+	 * Check if a block is in protected arena
+	 * @param block
 	 * @return
 	 */
-	public boolean inProtectedArenaCube(Player player) {
+	public boolean inProtectedArenaCube(Block block) {
 		if (arenaCubes == null) return false;
-		Location playerLoc = player.getLocation();
-		for (Cuboid cuboid : arenaCubes) {
-			// check world
-			if (!cuboid.onWorld(playerLoc.getWorld())) continue;
-			// check position, if on same world
-			if (cuboid.contains(playerLoc)) return true; // in protected cube!
-		}
+		Location blockLoc = block.getLocation();
+		// check position in each cube
+		for (Cuboid cuboid : arenaCubes)
+			if (cuboid.contains(blockLoc)) return true; // in protected cube!
 		
 		return false;
 	}

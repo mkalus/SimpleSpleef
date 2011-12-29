@@ -108,6 +108,7 @@ arenas:
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
             - DIRT
+            - GRASS
 # Alternatively: disallow digging away of certain blocks (name/id)
         disallowDigBlocks:
             - STONE

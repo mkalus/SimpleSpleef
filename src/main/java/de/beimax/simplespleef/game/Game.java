@@ -221,6 +221,14 @@ public abstract class Game {
 	}
 
 	/**
+	 * has game started (not countdown)?
+	 * @return true/false
+	 */
+	public boolean isInGame() {
+		return this.status == STATUS_STARTED;
+	}
+
+	/**
 	 * cleaning routine called at end of game
 	 */
 	public abstract void clean();

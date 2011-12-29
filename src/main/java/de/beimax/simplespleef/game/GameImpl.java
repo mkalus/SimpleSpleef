@@ -16,10 +16,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -30,6 +32,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.util.Cuboid;
 import de.beimax.simplespleef.util.MaterialHelper;
 
 /**
@@ -66,6 +69,31 @@ public class GameImpl extends Game {
 	 * list of players which may be teleported - used by teleportPlayer and playerMayTeleport
 	 */
 	private Set<Player> teleportOkList;
+	
+	/**
+	 * arena cuboid
+	 */
+	private Cuboid arena;
+
+	/**
+	 * floor cuboid
+	 */
+	private Cuboid floor;
+
+	/**
+	 * loose cuboid
+	 */
+	private Cuboid loose;
+	
+	/**
+	 * set to false, if disallowDigBlocks has been chosen in config
+	 */
+	private boolean allowDigBlocks = true;
+	
+	/**
+	 * blocks that can be dug or (if allowDigBlocks is false) cannot
+	 */
+	private HashSet<ItemStack> digBlocks;
 
 	/**
 	 * Constructor
@@ -110,7 +138,25 @@ public class GameImpl extends Game {
 				if (this.looseOnTouchMaterial.size() == 0) this.looseOnTouchMaterial = null; //no
 			} else this.looseOnTouchMaterial = null; //no
 		} else this.looseOnTouchMaterial = null; // reset
-		
+		// define arena, floor and loose cuboids
+		arena = this.gameHandler.configToCuboid(getId(), "arena");
+		floor = this.gameHandler.configToCuboid(getId(), "floor");
+		loose = this.gameHandler.configToCuboid(getId(), "loose");
+		// block destruction/keep hashes
+		if (conf.isList("allowDigBlocks")) {
+			allowDigBlocks = true;
+			digBlocks = new HashSet<ItemStack>();
+			for (String line : conf.getStringList("allowDigBlocks")) {
+				System.out.println(line);
+				digBlocks.add(MaterialHelper.getItemStackFromString(line));
+			}
+		} else if (conf.isList("disallowDigBlocks")) {
+			allowDigBlocks = false;
+			digBlocks = new HashSet<ItemStack>();
+			for (String line : conf.getStringList("disallowDigBlocks")) {
+				digBlocks.add(MaterialHelper.getItemStackFromString(line));
+			}
+		} else digBlocks = null; // delete previous settings
 		//TODO: more definitions/shortcuts
 	}
 
@@ -354,9 +400,23 @@ public class GameImpl extends Game {
 				}
 				// Ha, lost!
 				playerLoses(player);
+				return;
 			}
 		}
-		//TODO: check location within "loose" cuboid (setting loose)
+		// check location within "loose" cuboid (setting loose)
+		if (loose != null && loose.contains(player.getLocation())) {
+			// broadcast message of somebody loosing
+			String broadcastMessage = ChatColor.GREEN + gameHandler.getPlugin().ll("broadcasts.lostByCuboid", "[PLAYER]", player.getName(), "[ARENA]", getName());
+			if (gameHandler.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+				gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			} else {
+				// send message to all receivers
+				sendMessage(broadcastMessage, player);
+			}
+			// Ha, lost!
+			playerLoses(player);
+			return;			
+		}
 	}
 
 	@Override
@@ -364,6 +424,7 @@ public class GameImpl extends Game {
 		// check if the player is on the teleport-ok-list, delete him/her from list and return true
 		if (this.teleportOkList.contains(player)) {
 			this.teleportOkList.remove(player);
+			player.setFallDistance(0.0f); // set fall distance to 0 to negate damager
 			return true;
 		}
 		// otherwise return preventTeleportingDuringGames for this arena
@@ -372,9 +433,17 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		// TODO Auto-generated method stub
-		//TODO also check block playing here
+		Block block = event.getClickedBlock();
+		// check instant dig and block may be broken
+		if (event.getAction() == Action.LEFT_CLICK_BLOCK && block != null && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block)) {
+			// cancel event
+			event.setCancelled(true);
+			// set block to air
+			event.getClickedBlock().setType(Material.AIR);
+			event.getClickedBlock().setData((byte) 0);
+		}
 		
+		//TODO also check block placing here		
 	}
 
 	@Override
@@ -410,8 +479,21 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
-		// TODO Auto-generated method stub
-		
+		Block block = event.getBlock();
+		if (block == null) return; // sanity check
+		// may the block be broken?
+		if (!checkMayBreakBlock(block)) {
+			// cancel event
+			event.setCancelled(true);
+			// message to player
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.noDig"));
+		} else if (!configuration.getBoolean("blockDropping", true)) { // otherwise: block dropping set to false => destroy blocks
+			// cancel event - because we will handle the block destruction ourselves
+			event.setCancelled(true);
+			// set block to air
+			block.setType(Material.AIR);
+			block.setData((byte) 0);
+		}
 	}
 
 	/**
@@ -659,6 +741,54 @@ public class GameImpl extends Game {
 			return null;
 		}
 	}
+	
+	/**
+	 * check whether a certain block may be broken
+	 * => player has been checked before this, so this does only concern block breaks
+	 * and interactions by spleefers
+	 * @param block broken/interacted (on instant-break) by spleefer
+	 * @return true, if block may be destroyed
+	 */
+	protected boolean checkMayBreakBlock(Block block) {
+		// sanity check
+		if (block == null) return true;
+		// joined players may not break blocks as long as game has not started
+		if (!isInGame()) return false;
+		return checkMayBreakBlockMaterial(block) && checkMayBreakBlockLocation(block);
+	}
+	
+	/**
+	 * helper function for the above checkMayBreakBlock method to check the material of a block
+	 * @param block
+	 * @return
+	 */
+	private boolean checkMayBreakBlockMaterial(Block block) {
+		// allowed blocks? => allowDigBlocks
+		// alternatively: disallowDigBlocks
+		if (digBlocks != null) {
+			ItemStack checkblock = new ItemStack(block.getType(), 1, block.getData());
+			if (digBlocks.contains(checkblock)) return allowDigBlocks; // found -> return state
+			// not found
+			return !allowDigBlocks; // negate
+		}
+		return true;
+	}
+	
+	/**
+	 * helper function for the above checkMayBreakBlock method to check the location of a block
+	 * @param block
+	 * @return
+	 */
+	private boolean checkMayBreakBlockLocation(Block block) {
+		Location blockLocation = block.getLocation();
+		// arena floor defined?
+		if (this.floor != null) return this.floor.contains(blockLocation); // only arena floor can be broken during game
+		// otherwise, at least check, if block to be broken is outside a defined arena
+		else if (this.arena != null) return this.arena.contains(blockLocation);
+
+		// on all other cases - allow block breaks, like in original simple spleef games
+		return true;		
+	}
 
 	@Override
 	public void clean() {
@@ -668,6 +798,9 @@ public class GameImpl extends Game {
 		this.looseOnTouchMaterial = null;
 		this.countdown = null;
 		this.teleportOkList = null;
+		this.arena = null;
+		this.floor = null;
+		this.loose = null;
 		//TODO add more
 	}
 

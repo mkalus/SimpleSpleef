@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -292,8 +293,8 @@ public class SimpleSpleefAdmin {
 		ConfigurationSection mySection = arenaSection.getConfigurationSection(adminCommand);
 		// enable section
 		mySection.set("enabled", true);
-		// create section with location stuff
-		mySection.createSection(aOrB, LocationHelper.getXYZLocation(((Player) sender).getEyeLocation()));
+		// create section with location stuff - block which the player is standing on
+		mySection.createSection(aOrB, LocationHelper.getXYZLocation(((Player) sender).getLocation().getBlock().getRelative(BlockFace.DOWN).getLocation()));
 		
 		// save config to file
 		this.plugin.saveConfig();
