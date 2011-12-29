@@ -6,8 +6,11 @@ package de.beimax.simplespleef.util;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+
+import de.beimax.simplespleef.SimpleSpleef;
 
 /**
  * @author mkalus
@@ -50,5 +53,19 @@ public abstract class LocationHelper {
 		conf.set("z", location.getBlockZ());
 		
 		return conf.getValues(true);
+	}
+
+	/**
+	 * get exact location from config section
+	 * @param config
+	 * @return
+	 */
+	public static Location configToExactLocation(ConfigurationSection config) {
+		try {
+			World world = SimpleSpleef.getPlugin().getServer().getWorld(config.getString("world"));
+			return new Location(world, config.getDouble("x"), config.getDouble("y"), config.getDouble("z"), (float) config.getDouble("yaw"), (float) config.getDouble("pitch"));
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

@@ -15,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -34,6 +33,7 @@ import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.util.Cuboid;
+import de.beimax.simplespleef.util.LocationHelper;
 import de.beimax.simplespleef.util.MaterialHelper;
 
 /**
@@ -734,27 +734,13 @@ public class GameImpl extends Game {
 		if (!configuration.isConfigurationSection(spawn + "Spawn") || !configuration.getBoolean(spawn + "Spawn.enabled", false))
 			return; // just ignore, if not set or not enabled
 		// everything ok -> teleport player
-		Location teleportTo = configToExactLocation(configuration.getConfigurationSection(spawn + "Spawn"));
+		Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection(spawn + "Spawn"));
 		if (teleportTo == null) SimpleSpleef.log.warning("[SimpleSpleef] Teleport error - location was null!");
 		// add player to teleport ok list
 		this.teleportOkList.add(player);
 		player.teleport(teleportTo);
 	}
 
-	/**
-	 * get exact location from config section
-	 * @param config
-	 * @return
-	 */
-	private Location configToExactLocation(ConfigurationSection config) {
-		try {
-			World world = SimpleSpleef.getPlugin().getServer().getWorld(config.getString("world"));
-			return new Location(world, config.getDouble("x"), config.getDouble("y"), config.getDouble("z"), (float) config.getDouble("yaw"), (float) config.getDouble("pitch"));
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
 	/**
 	 * check whether a certain block may be broken
 	 * => player has been checked before this, so this does only concern block breaks
