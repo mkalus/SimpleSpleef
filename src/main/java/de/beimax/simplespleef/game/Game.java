@@ -28,11 +28,6 @@ public abstract class Game {
 	protected static final int STATUS_FINISHED = 4;
 
 	/**
-	 * reference on game handler instance
-	 */
-	protected final GameHandler gameHandler;
-
-	/**
 	 * name of the game/arena
 	 */
 	private final String name;
@@ -46,8 +41,7 @@ public abstract class Game {
 	 * Constructor
 	 * @param name
 	 */
-	public Game(GameHandler gameHandler, String name) {
-		this.gameHandler = gameHandler;
+	public Game(String name) {
 		this.name = name;
 		this.status = STATUS_NEW;
 	}

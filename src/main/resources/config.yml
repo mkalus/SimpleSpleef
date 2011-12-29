@@ -52,8 +52,10 @@ arenas:
 # Start the countdown by typing "/spleef start" - otherwise someone has to "/spleef countdown" the arena)
         spleeferStart: true
 # Clear inventory at game start and restore after game has ended
+# Not implemented yet
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid
+# Not implemented yet
         addToInventory: false
         addInventoryItems:
             - 1:BOW
@@ -102,8 +104,10 @@ arenas:
             - STATIONARY_WATER
             - STATIONARY_LAVA
 # Players dying loose
+# Not implemented yet
         looseOnDeath: true
 # Players logging out loose
+# Not implemented yet
         looseOnLogout: false
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
@@ -127,10 +131,12 @@ arenas:
 # If instantDig is false, do dug blocks drop blocks that can be picked up by players?
         blockDropping: true
 # Can players actually dig/break blocks outside defined arena?
+# Not implemented yet
         allowDiggingOutsideArena: false
 # Protect arena against changes by non-players
         protectArena: true
 # Restore arena after the game
+# Not implemented yet
         restoreArenaAfterGame: true
 # Arena cube that will be protected (saved in memory for restoration)
         arena:

@@ -46,11 +46,31 @@ public class SimpleSpleef extends JavaPlugin {
 	public static Logger log = Logger.getLogger("Minecraft");
 	
 	public static Economy economy = null;
+	
+	/**
+	 * self reference to singleton
+	 */
+	private static SimpleSpleef simpleSpleef;
+	
+	/**
+	 * get instance
+	 * @return
+	 */
+	public static SimpleSpleef getPlugin() {
+		return simpleSpleef;
+	}
 
 	/**
 	 * reference to game handler
 	 */
-	private GameHandler gameHandler;
+	private static GameHandler gameHandler;
+
+	/**
+	 * @return the gameHandler
+	 */
+	public static GameHandler getGameHandler() {
+		return gameHandler;
+	}
 
 	/**
 	 * reference to admin class
@@ -80,6 +100,9 @@ public class SimpleSpleef extends JavaPlugin {
 	public void onEnable() {
 		// initialize plugin
 		log.info(this.toString() + " is loading.");	
+		
+		// set reference
+		SimpleSpleef.simpleSpleef = this;
 
 		// configure plugin (configuration stuff)
 		configurePlugin();
@@ -88,8 +111,8 @@ public class SimpleSpleef extends JavaPlugin {
 		checkForUpdate();
 		
 		// create new handlers
-		this.gameHandler = new GameHandler(this);
-		this.admin = new SimpleSpleefAdmin(this);
+		SimpleSpleef.gameHandler = new GameHandler();
+		this.admin = new SimpleSpleefAdmin();
 		
 		// register vault stuff
 		setupEconomy();
@@ -107,6 +130,9 @@ public class SimpleSpleef extends JavaPlugin {
 
 		//save config to disk
 		this.saveConfig();
+		
+		// derefer
+		SimpleSpleef.simpleSpleef = null;
 	}
 	
 	/**
@@ -153,14 +179,14 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	protected void registerEvents() {
 		// let my command handler take care of commands
-		this.commandExecutor = new SimpleSpleefCommandExecutor(this.gameHandler);
+		this.commandExecutor = new SimpleSpleefCommandExecutor();
 		this.getCommand("spleef").setExecutor(commandExecutor);
 
 		// Prepare listeners
 		PluginManager pm = getServer().getPluginManager();
-		this.blockListener = new SimpleSpleefBlockListener(this.gameHandler);
-		this.entityListener = new SimpleSpleefEntityListener(this.gameHandler);
-		this.playerListener = new SimpleSpleefPlayerListener(this.gameHandler);
+		this.blockListener = new SimpleSpleefBlockListener();
+		this.entityListener = new SimpleSpleefEntityListener();
+		this.playerListener = new SimpleSpleefPlayerListener();
 		
 		// Register our events
 		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.High, this);
@@ -175,13 +201,6 @@ public class SimpleSpleef extends JavaPlugin {
 		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.High, this);
 		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Highest, this);
 		pm.registerEvent(Type.PLAYER_GAME_MODE_CHANGE, playerListener, Priority.Highest, this);
-	}
-
-	/**
-	 * @return the gameHandler
-	 */
-	public GameHandler getGameHandler() {
-		return gameHandler;
 	}
 
 	/**

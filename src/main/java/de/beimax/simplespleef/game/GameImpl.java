@@ -101,8 +101,8 @@ public class GameImpl extends Game {
 	 * @param gameHandler
 	 * @param name
 	 */
-	public GameImpl(GameHandler gameHandler, String name) {
-		super(gameHandler, name);
+	public GameImpl(String name) {
+		super(name);
 		this.spleefers = new SpleeferList();
 		this.countdown = null;
 		this.teleportOkList = new HashSet<Player>();
@@ -140,9 +140,9 @@ public class GameImpl extends Game {
 			} else this.looseOnTouchMaterial = null; //no
 		} else this.looseOnTouchMaterial = null; // reset
 		// define arena, floor and loose cuboids
-		arena = this.gameHandler.configToCuboid(getId(), "arena");
-		floor = this.gameHandler.configToCuboid(getId(), "floor");
-		loose = this.gameHandler.configToCuboid(getId(), "loose");
+		arena = SimpleSpleef.getGameHandler().configToCuboid(getId(), "arena");
+		floor = SimpleSpleef.getGameHandler().configToCuboid(getId(), "floor");
+		loose = SimpleSpleef.getGameHandler().configToCuboid(getId(), "loose");
 		// block destruction/keep hashes
 		if (conf.isList("allowDigBlocks")) {
 			allowDigBlocks = true;
@@ -165,13 +165,13 @@ public class GameImpl extends Game {
 	public boolean join(Player player) {
 		//check joinable status
 		if (!isJoinable()) {
-			player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.join", "[ARENA]", getName()));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.join", "[ARENA]", getName()));
 			return false;
 		}
 		// max number of players?
 		int maximumPlayers = configuration.getInt("maximumPlayers", 0);
 		if (maximumPlayers > 0 && spleefers.size() >= maximumPlayers) {
-			player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.joinMax", "[ARENA]", getName(), "[NUMBER]", String.valueOf(maximumPlayers)));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinMax", "[ARENA]", getName(), "[NUMBER]", String.valueOf(maximumPlayers)));
 			return false;
 		}
 		// already joined this game? => is caught by GameHandler, so we do not check this here...
@@ -180,16 +180,16 @@ public class GameImpl extends Game {
 		if (entryFee > 0.0) {
 			EconomyResponse response = SimpleSpleef.economy.withdrawPlayer(player.getName(), entryFee);
 			if (response.type == EconomyResponse.ResponseType.SUCCESS) { // ok, tell the player about the amount charged
-				player.sendMessage(this.gameHandler.getPlugin().ll("feedback.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
+				player.sendMessage(SimpleSpleef.getPlugin().ll("feedback.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
 			} else { //insufficient funds
-				player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
+				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
 				return false;
 			}
 		}
 		// check gamemode and change it if needed
 		if (player.getGameMode() != GameMode.SURVIVAL) {
 			player.setGameMode(GameMode.SURVIVAL);
-			player.sendMessage(ChatColor.YELLOW + this.gameHandler.getPlugin().ll("feedback.gamemodeChanged"));
+			player.sendMessage(ChatColor.YELLOW + SimpleSpleef.getPlugin().ll("feedback.gamemodeChanged"));
 		}
 		if (!spleefers.addSpleefer(player)) { // some weird error
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
@@ -213,13 +213,13 @@ public class GameImpl extends Game {
 	public boolean countdown(CommandSender sender) {
 		// game started already?
 		if (isInProgress() || countdown != null) { // avoid possible memory leak
-			sender.sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.startDouble", "[ARENA]", getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startDouble", "[ARENA]", getName()));
 			return false;
 		}
 		// minimum number of players?
 		int minimumPlayers = configuration.getInt("minimumPlayers", 0);
 		if (minimumPlayers > 0 && spleefers.size() < minimumPlayers) {
-			sender.sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.startMin", "[ARENA]", getName(), "[NUMBER]", String.valueOf(minimumPlayers)));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startMin", "[ARENA]", getName(), "[NUMBER]", String.valueOf(minimumPlayers)));
 			return false;
 		}
 		// start countdown, if setting is 0 or higher
@@ -253,14 +253,14 @@ public class GameImpl extends Game {
 	public boolean stop(Player player) {
 		// game is not in progress!
 		if (!isInProgress()) {
-			player.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.stop", "[ARENA]", getName()));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.stop", "[ARENA]", getName()));
 			return false;
 		}
 		// actually end the game
 		if (!endGame()) return false;
 		// send message
-		sendMessage(this.gameHandler.getPlugin().ll("feedback.stop", "[ARENA]", getName(), "[PLAYER]", player.getDisplayName()),
-				this.gameHandler.getPlugin().getConfig().getBoolean("settings.announceStop", true));
+		sendMessage(SimpleSpleef.getPlugin().ll("feedback.stop", "[ARENA]", getName(), "[PLAYER]", player.getDisplayName()),
+				SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceStop", true));
 		return true;
 	}
 	
@@ -270,10 +270,10 @@ public class GameImpl extends Game {
 		// end the game first, if game is started
 		if (!endGame()) return false;
 		// send message
-		sendMessage(this.gameHandler.getPlugin().ll("feedback.delete", "[ARENA]", getName(), "[PLAYER]", sender.getName()),
-				this.gameHandler.getPlugin().getConfig().getBoolean("settings.announceStop", true));
+		sendMessage(SimpleSpleef.getPlugin().ll("feedback.delete", "[ARENA]", getName(), "[PLAYER]", sender.getName()),
+				SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceStop", true));
 		// call the game handler to tell it that the game is over
-		gameHandler.gameOver(this);
+		SimpleSpleef.getGameHandler().gameOver(this);
 		return true;
 	}
 
@@ -330,7 +330,7 @@ public class GameImpl extends Game {
 	 */
 	public void sendMessage(String message, boolean broadcast) {
 		// global broadcast
-		if (broadcast) gameHandler.getPlugin().getServer().broadcastMessage(message);
+		if (broadcast) SimpleSpleef.getPlugin().getServer().broadcastMessage(message);
 		else { // only players and specators
 			// players
 			for (Spleefer spleefer : spleefers.get()) {
@@ -392,9 +392,9 @@ public class GameImpl extends Game {
 				if (lostByTouching) blockName = touchedBlock.name();
 				else blockName = onBlock.name();
 				// broadcast message of somebody loosing
-				String broadcastMessage = ChatColor.GREEN + gameHandler.getPlugin().ll("broadcasts.lostByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MATERIAL]", blockName);
-				if (gameHandler.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
-					gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+				String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MATERIAL]", blockName);
+				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+					SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 				} else {
 					// send message to all receivers
 					sendMessage(broadcastMessage, player);
@@ -407,9 +407,9 @@ public class GameImpl extends Game {
 		// check location within "loose" cuboid (setting loose)
 		if (loose != null && loose.contains(player.getLocation())) {
 			// broadcast message of somebody loosing
-			String broadcastMessage = ChatColor.GREEN + gameHandler.getPlugin().ll("broadcasts.lostByCuboid", "[PLAYER]", player.getName(), "[ARENA]", getName());
-			if (gameHandler.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
-				gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByCuboid", "[PLAYER]", player.getName(), "[ARENA]", getName());
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				// send message to all receivers
 				sendMessage(broadcastMessage, player);
@@ -487,7 +487,7 @@ public class GameImpl extends Game {
 			// cancel event
 			event.setCancelled(true);
 			// message to player
-			event.getPlayer().sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.noDig"));
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noDig"));
 		} else if (!configuration.getBoolean("blockDropping", true)) { // otherwise: block dropping set to false => destroy blocks
 			// cancel event - because we will handle the block destruction ourselves
 			event.setCancelled(true);
@@ -504,7 +504,7 @@ public class GameImpl extends Game {
 		if (!isInGame() || !configuration.getBoolean("allowBlockPlacing", false)) {
 			// cancel event
 			event.setCancelled(true);
-			event.getPlayer().sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.noPlacement"));
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noPlacement"));
 		}
 	}
 
@@ -517,7 +517,7 @@ public class GameImpl extends Game {
 		// set player to lost
 		spleefers.setLost(player);
 		// message to player
-		player.sendMessage(ChatColor.RED + this.gameHandler.getPlugin().ll("feedback.lost"));
+		player.sendMessage(ChatColor.RED + SimpleSpleef.getPlugin().ll("feedback.lost"));
 		// broadcast message has to be sent by calling method
 		// shovel lost, too
 		removeShovelItem(player, true);
@@ -538,7 +538,7 @@ public class GameImpl extends Game {
 			if (!spleefer.hasLost()) { // not lost?
 				Player player = spleefer.getPlayer();
 				//this guy is a winner - send a message
-				player.sendMessage(ChatColor.DARK_GREEN + this.gameHandler.getPlugin().ll("feedback.won"));
+				player.sendMessage(ChatColor.DARK_GREEN + SimpleSpleef.getPlugin().ll("feedback.won"));
 				winners.add(player); // aggregate the winners to broadcast them later on
 				// pay prizes
 				payPrizeMoney(player);
@@ -546,11 +546,12 @@ public class GameImpl extends Game {
 			}
 		}
 		//TODO: winning message! <= get the total winners from winners list
+		//announceWin
 		
 		// clean up game and end it
 		endGame();
 		// call the game handler to tell it that the game is over
-		gameHandler.gameOver(this);
+		SimpleSpleef.getGameHandler().gameOver(this);
 	}
 
 	/**
@@ -567,11 +568,11 @@ public class GameImpl extends Game {
 		// give money to player
 		SimpleSpleef.economy.depositPlayer(player.getName(), win);
 		// player gets message
-		player.sendMessage(ChatColor.AQUA + gameHandler.getPlugin().ll("feeback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
+		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feeback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
 		// broadcast prize?
-		String broadcastMessage = ChatColor.AQUA + gameHandler.getPlugin().ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
-		if (gameHandler.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
-			gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			sendMessage(broadcastMessage, player); // send message to all receivers
 		}
@@ -596,11 +597,11 @@ public class GameImpl extends Game {
 		// give prizes to player
 		player.getInventory().addItem(itemStack);
 		// player gets message
-		player.sendMessage(ChatColor.AQUA + gameHandler.getPlugin().ll("feeback.prizeItems", "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount())));
+		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feeback.prizeItems", "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount())));
 		// broadcast prize?
-		String broadcastMessage = ChatColor.AQUA + gameHandler.getPlugin().ll("broadcasts.prizeItems", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount()));
-		if (gameHandler.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
-			gameHandler.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeItems", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount()));
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			sendMessage(broadcastMessage, player); // send message to all receivers
 		}
@@ -747,7 +748,7 @@ public class GameImpl extends Game {
 	 */
 	private Location configToExactLocation(ConfigurationSection config) {
 		try {
-			World world = gameHandler.getPlugin().getServer().getWorld(config.getString("world"));
+			World world = SimpleSpleef.getPlugin().getServer().getWorld(config.getString("world"));
 			return new Location(world, config.getDouble("x"), config.getDouble("y"), config.getDouble("z"), (float) config.getDouble("yaw"), (float) config.getDouble("pitch"));
 		} catch (Exception e) {
 			return null;
@@ -835,8 +836,8 @@ public class GameImpl extends Game {
 			status = STATUS_COUNTDOWN;
 
 			// announce countdown?
-			boolean broadcast = gameHandler.getPlugin().getConfig().getBoolean("settings.announceCountdown", true);
-			sendMessage(ChatColor.BLUE + gameHandler.getPlugin().ll("feedback.countdownStart"), broadcast);
+			boolean broadcast = SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceCountdown", true);
+			sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownStart"), broadcast);
 			
 			// teleport players to arena
 			for (Spleefer spleefer : spleefers.get()) {
@@ -858,7 +859,7 @@ public class GameImpl extends Game {
 					else {
 						start = start + 1000;
 						// Broadcast countdown
-						sendMessage(ChatColor.BLUE + gameHandler.getPlugin().ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", GameImpl.this.getName()), broadcast);
+						sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", GameImpl.this.getName()), broadcast);
 						count--;
 					}
 				}
@@ -870,12 +871,12 @@ public class GameImpl extends Game {
 			// countdown ended due to interruption?
 			if (interrupted) {
 				// send message
-				sendMessage(ChatColor.RED + gameHandler.getPlugin().ll("feedback.countdownInterrupted"), broadcast);
+				sendMessage(ChatColor.RED + SimpleSpleef.getPlugin().ll("feedback.countdownInterrupted"), broadcast);
 				// end the game
 				GameImpl.this.endGame();
 			} else {
 				// send message
-				sendMessage(ChatColor.BLUE + gameHandler.getPlugin().ll("feedback.countdownGo"), broadcast);
+				sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownGo"), broadcast);
 				// start the game itself!
 				GameImpl.this.start();
 			}

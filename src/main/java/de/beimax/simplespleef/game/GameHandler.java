@@ -29,11 +29,6 @@ import de.beimax.simplespleef.util.Cuboid;
  */
 public class GameHandler {
 	/**
-	 * reference to plugin
-	 */
-	private final SimpleSpleef plugin;
-	
-	/**
 	 * games array
 	 */
 	private Game[] games;
@@ -47,16 +42,8 @@ public class GameHandler {
 	 * Constructor
 	 * @param plugin reference to plugin
 	 */
-	public GameHandler(SimpleSpleef plugin) {
-		this.plugin = plugin;
+	public GameHandler() {
 		updateGameHandlerData();
-	}
-
-	/**
-	 * @return the plugin
-	 */
-	public SimpleSpleef getPlugin() {
-		return plugin;
 	}
 	
 	/**
@@ -105,7 +92,7 @@ public class GameHandler {
 	 */
 	public boolean addGame(String type, String name) {
 		// let the factory handle the details
-		Game game = GameFactory.createGame(this, type, name);
+		Game game = GameFactory.createGame(type, name);
 		if (game == null) return false; // no game created?
 		
 		return addGame(game); // add game
@@ -193,7 +180,7 @@ public class GameHandler {
 	 * @return
 	 */
 	public String gameNameToType(String game) {
-		return this.getPlugin().getConfig().getString("arenas." + game + ".type", "standard");
+		return SimpleSpleef.getPlugin().getConfig().getString("arenas." + game + ".type", "standard");
 	}
 
 	/**
@@ -250,9 +237,9 @@ public class GameHandler {
 	public Map<String, Boolean> getPossibleGames() {
 		Map<String, Boolean> map = new TreeMap<String, Boolean>(); // sorting is maintained
 		// get arenas from config and check if they are enabled
-		Set<String> arenas = this.getPlugin().getConfig().getConfigurationSection("arenas").getKeys(false);
+		Set<String> arenas = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas").getKeys(false);
 		for (String arena : arenas) {
-			Boolean enabled = this.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false);
+			Boolean enabled = SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false);
 			map.put(arena, enabled);
 		}
 		return map;
@@ -263,7 +250,7 @@ public class GameHandler {
 	 * @return
 	 */
 	public String getDefaultArena() {
-		return this.getPlugin().getConfig().getString("settings.defaultArena", "default");
+		return SimpleSpleef.getPlugin().getConfig().getString("settings.defaultArena", "default");
 	}
 	
 	/**
@@ -276,15 +263,15 @@ public class GameHandler {
 		Game game = getGameByName(arena);
 		// does the game exist already?
 		if (game != null) {
-			sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.arenaExistsAlready", "[ARENA]", game.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaExistsAlready", "[ARENA]", game.getName()));
 			return null;
 		}
 		game = createNewGame(arena);
 		// announce new game globally?
-		if (this.getPlugin().getConfig().getBoolean("settings.announceGame", true))
-			this.getPlugin().getServer().broadcastMessage(ChatColor.GOLD + this.getPlugin().ll("broadcasts.announce", "[PLAYER]", sender.getName(), "[ARENA]", game.getName()));
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceGame", true))
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(ChatColor.GOLD + SimpleSpleef.getPlugin().ll("broadcasts.announce", "[PLAYER]", sender.getName(), "[ARENA]", game.getName()));
 		else
-			sender.sendMessage(ChatColor.GOLD + this.getPlugin().ll("feedback.announce", "[ARENA]", game.getName()));
+			sender.sendMessage(ChatColor.GOLD + SimpleSpleef.getPlugin().ll("feedback.announce", "[ARENA]", game.getName()));
 		return game;
 	}
 	
@@ -300,32 +287,32 @@ public class GameHandler {
 		// does the game not exist?
 		if (game == null) {
 			// check if game is disabled
-			if (!this.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
-				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
+			if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
 				return;
 			}
 			// do players have the right to join unstarted games?
-			if (this.getPlugin().getConfig().getBoolean("arenas." + arena + ".announceOnJoin", true))
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".announceOnJoin", true))
 				game = announce(sender, arena);
 			else { // tell player that he may not announce game
-				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.announceBeforeJoin", "[ARENA]", arena));
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.announceBeforeJoin", "[ARENA]", arena));
 				return;
 			}
 		}
 		// player already joined another arena?
 		Game checkGame = checkPlayerInGame(player);
 		if (checkGame != null) {
-			sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.joinDouble", "[ARENA]", checkGame.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinDouble", "[ARENA]", checkGame.getName()));
 			return;			
 		} else checkGame = null;
 		// ok, try to join the game itself...
 		if (!game.join(player)) return;
 		// now we announce the joining of the player...
-		String broadcastMessage = ChatColor.GREEN + this.getPlugin().ll("broadcasts.join", "[PLAYER]", sender.getName(), "[ARENA]", game.getName());
-		if (this.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) { // broadcast
-			this.getPlugin().getServer().broadcastMessage(broadcastMessage);
+		String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.join", "[PLAYER]", sender.getName(), "[ARENA]", game.getName());
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) { // broadcast
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage);
 		} else { // player only
-			sender.sendMessage(ChatColor.GREEN + this.getPlugin().ll("feedback.join", "[ARENA]", game.getName()));
+			sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.join", "[ARENA]", game.getName()));
 			game.sendMessage(broadcastMessage, player); // notify players and spectators
 		}
 	}
@@ -342,14 +329,14 @@ public class GameHandler {
 		if (checkGame != null) {
 			String arena = checkGame.getId();
 			//is config "spleeferStart" of arena is set to true? - isJoinable added to avoid error message and let game do this instead
-			if (checkGame.isJoinable() && !this.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
-				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", arena));
+			if (checkGame.isJoinable() && !SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", arena));
 			else // spleeferStart is true: attempt to start countdown
 				countdown(sender, arena);
 			return;
 		}
 		// sender not part of any game
-		sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.start"));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.start"));
 	}
 
 	/**
@@ -363,12 +350,12 @@ public class GameHandler {
 		// does the game not exist?
 		if (game == null) {
 			// check if game is disabled
-			if (!this.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
-				sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
+			if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
 				return;
 			}
 			// game not announced yet...
-			sender.sendMessage(ChatColor.DARK_RED + this.getPlugin().ll("errors.noGameAnnounced", "[ARENA]", arena));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noGameAnnounced", "[ARENA]", arena));
 			return;
 		}
 		// start countdown for game
@@ -395,7 +382,7 @@ public class GameHandler {
 		if (checkGame != null) {
 			checkGame.stop(player); // stop game
 		} else //print error, since player not part of a game
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.stopNoPlaying"));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.stopNoPlaying"));
 	}
 
 	/**
@@ -416,14 +403,14 @@ public class GameHandler {
 			}
 			game = checkPlayerInGame(player);
 			if (game == null) {
-				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.deleteNoPlaying"));
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.deleteNoPlaying"));
 				return;
 			}
 		} else { // otherwise try to get arena by name
 			game = getGameByName(arena);
 			if (game == null) {
 				// print error, arena was not found
-				sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.unknownArena", "[ARENA]", arena));
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
 				return;
 			}
 		}
@@ -459,9 +446,9 @@ public class GameHandler {
 	protected Game createNewGame(String arena) {
 		// get type of arena
 		String type = gameNameToType(arena);
-		Game game = GameFactory.createGame(this, type, arena);
+		Game game = GameFactory.createGame(type, arena);
 		// define configuration section for this game
-		game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
+		game.defineSettings(SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
 		// add game to list
 		addGame(game);
 		// return newly created game
@@ -482,7 +469,7 @@ public class GameHandler {
 		} else if (inProtectedArenaCube(event.getBlock())) {
 			// cancel event
 			event.setCancelled(true);
-			player.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.noDig"));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noDig"));
 		}
 	}
 	
@@ -500,7 +487,7 @@ public class GameHandler {
 		} else if (inProtectedArenaCube(event.getBlock())) {
 			// cancel event
 			event.setCancelled(true);
-			player.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.noPlacement"));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noPlacement"));
 		}
 	}
 	
@@ -511,7 +498,7 @@ public class GameHandler {
 	 * @return
 	 */
 	public Cuboid configToCuboid(String arena, String section) {
-		FileConfiguration conf = this.plugin.getConfig();
+		FileConfiguration conf = SimpleSpleef.getPlugin().getConfig();
 		arena = arena.toLowerCase();
 		section = section.toLowerCase();
 		// is arena protected? If not, ignore to save resources
@@ -520,8 +507,8 @@ public class GameHandler {
 		if (!conf.isConfigurationSection("arenas." + arena + "." + section) ||
 				!conf.getBoolean("arenas." + arena + ".arena.enabled", false)) return null;
 		// now, check sane coords
-		World firstWorld = this.plugin.getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".a.world"));
-		World secondWorld = this.plugin.getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".b.world"));
+		World firstWorld = SimpleSpleef.getPlugin().getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".a.world"));
+		World secondWorld = SimpleSpleef.getPlugin().getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".b.world"));
 		if (firstWorld == null || secondWorld == null || firstWorld != secondWorld) return null; // non-sane worlds
 		int firstX = conf.getInt("arenas." + arena + "." + section + ".a.x", 0);
 		int firstY = conf.getInt("arenas." + arena + "." + section + ".a.y", 0);
@@ -559,7 +546,7 @@ public class GameHandler {
 		// iterate through active games
 		for (Game game : getGames()) {
 			// redefine settings
-			game.defineSettings(this.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
+			game.defineSettings(SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
 		}
 	}
 

@@ -10,13 +10,12 @@ package de.beimax.simplespleef.game;
 public abstract class GameFactory {
 	/**
 	 * factory create a new game instance
-	 * @param handler
 	 * @param type
 	 * @param name
 	 * @return game or null, if game type does not exist
 	 */
-	public static Game createGame(GameHandler handler, String type, String name) {
+	public static Game createGame(String type, String name) {
 		// TODO: inject other game types
-		return new GameImpl(handler, name);
+		return new GameImpl(name);
 	}
 }

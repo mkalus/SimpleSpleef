@@ -10,8 +10,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
-import de.beimax.simplespleef.game.GameHandler;
 
 /**
  * Handle events for all Player related events
@@ -19,27 +19,14 @@ import de.beimax.simplespleef.game.GameHandler;
  * @author maxkalus
  */
 public class SimpleSpleefPlayerListener extends PlayerListener {
-	/**
-	 * reference to game handler
-	 */
-	private final GameHandler gameHandler;
-	
-	/**
-	 * Constructor
-	 * @param gameHandler reference to game handler
-	 */
-	public SimpleSpleefPlayerListener(GameHandler gameHandler) {
-		this.gameHandler = gameHandler;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.bukkit.event.player.PlayerListener#onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent)
 	 */
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// tell all games about it
-			for (Game game : gameHandler.getGames()) {
+			for (Game game : SimpleSpleef.getGameHandler().getGames()) {
 				game.onPlayerJoin(event);
 			}
 		}
@@ -50,9 +37,9 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerKick(PlayerKickEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
-			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
 			if (game != null) game.onPlayerKick(event);
 		}
 	}
@@ -66,9 +53,9 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
-			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
 			if (game != null) game.onPlayerQuit(event);
 		}
 	}	
@@ -82,9 +69,9 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
-			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
 			if (game != null) game.onPlayerMove(event);
 		}
 	}
@@ -94,9 +81,9 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
-			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
 			if (game != null) game.onPlayerInteract(event);
 		}
 	}
@@ -106,13 +93,13 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
-			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
 			if (game != null) {
 				// check, if arena allows the player's teleportation
 				if (!game.playerMayTeleport(event.getPlayer())) {
-					event.getPlayer().sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.teleport", "[ARENA]", game.getName()));
+					event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teleport", "[ARENA]", game.getName()));
 					event.setCancelled(true); //cancel event
 				}
 			}
@@ -124,11 +111,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
-		if (gameHandler.hasGames()) {
+		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
-			Game game = gameHandler.checkPlayerInGame(event.getPlayer());
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
 			if (game != null) { // generally disallow changes of game modes for spleefers
-				event.getPlayer().sendMessage(ChatColor.DARK_RED + gameHandler.getPlugin().ll("errors.gamemodeChange"));
+				event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.gamemodeChange"));
 				event.setCancelled(true); //cancel event
 			}			
 		}

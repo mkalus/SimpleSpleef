@@ -14,8 +14,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
+import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
-import de.beimax.simplespleef.game.GameHandler;
 
 /**
  * @author mkalus
@@ -45,16 +45,10 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	}
 	
 	/**
-	 * reference to game handler
-	 */
-	private final GameHandler gameHandler;
-	
-	/**
 	 * Constructor
 	 * @param gameHandler reference to game handler
 	 */
-	public SimpleSpleefCommandExecutor(GameHandler gameHandler) {
-		this.gameHandler = gameHandler;
+	public SimpleSpleefCommandExecutor() {
 	}
 
 	/**
@@ -121,7 +115,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		if (!sender.hasPermission("simplespleef.help")) return false;
 		
 		// get all commands in language file
-		Map<String, String> commands = this.gameHandler.getPlugin().lls("command");
+		Map<String, String> commands = SimpleSpleef.getPlugin().lls("command");
 		// control if there is any output:
 		boolean output = false;
 		// cycle through commands
@@ -137,7 +131,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		}
 		// was there output? if not show response
 		if (!output)
-			sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.noPermissionAtAll"));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noPermissionAtAll"));
 		return true;
 	}
 	
@@ -152,7 +146,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// get game from 2nd argument
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		if (arena != null) { // no errors - then try to announce new game
-			this.gameHandler.announce(sender, arena);
+			SimpleSpleef.getGameHandler().announce(sender, arena);
 		}
 	}
 	
@@ -167,7 +161,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// get game from 2nd argument
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		if (arena != null) { // no errors - then try to announce new game
-			this.gameHandler.join(sender, arena);
+			SimpleSpleef.getGameHandler().join(sender, arena);
 		}
 	}
 	
@@ -178,9 +172,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected void arenasCommand(CommandSender sender, String[] args) {
 		//get current games
-		List<String> games = this.gameHandler.getGameIds();
+		List<String> games = SimpleSpleef.getGameHandler().getGameIds();
 		// get all possible games
-		Map<String, Boolean> arenas = this.gameHandler.getPossibleGames();
+		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();
 		if (arenas == null) return; // none - unlikely, but possible...
 		// cycle through possible games
 		for (Entry<String, Boolean> arena: arenas.entrySet()) {
@@ -190,18 +184,18 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			String information;
 			if (arena.getValue() == false) {
 				color = ChatColor.DARK_GRAY; // arena has been disabled in the the config
-				information = this.gameHandler.getPlugin().ll("feedback.arenaDisabled");
+				information = SimpleSpleef.getPlugin().ll("feedback.arenaDisabled");
 			}
 			else if (games.contains(name)) { // is it an active game?
 				// game active or still joinable?
-				Game activeGame = this.gameHandler.getGameByName(name);
+				Game activeGame = SimpleSpleef.getGameHandler().getGameByName(name);
 				if (activeGame.isJoinable()) {
 					color = ChatColor.GREEN; // joinable
-					information = this.gameHandler.getPlugin().ll("feedback.arenaJoinable");
+					information = SimpleSpleef.getPlugin().ll("feedback.arenaJoinable");
 				}
 				else {
 					color = ChatColor.LIGHT_PURPLE; // not joinable - because running
-					information = this.gameHandler.getPlugin().ll("feedback.arenaInProgress");
+					information = SimpleSpleef.getPlugin().ll("feedback.arenaInProgress");
 				}
 				// ok, gather some more information on the game to display
 				information = information + " " + activeGame.getNumberOfPlayers();
@@ -231,7 +225,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected void startCommand(CommandSender sender, String[] args) {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 0)) return;
-		this.gameHandler.start(sender);
+		SimpleSpleef.getGameHandler().start(sender);
 	}
 	
 	/**
@@ -246,9 +240,9 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		// if player and no arena defined - arena is unset, so player can start current arena
 		if (arena != null && args.length < 2 && !isConsole(sender))
-			this.gameHandler.start(sender);
+			SimpleSpleef.getGameHandler().start(sender);
 		else if (arena != null) { // no errors - then try to announce new game
-			this.gameHandler.countdown(sender, arena);
+			SimpleSpleef.getGameHandler().countdown(sender, arena);
 		}
 	}
 	
@@ -260,7 +254,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected void leaveCommand(CommandSender sender, String[] args) {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 0)) return;
-		this.gameHandler.leave(sender);
+		SimpleSpleef.getGameHandler().leave(sender);
 	}
 	
 	/**
@@ -271,7 +265,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected void stopCommand(CommandSender sender, String[] args) {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 0)) return;
-		this.gameHandler.stop(sender);
+		SimpleSpleef.getGameHandler().stop(sender);
 	}
 	
 	/**
@@ -282,7 +276,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected void deleteCommand(CommandSender sender, String[] args) {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 0)) return;
-		this.gameHandler.delete(sender, null);
+		SimpleSpleef.getGameHandler().delete(sender, null);
 	}
 	
 	/**
@@ -297,7 +291,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		if (tooFewArguments(sender, args, 1)) return;
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		if (arena != null) {
-			this.gameHandler.delete(sender, arena);
+			SimpleSpleef.getGameHandler().delete(sender, arena);
 		}
 	}
 	
@@ -312,7 +306,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// get game from 2nd argument
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		if (arena != null) { // no errors - then try to announce new game
-			this.gameHandler.watch(sender, arena);
+			SimpleSpleef.getGameHandler().watch(sender, arena);
 		}
 	}
 	
@@ -323,7 +317,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected void adminCommand(CommandSender sender, String[] args) {
 		// delegate all further stuff to admin class
-		this.gameHandler.getPlugin().getAdminClass().executeCommand(sender, args);
+		SimpleSpleef.getPlugin().getAdminClass().executeCommand(sender, args);
 	}
 	
 	//TODO: add further commands here...
@@ -335,7 +329,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @return true
 	 */
 	protected boolean unknownCommand(CommandSender sender, String command) {
-		sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.unknownCommand", "[COMMAND]", command));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownCommand", "[COMMAND]", command));
 		return true;
 	}
 
@@ -346,7 +340,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @return true
 	 */
 	protected boolean unknownArena(CommandSender sender, String arena) {
-		sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
 		return true;
 	}
 
@@ -381,8 +375,8 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected boolean tooFewArguments(CommandSender sender, String[] args, int min) {
 		if (args.length < min+1) {
-			sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.tooFewArguments", "[MIN]", String.valueOf(min)));
-			String commandString = this.gameHandler.getPlugin().ll("command." + args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.tooFewArguments", "[MIN]", String.valueOf(min)));
+			String commandString = SimpleSpleef.getPlugin().ll("command." + args[0]);
 			if (commandString != null)
 				printCommandString(sender, commandString);
 			return true;
@@ -398,8 +392,8 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected boolean tooManyArguments(CommandSender sender, String[] args, int max) {
 		if (args.length > max+1) {
-			sender.sendMessage(ChatColor.DARK_RED + this.gameHandler.getPlugin().ll("errors.tooManyArguments", "[MAX]", String.valueOf(max)));
-			String commandString = this.gameHandler.getPlugin().ll("command." + args[0]);
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.tooManyArguments", "[MAX]", String.valueOf(max)));
+			String commandString = SimpleSpleef.getPlugin().ll("command." + args[0]);
 			if (commandString != null)
 				printCommandString(sender, commandString);
 			return true;
@@ -416,11 +410,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected String getArenaNameFromArgument(CommandSender sender, String[] args, int index) {
 		String name;
 		// of too short, get the default arena
-		if (args.length <= index) name = this.gameHandler.getDefaultArena();
+		if (args.length <= index) name = SimpleSpleef.getGameHandler().getDefaultArena();
 		else name = args[index];
 		
 		// check for the existence of the arena
-		if (!this.gameHandler.gameTypeOrNameExists(name)) {
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(name)) {
 			// error output, if no arena has been found
 			unknownArena(sender, name);
 			return null;

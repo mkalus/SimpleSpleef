@@ -24,11 +24,6 @@ import de.beimax.simplespleef.util.LocationHelper;
  */
 public class SimpleSpleefAdmin {
 	/**
-	 * reference to plugin
-	 */
-	private final SimpleSpleef plugin;
-	
-	/**
 	 * saves which command senders have selected which arena as current one
 	 */
 	private HashMap<CommandSender, String> selectedArenas;
@@ -37,8 +32,7 @@ public class SimpleSpleefAdmin {
 	 * Constructor
 	 * @param plugin reference to plugin
 	 */
-	public SimpleSpleefAdmin(SimpleSpleef plugin) {
-		this.plugin = plugin;
+	public SimpleSpleefAdmin() {
 		selectedArenas = new HashMap<CommandSender, String>();
 	}
 
@@ -92,7 +86,7 @@ public class SimpleSpleefAdmin {
 		} else if (adminCommand.equals("set")) {
 			//TODO
 		} else // unknown command feedback
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.unknownCommand", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownCommand", "[COMMAND]", adminCommand));
 		
 		// should arena definition be checked?
 		if (checkArena) checkArena(sender);
@@ -108,7 +102,7 @@ public class SimpleSpleefAdmin {
 	protected boolean checkThreeArgs(CommandSender sender, String[] args, String adminCommand) {
 		// check argument length
 		if (args.length != 3) {
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
 			return false;
 		}
 		return true;
@@ -129,7 +123,7 @@ public class SimpleSpleefAdmin {
 		if (spawn.equals("lounge") || spawn.equals("game") || spawn.equals("spectator") || spawn.equals("loose"))
 			return true;
 		// error feedback
-		sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgumentSpawn"));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgumentSpawn"));
 		return false;		
 	}
 	
@@ -143,12 +137,12 @@ public class SimpleSpleefAdmin {
 	protected boolean checkThirdAB(CommandSender sender, String[] args,
 			String adminCommand) {
 		if (args.length != 3) {
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
 			return false;
 		}
 		
 		if (args[2].equalsIgnoreCase("a") || args[2].equalsIgnoreCase("b")) return true;
-		sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.aOrB", "[COMMAND]", adminCommand));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.aOrB", "[COMMAND]", adminCommand));
 		return false;
 	}
 
@@ -158,7 +152,7 @@ public class SimpleSpleefAdmin {
 	 */
 	protected void helpCommand(CommandSender sender) {
 		// get help lines
-		String[] lines = plugin.ll("admin.help").split("\n");
+		String[] lines = SimpleSpleef.getPlugin().ll("admin.help").split("\n");
 		for (String line : lines)
 			SimpleSpleefCommandExecutor.printCommandString(sender, line);
 	}
@@ -170,7 +164,7 @@ public class SimpleSpleefAdmin {
 	 */
 	protected void selectedCommand(CommandSender sender) {
 		// get all possible games
-		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames();
+		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();
 		// get selected arena
 		String selected = getSelectedArena(sender);
 		for (Entry<String, Boolean> arena: arenas.entrySet()) {
@@ -187,18 +181,18 @@ public class SimpleSpleefAdmin {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// get all possible games
-		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames();  //TODO: write method to do this!
+		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();  //TODO: write method to do this!
 		for (Entry<String, Boolean> checkArena: arenas.entrySet()) {
 			if (checkArena.getKey().equals(id)) {
 				// set new default arena
 				setSelectedArena(sender, id);
 				// feedback
-				sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.setarena", "[ARENA]", id));
+				sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.setarena", "[ARENA]", id));
 				return;
 			}
 		}
 		// no arena found by that name => error
-		sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.unknownArena", "[ARENA]", id));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", id));
 	}
 
 	/**
@@ -208,16 +202,16 @@ public class SimpleSpleefAdmin {
 	 */
 	protected void addarenaCommand(CommandSender sender, String arena) {
 		// get all possible games
-		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames();
+		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// check if arena exists already
 		if (arenas.get(id) != null) {
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("adminerrors.addarenaArenaExists", "[ARENA]", arena));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.addarenaArenaExists", "[ARENA]", arena));
 			return;
 		}
 		// create new arena entry in config
-		ConfigHelper configHelper = new ConfigHelper(this.plugin);
+		ConfigHelper configHelper = new ConfigHelper(SimpleSpleef.getPlugin());
 		if (!configHelper.createNewArena(id, arena)) {
 			sender.sendMessage(ChatColor.DARK_RED + "Internal error: Could not create arena - see log file for details.");
 			return;
@@ -225,7 +219,7 @@ public class SimpleSpleefAdmin {
 		// set default arena
 		setSelectedArena(sender, arena);
 		// feedback to user
-		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.addarena", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.addarena", "[ARENA]", arena));
 	}
 
 	/**
@@ -237,7 +231,7 @@ public class SimpleSpleefAdmin {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// get all possible games
-		Map<String, Boolean> arenas = this.plugin.getGameHandler().getPossibleGames(); //TODO: write method to do this!
+		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames(); //TODO: write method to do this!
 		boolean found = false;
 		for (Entry<String, Boolean> checkArena: arenas.entrySet()) {
 			if (checkArena.getKey().equals(id)) {
@@ -248,18 +242,18 @@ public class SimpleSpleefAdmin {
 		// not found?
 		if (!found) {
 			// no arena found by that name => error
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.unknownArena", "[ARENA]", id));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", id));
 			return;
 		}
 		
 		// ok, now delete arena config
-		this.plugin.getConfig().set("arenas." + id, null);
+		SimpleSpleef.getPlugin().getConfig().set("arenas." + id, null);
 
 		// save configuration now
-		this.plugin.saveConfig();
+		SimpleSpleef.getPlugin().saveConfig();
 
 		// feedback to user
-		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.delarena", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.delarena", "[ARENA]", arena));
 	}
 
 	/**
@@ -271,7 +265,7 @@ public class SimpleSpleefAdmin {
 	protected void defineArenaPoint(CommandSender sender, String aOrB,
 			String adminCommand) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
 			return;
 		}
 		
@@ -284,7 +278,7 @@ public class SimpleSpleefAdmin {
 		//TODO: check arena existence
 
 		// get arena section
-		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);
+		ConfigurationSection arenaSection = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
 		
 		// create section, if needed
 		if (!arenaSection.isConfigurationSection(adminCommand))
@@ -297,10 +291,10 @@ public class SimpleSpleefAdmin {
 		mySection.createSection(aOrB, LocationHelper.getXYZLocation(((Player) sender).getLocation().getBlock().getRelative(BlockFace.DOWN).getLocation()));
 		
 		// save config to file
-		this.plugin.saveConfig();
+		SimpleSpleef.getPlugin().saveConfig();
 		
 		// feedback to player
-		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.defineArenaPoint", "[ARENA]", arena, "[POINT]", aOrB, "[SECTION]", adminCommand));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineArenaPoint", "[ARENA]", arena, "[POINT]", aOrB, "[SECTION]", adminCommand));
 	}
 
 	/**
@@ -312,7 +306,7 @@ public class SimpleSpleefAdmin {
 	protected void defineSpawnPoint(CommandSender sender, String spawn,
 			String adminCommand) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.DARK_RED + this.plugin.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
 			return;
 		}
 		
@@ -325,16 +319,16 @@ public class SimpleSpleefAdmin {
 		//TODO: check arena existence
 
 		// get arena section
-		ConfigurationSection arenaSection = this.plugin.getConfig().getConfigurationSection("arenas." + arena);
+		ConfigurationSection arenaSection = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
 
 		// create section
 		arenaSection.createSection(spawn + "Spawn", LocationHelper.getExactLocation(((Player) sender).getLocation(), true));
 
 		// save config to file
-		this.plugin.saveConfig();
+		SimpleSpleef.getPlugin().saveConfig();
 		
 		// feedback to player
-		sender.sendMessage(ChatColor.GREEN + this.plugin.ll("adminfeedback.defineSpawnPoint", "[ARENA]", arena, "[SPAWN]", spawn));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineSpawnPoint", "[ARENA]", arena, "[SPAWN]", spawn));
 	}
 
 	// TODO add new commands here
@@ -346,7 +340,7 @@ public class SimpleSpleefAdmin {
 		// TODO Auto-generated method stub
 		
 		// reload the configuration of everything
-		this.plugin.getGameHandler().reloadConfig();
+		SimpleSpleef.getGameHandler().reloadConfig();
 	}
 
 	/**
@@ -359,7 +353,7 @@ public class SimpleSpleefAdmin {
 		
 		// if not found, define default arena as current one
 		if (arena == null)
-			return this.plugin.getGameHandler().getDefaultArena();
+			return SimpleSpleef.getGameHandler().getDefaultArena();
 		return arena;
 	}
 	
