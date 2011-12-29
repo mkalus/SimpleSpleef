@@ -7,12 +7,13 @@ import java.io.Serializable;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 /**
  * @author mkalus Represents cube in the world - inspired by Cuboid plugin
  */
 public class Cuboid implements Serializable {
-	private static final long serialVersionUID = 5378552316337311806L;
+	private static final long serialVersionUID = 4189254652090021378L;
 
 	/**
 	 * world
@@ -109,5 +110,39 @@ public class Cuboid implements Serializable {
 	 */
 	public boolean contains(Location location) {
 		return onWorld(location.getWorld()) && contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	/**
+	 * return array of serializable blocks
+	 * return serializable block data
+	 * @return
+	 */
+	public SerializableBlockData[][][] getSerializedBlocks() {
+		SerializableBlockData[][][] blockData =
+			new SerializableBlockData[this.coords[3]-this.coords[0]+1][this.coords[4]-this.coords[1]+1][this.coords[5]-this.coords[2]+1];
+		
+		// copy data from blocks
+		for (int x = this.coords[0]; x <= this.coords[3]; x++)
+			for (int y = this.coords[1]; y <= this.coords[4]; y++)
+				for (int z = this.coords[2]; z <= this.coords[5]; z++) {
+					Block block = this.world.getBlockAt(x, y, z);
+					blockData[Math.abs(this.coords[0]-x)][Math.abs(this.coords[1]-y)][Math.abs(this.coords[2]-z)] =
+						new SerializableBlockData(block.getTypeId(), block.getData());
+				}
+		return blockData;
+	}
+	
+	/**
+	 * restore array of serializable blocks
+	 * @param blockData
+	 */
+	public void setSerializedBlocks(SerializableBlockData[][][] blockData) {
+		for (int x = 0; x < blockData.length; x++)
+			for (int y = 0; y < blockData[0].length; y++)
+				for (int z = 0; z < blockData[0][0].length; z++) {
+					Block block = this.world.getBlockAt(this.coords[0] + x, this.coords[1] + y, this.coords[2] + z);
+					block.setTypeId(blockData[x][y][z].getTypeId());
+					block.setData(blockData[x][y][z].getData());
+				}
 	}
 }

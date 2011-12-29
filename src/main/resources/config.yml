@@ -41,6 +41,7 @@ arenas:
 # type - this can contain either standard or a class name like com.mystuff.MySpleefGameImpl
         type: standard
 # enabled?
+# Not implemented yet (at least in all cases)
         enabled: true
 # Minimum and maximum players
         minimumPlayers: 2
@@ -136,7 +137,6 @@ arenas:
 # Protect arena against changes by non-players
         protectArena: true
 # Restore arena after the game
-# Not implemented yet
         restoreArenaAfterGame: true
 # Arena cube that will be protected (saved in memory for restoration)
         arena:

@@ -3,11 +3,12 @@
  */
 package de.beimax.simplespleef.game;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.*;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -20,21 +21,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.block.*;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.*;
 
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.util.Cuboid;
-import de.beimax.simplespleef.util.LocationHelper;
-import de.beimax.simplespleef.util.MaterialHelper;
+import de.beimax.simplespleef.util.*;
 
 /**
  * @author mkalus
@@ -148,7 +140,6 @@ public class GameImpl extends Game {
 			allowDigBlocks = true;
 			digBlocks = new HashSet<ItemStack>();
 			for (String line : conf.getStringList("allowDigBlocks")) {
-				System.out.println(line);
 				digBlocks.add(MaterialHelper.getItemStackFromString(line));
 			}
 		} else if (conf.isList("disallowDigBlocks")) {
@@ -238,6 +229,8 @@ public class GameImpl extends Game {
 	public boolean start() {
 		// delete countdown
 		deleteCountdown();
+		// save arena information
+		saveArena();
 		// change game status
 		status = STATUS_STARTED;
 		// possibly clear inventory
@@ -300,6 +293,8 @@ public class GameImpl extends Game {
 			if (!spleefer.hasLost())
 				teleportPlayer(spleefer.getPlayer(), "lounge");
 		}
+		// restore arena
+		restoreArena();
 		// change game status
 		status = STATUS_NEW;
 		return true;
@@ -787,6 +782,61 @@ public class GameImpl extends Game {
 
 		// on all other cases - allow block breaks, like in original simple spleef games
 		return true;		
+	}
+	
+	/**
+	 * save arena information, if setting restoreArenaAfterGame has been set
+	 */
+	protected void saveArena() {
+		if (arena == null || !configuration.getBoolean("restoreArenaAfterGame", true)) return; // ignore, if arena not defined or setting false
+		SerializableBlockData[][][] blockData = arena.getSerializedBlocks();
+		
+		// output file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + ".save");
+		// delete old file
+		if (file.exists()) {
+			if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
+			return;
+		}
+		try {
+			// serialize objects
+			FileOutputStream fileStream = new FileOutputStream(file);
+			ObjectOutputStream os = new ObjectOutputStream(fileStream);
+			// write array itself
+			os.writeObject(blockData);
+			os.close();
+		} catch (Exception e) {
+			 SimpleSpleef.log.warning("[SimpleSpleef] Could not save arena file " + file.getName() + ". Reason: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * restore arena information, if setting restoreArenaAfterGame has been set
+	 */
+	protected void restoreArena() {
+		if (arena == null || !configuration.getBoolean("restoreArenaAfterGame", true)) return; // ignore, if arena not defined or setting false
+		
+		// input file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + ".save");
+		if (!file.exists()) {
+			SimpleSpleef.log.warning("[SimpleSpleef] Could find arena file " + file.getName());
+			return;
+		}
+		SerializableBlockData[][][] blockData;
+		try {
+			// deserialize objects
+			FileInputStream fileInputStream = new FileInputStream(file);
+			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
+			blockData = (SerializableBlockData[][][]) oInputStream.readObject();
+			oInputStream.close();
+		} catch (Exception e) {
+			 SimpleSpleef.log.warning("[SimpleSpleef] Could not restore arena file " + file.getName() + ". Reason: " + e.getMessage());
+			 return;
+		}
+		// restore arena
+		arena.setSerializedBlocks(blockData);
+		// delete file at the end - cleanup work...
+		if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
 	}
 
 	@Override

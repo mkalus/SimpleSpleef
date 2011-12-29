@@ -143,7 +143,7 @@ public class SimpleSpleef extends JavaPlugin {
 		this.getConfig().options().copyDefaults(true);
 
 		// create config helper
-		ConfigHelper configHelper = new ConfigHelper(this);
+		ConfigHelper configHelper = new ConfigHelper();
 		// update sample config, if needed
 		configHelper.updateSampleConfig();
 		// update language files

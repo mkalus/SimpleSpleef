@@ -90,3 +90,5 @@ adminfeedback:
     delarena: 'Arena [ARENA] gelöscht!'
     defineArenaPoint: 'Punkt [POINT] von [SECTION] in der Arena [ARENA] gesetzt.'
     defineSpawnPoint: 'Spawn [SPAWN] in der Arena [ARENA] gesetzt.'
+    enable: '[ARENA] aktiviert.'
+    disable: '[ARENA] deaktiviert.'

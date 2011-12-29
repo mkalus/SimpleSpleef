@@ -80,9 +80,13 @@ public class SimpleSpleefAdmin {
 				checkArena = true;
 			}
 		} else if (adminCommand.equals("enable")) {
-			//TODO
+			if (checkThreeArgs(sender, args, adminCommand))
+				if (enableArena(sender, args[2]))
+					checkArena = true;
 		} else if (adminCommand.equals("disable")) {
-			//TODO
+			if (checkThreeArgs(sender, args, adminCommand))
+				if (disableArena(sender, args[2]))
+					checkArena = true;
 		} else if (adminCommand.equals("set")) {
 			//TODO
 		} else // unknown command feedback
@@ -211,7 +215,7 @@ public class SimpleSpleefAdmin {
 			return;
 		}
 		// create new arena entry in config
-		ConfigHelper configHelper = new ConfigHelper(SimpleSpleef.getPlugin());
+		ConfigHelper configHelper = new ConfigHelper();
 		if (!configHelper.createNewArena(id, arena)) {
 			sender.sendMessage(ChatColor.DARK_RED + "Internal error: Could not create arena - see log file for details.");
 			return;
@@ -342,6 +346,43 @@ public class SimpleSpleefAdmin {
 		// reload the configuration of everything
 		SimpleSpleef.getGameHandler().reloadConfig();
 	}
+
+	/**
+	 * enable arena
+	 * @param sender
+	 * @param string
+	 * @return
+	 */
+	protected boolean enableArena(CommandSender sender, String arena) {
+		// does arena exist?
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return false;
+		}
+		// enable arena
+		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", true);
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.enable", "[ARENA]", arena));
+		return true;
+	}
+
+	/**
+	 * disable arena
+	 * @param sender
+	 * @param string
+	 * @return
+	 */
+	protected boolean disableArena(CommandSender sender, String arena) {
+		// does arena exist?
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return false;
+		}
+		// disable arena
+		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", true);
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.disable", "[ARENA]", arena));
+		return true;
+	}
+
 
 	/**
 	 * gets or defines currently selected arena

@@ -90,3 +90,5 @@ adminfeedback:
     delarena: 'Arena [ARENA] deleted!'
     defineArenaPoint: 'Set point [POINT] of [SECTION] in arena [ARENA].'
     defineSpawnPoint: 'Set spawn [SPAWN] in arena [ARENA].'
+    enable: '[ARENA] enabled.'
+    disable: '[ARENA] disabled.'

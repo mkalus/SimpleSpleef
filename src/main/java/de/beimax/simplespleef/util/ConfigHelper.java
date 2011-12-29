@@ -27,19 +27,6 @@ public class ConfigHelper {
 	public final static String[] languagesAvailable = {"en", "de"};
 	
 	/**
-	 * reference to plugin
-	 */
-	private SimpleSpleef plugin;
-
-	/**
-	 * Constructor
-	 * @param plugin
-	 */
-	public ConfigHelper(SimpleSpleef plugin) {
-		this.plugin = plugin;
-	}
-	
-	/**
 	 * Create a new arena configuration section.
 	 * This method does not check if the arena exists already (done in simple speef admin e.g.)!
 	 * Might want to change this in the future...
@@ -51,11 +38,11 @@ public class ConfigHelper {
 		// get sample config from ressource
 		try {
 			// input default file
-			InputStream is = this.plugin.getResource("config.yml");
+			InputStream is = SimpleSpleef.getPlugin().getResource("config.yml");
 			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(is);
 			
 			// create new configuration section in main config
-			ConfigurationSection newSection = this.plugin.getConfig().createSection("arenas." + id);
+			ConfigurationSection newSection = SimpleSpleef.getPlugin().getConfig().createSection("arenas." + id);
 
 			// get default arena
 			ConfigurationSection section = defConfig.getConfigurationSection("arenas.default");
@@ -75,7 +62,7 @@ public class ConfigHelper {
 			}
 
 			// save configuration now
-			this.plugin.saveConfig();
+			SimpleSpleef.getPlugin().saveConfig();
 		} catch (Exception e) {
 			e.printStackTrace();
 			SimpleSpleef.log.severe("[SimpleSpleef] Could not load sample arena due to exception: " + e.getMessage());
@@ -92,16 +79,16 @@ public class ConfigHelper {
 		// check, if "sample" config file has to be updated
 		try {
 			// output sample file
-			File file = new File(this.plugin.getDataFolder(), "sample_config.yml");
+			File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "sample_config.yml");
 			// input default file
-			InputStream is = this.plugin.getResource("config.yml");
+			InputStream is = SimpleSpleef.getPlugin().getResource("config.yml");
 			
 			boolean copyDefault;
 			if (file.exists()) { // file exists - check crc32 sums of files
 				if (crc32Sum(new FileInputStream(file)) == crc32Sum(is)) copyDefault =  false;
 				else {
 					copyDefault =  true;
-					is = this.plugin.getResource("config.yml"); // reopen stream
+					is = SimpleSpleef.getPlugin().getResource("config.yml"); // reopen stream
 				}
 			} else { // file does not exist and can be copied right away
 				copyDefault = true;
@@ -155,11 +142,11 @@ public class ConfigHelper {
 		// load language files one by one
 		for (String language : ConfigHelper.languagesAvailable) {
 			// load saved file from data folder
-			File languageFile = new File(this.plugin.getDataFolder(), "lang_" + language + ".yml");
+			File languageFile = new File(SimpleSpleef.getPlugin().getDataFolder(), "lang_" + language + ".yml");
 			FileConfiguration languageConfig = YamlConfiguration.loadConfiguration(languageFile);
 			
 			// get default config from resource
-			InputStream languageConfigStream = this.plugin.getResource("lang_" + language + ".yml");
+			InputStream languageConfigStream = SimpleSpleef.getPlugin().getResource("lang_" + language + ".yml");
 		    if (languageConfigStream != null) {
 		        YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(languageConfigStream);
 		        // update config
