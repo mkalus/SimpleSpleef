@@ -315,15 +315,19 @@ public class SimpleSpleef extends JavaPlugin {
 	 * set up economy - see http://dev.bukkit.org/server-mods/vault/
 	 * @return
 	 */
-	private Boolean setupEconomy() {
-		RegisteredServiceProvider<Economy> economyProvider = getServer()
-				.getServicesManager().getRegistration(
-						net.milkbowl.vault.economy.Economy.class);
-		if (economyProvider != null) {
-			economy = economyProvider.getProvider();
+	private boolean setupEconomy() {
+		if (this.getServer().getPluginManager().getPlugin("Vault") != null) {
+			RegisteredServiceProvider<Economy> economyProvider = getServer()
+					.getServicesManager().getRegistration(
+							net.milkbowl.vault.economy.Economy.class);
+			if (economyProvider != null) {
+				economy = economyProvider.getProvider();
+			}
+	
+			return (economy != null);
 		}
-
-		return (economy != null);
+		economy = null; // in the slim chance, that the plugin is reloaded during play
+		return false;
 	}
 	
 	/** 

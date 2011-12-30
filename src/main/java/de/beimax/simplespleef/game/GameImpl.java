@@ -173,14 +173,16 @@ public class GameImpl extends Game {
 		}
 		// already joined this game? => is caught by GameHandler, so we do not check this here...
 		// check funds of player...
-		double entryFee = configuration.getDouble("entryFee", 0.0);
-		if (entryFee > 0.0) {
-			EconomyResponse response = SimpleSpleef.economy.withdrawPlayer(player.getName(), entryFee);
-			if (response.type == EconomyResponse.ResponseType.SUCCESS) { // ok, tell the player about the amount charged
-				player.sendMessage(SimpleSpleef.getPlugin().ll("feedback.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
-			} else { //insufficient funds
-				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
-				return false;
+		if (SimpleSpleef.economy != null) {
+			double entryFee = configuration.getDouble("entryFee", 0.0);
+			if (entryFee > 0.0) {
+				EconomyResponse response = SimpleSpleef.economy.withdrawPlayer(player.getName(), entryFee);
+				if (response.type == EconomyResponse.ResponseType.SUCCESS) { // ok, tell the player about the amount charged
+					player.sendMessage(SimpleSpleef.getPlugin().ll("feedback.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
+				} else { //insufficient funds
+					player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
+					return false;
+				}
 			}
 		}
 		// check gamemode and change it if needed
@@ -671,17 +673,19 @@ public class GameImpl extends Game {
 		double prizeMoneyPerPlayer = configuration.getDouble("prizeMoneyPerPlayer", 5.0);
 		double win = prizeMoneyFixed + prizeMoneyPerPlayer * spleefers.size();
 		if (win == 0) return; // if no prize money is payed, return without telling anybody
-		String formated = SimpleSpleef.economy.format(win);
-		// give money to player
-		SimpleSpleef.economy.depositPlayer(player.getName(), win);
-		// player gets message
-		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feedback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
-		// broadcast prize?
-		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
-		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
-		} else {
-			sendMessage(broadcastMessage, player); // send message to all receivers
+		if (SimpleSpleef.economy != null) {
+			String formated = SimpleSpleef.economy.format(win);
+			// give money to player
+			SimpleSpleef.economy.depositPlayer(player.getName(), win);
+			// player gets message
+			player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feedback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
+			// broadcast prize?
+			String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
+				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			} else {
+				sendMessage(broadcastMessage, player); // send message to all receivers
+			}
 		}
 	}
 
