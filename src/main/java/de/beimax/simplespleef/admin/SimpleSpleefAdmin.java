@@ -364,6 +364,9 @@ public class SimpleSpleefAdmin {
 		mySection.createSection("a", LocationHelper.getXYZLocation(new Location(world, minP.getX(), minP.getY(), minP.getZ())));
 		mySection.createSection("b", LocationHelper.getXYZLocation(new Location(world, maxP.getX(), maxP.getY(), maxP.getZ())));
 
+		// save config to file
+		SimpleSpleef.getPlugin().saveConfig();
+
 		// feedback to player
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineArenaPointWorldEdit", "[ARENA]", arena, "[SECTION]", adminCommand));
 	}
