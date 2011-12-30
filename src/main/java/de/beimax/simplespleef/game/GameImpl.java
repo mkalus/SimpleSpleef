@@ -207,9 +207,50 @@ public class GameImpl extends Game {
 
 	@Override
 	public boolean leave(Player player) {
-		//TODO: check status
-		//TODO: player feedback
-		return spleefers.removeSpleefer(player);
+		// is the player a spectator?
+		if (spectators.contains(player)) {
+			return back(player); // redirect to back command instead
+		}
+		// check, if player is not a spleefer
+		if (!spleefers.hasSpleefer(player)) {
+			player.sendMessage(ChatColor.DARK_RED + "Internal error while leave occured! Please tell the SimpleSpleef creator!");
+			return false;
+		}
+		// check game status
+		if (isJoinable()) { //still joinable - not so bad!
+			// just remove spleefer
+			spleefers.removeSpleefer(player);
+		} else if (countdown != null) { // during countdown - end the game...
+			// set player to lost, so that the player is not teleported twice
+			spleefers.setLost(player);
+			endGame(); // actually end the game
+		} else { // game is in progress - player looses - simple as that
+			// player looses
+			playerLoses(player, false); // do not teleport leaving players...
+		}
+		// inform player
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.leave"));
+		// broadcast message of somebody loosing
+		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.leave", "[PLAYER]", player.getName(), "[ARENA]", getName());
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) {
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		} else {
+			// send message to all receivers
+			sendMessage(broadcastMessage, player);
+		}
+		// teleport him/her back to original position, if supported
+		if (configuration.getBoolean("enableBackCommand", true)) {
+			// get original position
+			Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
+			if (originalLocation == null) { // no position
+				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.backNoLocation"));
+				return false;
+			}
+			// teleport player to original position
+			player.teleport(originalLocation);
+			player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.back"));
+		}
+		return true;
 	}
 
 	@Override

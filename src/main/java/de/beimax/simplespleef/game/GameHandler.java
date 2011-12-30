@@ -384,7 +384,20 @@ public class GameHandler {
 	 * @param sender
 	 */
 	public void leave(CommandSender sender) {
-		// TODO Auto-generated method stub
+		Player player;
+		try {
+			player = (Player) sender; // cast to player
+		} catch (Exception e) { // handle possible cast error
+			sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
+			return;
+		}
+		// player part of an active game or he/she is a spectator?
+		Game game = checkPlayerInGame(player);
+		if (game == null) game = checkSpectatorInGame(player);
+		if (game != null) {
+			game.leave(player);
+		} else
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.leave"));
 	}
 
 	/**

@@ -62,7 +62,7 @@ arenas:
         addInventoryItems:
             - 1:BOW
             - 64:ARROW
-# Fees to join (money)
+# Fees to join (money) - Vault required
         entryFee: 5.0
 # Turn prizes of items on/off
         giveItemPrizes: true
@@ -95,9 +95,9 @@ arenas:
             - 1:EYE_OF_ENDER
             - 1:GRASS
             - 4:SMOOTH_BRICK:1
-# Winner gets this amount of price money for each player in game
+# Winner gets this amount of price money for each player in game - Vault required
         prizeMoneyPerPlayer: 5.0
-# Winner gets this amount of price money fixed (toal is per player + fixed)
+# Winner gets this amount of price money fixed (toal is per player + fixed) - Vault required
         prizeMoneyFixed: 0.0
 # Loose game by touching certain blocks?
         looseOnTouchBlocks: true
