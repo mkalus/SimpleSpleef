@@ -131,8 +131,7 @@ arenas:
         allowBlockPlacing: false
 # If instantDig is false, do dug blocks drop blocks that can be picked up by players?
         blockDropping: true
-# Can players actually dig/break blocks outside defined arena?
-# Not implemented yet
+# Can spleefers actually dig/break blocks outside defined arena? If set to true, blocks outside defined arena can be broken
         allowDiggingOutsideArena: false
 # Protect arena against changes by non-players
         protectArena: true

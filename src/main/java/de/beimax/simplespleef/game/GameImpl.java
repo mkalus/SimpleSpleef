@@ -89,6 +89,11 @@ public class GameImpl extends Game {
 	private boolean allowDigBlocks = true;
 	
 	/**
+	 * shortcut for setting
+	 */
+	private boolean allowDiggingOutsideArena;
+	
+	/**
 	 * blocks that can be dug or (if allowDigBlocks is false) cannot
 	 */
 	private HashSet<ItemStack> digBlocks;
@@ -155,6 +160,7 @@ public class GameImpl extends Game {
 				digBlocks.add(MaterialHelper.getItemStackFromString(line));
 			}
 		} else digBlocks = null; // delete previous settings
+		allowDiggingOutsideArena = conf.getBoolean("allowDiggingOutsideArena", false);
 		//TODO: more definitions/shortcuts
 	}
 
@@ -934,9 +940,10 @@ public class GameImpl extends Game {
 		Location blockLocation = block.getLocation();
 		// arena floor defined?
 		if (this.floor != null) return this.floor.contains(blockLocation); // only arena floor can be broken during game
-		// otherwise, at least check, if block to be broken is outside a defined arena
-		else if (this.arena != null) return this.arena.contains(blockLocation);
-
+		// otherwise, can blocks outside the defined arena be broken?
+		else if (!allowDiggingOutsideArena) return false; // no, they can't
+		// if allowDiggingOutsideArena is true, allow digging outside arena, but not within
+		else if (this.arena != null) return !this.arena.contains(blockLocation);
 		// on all other cases - allow block breaks, like in original simple spleef games
 		return true;		
 	}
