@@ -106,3 +106,6 @@ adminfeedback:
     defineSpawnPoint: 'Set spawn [SPAWN] in arena [ARENA].'
     enable: '[ARENA] enabled.'
     disable: '[ARENA] disabled.'
+material:
+    STATIONARY_WATER: water
+    STATIONARY_LAVA: lava

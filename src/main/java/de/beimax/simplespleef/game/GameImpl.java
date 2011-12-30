@@ -479,6 +479,9 @@ public class GameImpl extends Game {
 				String blockName;
 				if (lostByTouching) blockName = touchedBlock.name();
 				else blockName = onBlock.name();
+				// translate block name
+				String translatedBlockName = SimpleSpleef.getPlugin().ll("material." + blockName);
+				if (translatedBlockName != null) blockName = translatedBlockName;
 				// broadcast message of somebody loosing
 				String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MATERIAL]", blockName);
 				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
