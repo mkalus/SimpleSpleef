@@ -8,10 +8,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.Region;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
@@ -69,8 +76,12 @@ public class SimpleSpleefAdmin {
 			if (checkThreeArgs(sender, args, adminCommand))
 				delarenaCommand(sender, args[2]);
 		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose")) {
-			// check a/b
-			if (checkThirdAB(sender, args, adminCommand)) {
+			// check for WorldEdit selection
+			if (args.length == 2 && SimpleSpleef.getWorldEditAPI() != null) {
+				defineArenaPointWorldEdit(sender, adminCommand);
+				checkArena = true;
+			} // check a/b
+			else if (checkThirdAB(sender, args, adminCommand)) {
 				defineArenaPoint(sender, args[2], adminCommand);
 				checkArena = true;
 			}
@@ -234,18 +245,8 @@ public class SimpleSpleefAdmin {
 	protected void delarenaCommand(CommandSender sender, String arena) {
 		// arena name to lower case
 		String id = arena.toLowerCase();
-		// get all possible games
-		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames(); //TODO: write method to do this!
-		boolean found = false;
-		for (Entry<String, Boolean> checkArena: arenas.entrySet()) {
-			if (checkArena.getKey().equals(id)) {
-				found = true;
-				break;
-			}
-		}
-		// not found?
-		if (!found) {
-			// no arena found by that name => error
+		// does arena exist?
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(id)) {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", id));
 			return;
 		}
@@ -279,7 +280,11 @@ public class SimpleSpleefAdmin {
 		
 		// get player location and arena
 		String arena = getSelectedArena(sender);
-		//TODO: check arena existence
+		//check arena existence
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return;
+		}
 
 		// get arena section
 		ConfigurationSection arenaSection = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
@@ -299,6 +304,68 @@ public class SimpleSpleefAdmin {
 		
 		// feedback to player
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineArenaPoint", "[ARENA]", arena, "[POINT]", aOrB, "[SECTION]", adminCommand));
+	}
+
+	/**
+	 * define an arena arena depending on WorldEdit selection - API is not checked in this method!
+	 * @param sender
+	 * @param adminCommand
+	 */
+	protected void defineArenaPointWorldEdit(CommandSender sender,
+			String adminCommand) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			return;
+		}
+		// correct case
+		adminCommand = adminCommand.toLowerCase();
+
+		// get WorldEdit Session
+		LocalSession session = SimpleSpleef.getWorldEditAPI().getSession((Player) sender);
+
+		// get player location and arena
+		String arena = getSelectedArena(sender);
+		//check arena existence
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return;
+		}
+
+		// is a region defined?
+		Region region;
+		try {
+			region = session.getSelection(session.getSelectionWorld());
+		} catch (IncompleteRegionException e) { // error in selection
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.worldEditRegion"));
+			return;
+		}
+		// get minimum and maximum vectors
+		Vector minP = region.getMinimumPoint();
+		Vector maxP = region.getMaximumPoint();
+		// get world
+		World world = SimpleSpleef.getPlugin().getServer().getWorld(region.getWorld().getName());
+		// sanity check
+		if (world == null || minP == null || maxP == null) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.worldEditRegion"));
+			return;			
+		}
+
+		// get arena section
+		ConfigurationSection arenaSection = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
+		
+		// create section, if needed
+		if (!arenaSection.isConfigurationSection(adminCommand))
+			arenaSection.createSection(adminCommand);
+		// get this section
+		ConfigurationSection mySection = arenaSection.getConfigurationSection(adminCommand);
+		// enable section
+		mySection.set("enabled", true);
+		// create section with location stuff - selected blocks
+		mySection.createSection("a", LocationHelper.getXYZLocation(new Location(world, minP.getX(), minP.getY(), minP.getZ())));
+		mySection.createSection("b", LocationHelper.getXYZLocation(new Location(world, maxP.getX(), maxP.getY(), maxP.getZ())));
+
+		// feedback to player
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineArenaPointWorldEdit", "[ARENA]", arena, "[SECTION]", adminCommand));
 	}
 
 	/**
@@ -338,11 +405,9 @@ public class SimpleSpleefAdmin {
 	// TODO add new commands here
 
 	/**
-	 * check arena changed by sender
+	 * check arena changed by sender -> do updates
 	 */
 	protected void checkArena(CommandSender sender) {
-		// TODO Auto-generated method stub
-		
 		// reload the configuration of everything
 		SimpleSpleef.getGameHandler().reloadConfig();
 	}

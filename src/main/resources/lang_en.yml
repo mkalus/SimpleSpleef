@@ -84,11 +84,13 @@ adminerrors:
     aOrB: '[COMMAND] expects one parameter a or b.'
     addarenaArenaExists: 'Arena [ARENA] exists already.'
     oneArgumentSpawn: 'spawn expects one parameter named lounge, game, spectator, or loose.'
+    worldEditRegion: 'No WorldEdit region selected.'
 adminfeedback:
     setarena: 'Arena [ARENA] selected!'
     addarena: 'Arena [ARENA] created!'
     delarena: 'Arena [ARENA] deleted!'
     defineArenaPoint: 'Set point [POINT] of [SECTION] in arena [ARENA].'
+    defineArenaPointWorldEdit: 'Defined section [SECTION] in arena [ARENA] using WorldEdit.'
     defineSpawnPoint: 'Set spawn [SPAWN] in arena [ARENA].'
     enable: '[ARENA] enabled.'
     disable: '[ARENA] disabled.'

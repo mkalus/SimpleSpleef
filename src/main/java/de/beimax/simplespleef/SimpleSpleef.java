@@ -29,6 +29,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+
 import de.beimax.simplespleef.admin.SimpleSpleefAdmin;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
 import de.beimax.simplespleef.game.GameHandler;
@@ -43,7 +46,7 @@ import de.beimax.simplespleef.util.UpdateChecker;
  * @author mkalus
  */
 public class SimpleSpleef extends JavaPlugin {
-	public static Logger log = Logger.getLogger("Minecraft");
+	public static final Logger log = Logger.getLogger("Minecraft");
 	
 	public static Economy economy = null;
 	
@@ -70,6 +73,23 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public static GameHandler getGameHandler() {
 		return gameHandler;
+	}
+
+	/**
+	 * world edit API
+	 */
+	private static WorldEditAPI worldEditAPI = null;
+
+	/**
+	 * sets the world edit API for this plugin
+	 * @param worldEditAPI
+	 */
+	public static void setWorldEditAPI(WorldEditAPI worldEditAPI) {
+		SimpleSpleef.worldEditAPI = worldEditAPI;
+	}
+	
+	public static WorldEditAPI getWorldEditAPI() {
+		return SimpleSpleef.worldEditAPI;
 	}
 
 	/**
@@ -119,6 +139,9 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// add event listeners
 		registerEvents();
+		
+		// check for WorldEdit 
+		checkForWorldEdit();
 	}
 
 	/**
@@ -126,12 +149,22 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public void onDisable() {
 		log.info(this.toString() + " is shutting down.");
-		//TODO: clean memory
+		// clean memory
+		SimpleSpleef.worldEditAPI = null;
+		SimpleSpleef.gameHandler = null;
+		SimpleSpleef.economy = null;
+		this.admin = null;
+		this.lang = null;
+		this.playerListener = null;
+		this.entityListener = null;
+		this.blockListener = null;
+		this.commandExecutor = null;
+		//TODO add if more stuff comes along
 
 		//save config to disk
 		this.saveConfig();
 		
-		// derefer
+		// derefer self reference
 		SimpleSpleef.simpleSpleef = null;
 	}
 	
@@ -178,6 +211,9 @@ public class SimpleSpleef extends JavaPlugin {
 	 * Configure event listeners
 	 */
 	protected void registerEvents() {
+		// add listener for other plugins
+		PluginListener pluginListener = new PluginListener();
+		
 		// let my command handler take care of commands
 		this.commandExecutor = new SimpleSpleefCommandExecutor();
 		this.getCommand("spleef").setExecutor(commandExecutor);
@@ -189,6 +225,8 @@ public class SimpleSpleef extends JavaPlugin {
 		this.playerListener = new SimpleSpleefPlayerListener();
 		
 		// Register our events
+		pm.registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
+		
 		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.High, this);
 		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.High, this);
 		
@@ -269,5 +307,15 @@ public class SimpleSpleef extends JavaPlugin {
 		}
 
 		return (economy != null);
+	}
+	
+	/** 
+	 * make sure worldEdit is loaded - inspired by MultiversePortals
+	 */
+	private void checkForWorldEdit() {
+		 if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+			 SimpleSpleef.setWorldEditAPI(new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit")));
+				SimpleSpleef.log.info("[SimpleSpleef] Found WorldEdit. Using it for selections.");
+		 }
 	}
 }
