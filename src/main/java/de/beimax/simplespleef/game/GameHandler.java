@@ -54,6 +54,8 @@ public class GameHandler {
 		arenaCubes = new LinkedList<Cuboid>();
 		// get possible games
 		for (String game : getPossibleGames().keySet()) {
+			// game enabled?
+			if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + game + ".enabled", false)) continue;
 			Cuboid cuboid = configToCuboid(game, "arena");
 			if (cuboid != null)
 				arenaCubes.add(cuboid); // add to list

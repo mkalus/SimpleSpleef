@@ -378,7 +378,7 @@ public class SimpleSpleefAdmin {
 			return false;
 		}
 		// disable arena
-		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", true);
+		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", false);
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.disable", "[ARENA]", arena));
 		return true;
 	}
