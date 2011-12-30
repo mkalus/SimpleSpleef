@@ -195,19 +195,16 @@ public class SimpleSpleefAdmin {
 	protected void setarenaCommand(CommandSender sender, String arena) {
 		// arena name to lower case
 		String id = arena.toLowerCase();
-		// get all possible games
-		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();  //TODO: write method to do this!
-		for (Entry<String, Boolean> checkArena: arenas.entrySet()) {
-			if (checkArena.getKey().equals(id)) {
-				// set new default arena
-				setSelectedArena(sender, id);
-				// feedback
-				sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.setarena", "[ARENA]", id));
-				return;
-			}
+		// check arena existence
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(id)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return;
 		}
-		// no arena found by that name => error
-		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", id));
+
+		// set new default arena
+		setSelectedArena(sender, id);
+		// feedback
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.setarena", "[ARENA]", id));
 	}
 
 	/**
@@ -390,7 +387,11 @@ public class SimpleSpleefAdmin {
 		
 		// get player location and arena
 		String arena = getSelectedArena(sender);
-		//TODO: check arena existence
+		// check arena existence
+		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return;
+		}
 
 		// get arena section
 		ConfigurationSection arenaSection = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
