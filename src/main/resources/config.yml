@@ -32,6 +32,8 @@ settings:
     announcePrize: true
 # prevent players from teleporting into/out of the arena during the game
     preventTeleportingDuringGames: true
+# Keep original positions of players/spectators for this number of seconds (default is 1h)
+    keepOriginalLocationsSeconds: 3600
 # arena specific settings
 arenas:
 # default arena
@@ -137,6 +139,8 @@ arenas:
         protectArena: true
 # Restore arena after the game
         restoreArenaAfterGame: true
+# Players can teleport back to original position after game with /spl back?
+        enableBackCommand: true
 # Arena cube that will be protected (saved in memory for restoration)
         arena:
             enabled: false

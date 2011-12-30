@@ -187,7 +187,9 @@ public class GameImpl extends Game {
 			return false;
 		}
 		// inform/broadcast join is done by the game handler
-		// TODO: remember player's last position
+		// remember player's last position
+		if (configuration.getBoolean("enableBackCommand", true))
+			SimpleSpleef.getOriginalPositionKeeper().keepPosition(player);
 		// teleport player to lounge
 		teleportPlayer(player, "lounge");
 		return true;
@@ -303,6 +305,8 @@ public class GameImpl extends Game {
 	@Override
 	public boolean spectate() {
 		// TODO Auto-generated method stub
+		// save spectator's original position
+		//addOriginalLocation(spectator);
 		return false;
 	}
 
@@ -454,6 +458,8 @@ public class GameImpl extends Game {
 	public void onPlayerKick(PlayerKickEvent event) {
 		// remove shovel of player, if needed
 		removeShovelItem(event.getPlayer(), true);
+		// delete original position, because player is banned anyhow
+		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
 		// TODO Auto-generated method stub
 		
 	}
@@ -469,6 +475,8 @@ public class GameImpl extends Game {
 	public void onPlayerDeath(Player player) {
 		// remove shovel of player, if needed
 		removeShovelItem(player, true);
+		// delete original position, because player spawns somewhere else anyhow
+		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
 		// TODO Auto-generated method stub
 		
 	}
@@ -530,8 +538,8 @@ public class GameImpl extends Game {
 		// determine winners
 		LinkedList<Player> winners = new LinkedList<Player>();
 		for (Spleefer spleefer : spleefers.get()) {
+			Player player = spleefer.getPlayer();
 			if (!spleefer.hasLost()) { // not lost?
-				Player player = spleefer.getPlayer();
 				//this guy is a winner - send a message
 				player.sendMessage(ChatColor.DARK_GREEN + SimpleSpleef.getPlugin().ll("feedback.won"));
 				winners.add(player); // aggregate the winners to broadcast them later on
@@ -539,6 +547,9 @@ public class GameImpl extends Game {
 				payPrizeMoney(player);
 				payPrizeItems(player);
 			}
+			// update original positions
+			if (configuration.getBoolean("enableBackCommand", true))
+				SimpleSpleef.getOriginalPositionKeeper().updateOriginalLocationTimestamp(player);
 		}
 		//TODO: winning message! <= get the total winners from winners list
 		//announceWin

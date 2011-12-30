@@ -35,6 +35,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import de.beimax.simplespleef.admin.SimpleSpleefAdmin;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
 import de.beimax.simplespleef.game.GameHandler;
+import de.beimax.simplespleef.game.OriginalPositionKeeper;
 import de.beimax.simplespleef.listeners.*;
 import de.beimax.simplespleef.util.ConfigHelper;
 import de.beimax.simplespleef.util.Translator;
@@ -88,8 +89,23 @@ public class SimpleSpleef extends JavaPlugin {
 		SimpleSpleef.worldEditAPI = worldEditAPI;
 	}
 	
+	/**
+	 * return WorldEditAPI
+	 * @return
+	 */
 	public static WorldEditAPI getWorldEditAPI() {
 		return SimpleSpleef.worldEditAPI;
+	}
+	
+	private static OriginalPositionKeeper originalPositionKeeper;
+	
+	/**
+	 * get originalPositionKeeper instance (singleton)
+	 * @return
+	 */
+	public static OriginalPositionKeeper getOriginalPositionKeeper() {
+		if (originalPositionKeeper == null) originalPositionKeeper = new OriginalPositionKeeper();
+		return originalPositionKeeper;
 	}
 
 	/**
@@ -153,6 +169,7 @@ public class SimpleSpleef extends JavaPlugin {
 		SimpleSpleef.worldEditAPI = null;
 		SimpleSpleef.gameHandler = null;
 		SimpleSpleef.economy = null;
+		SimpleSpleef.originalPositionKeeper = null;
 		this.admin = null;
 		this.lang = null;
 		this.playerListener = null;
