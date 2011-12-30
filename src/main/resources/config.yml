@@ -106,7 +106,6 @@ arenas:
             - STATIONARY_WATER
             - STATIONARY_LAVA
 # Players dying loose
-# Not implemented yet
         looseOnDeath: true
 # Players logging out loose
 # Not implemented yet

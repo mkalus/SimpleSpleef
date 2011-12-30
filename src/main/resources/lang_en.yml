@@ -54,6 +54,7 @@ broadcasts:
     join: '[PLAYER] has joined a game in arena [ARENA].'
     lostByTouching: '[PLAYER] has touched [MATERIAL] and fell out of game [ARENA].'
     lostByCuboid: '[PLAYER] fell out of game [ARENA].'
+    lostByDeath: '[PLAYER] died horribly in arena [ARENA] and lost...'
     prizeMoney: '[PLAYER] has received [MONEY] as prize money in arena [ARENA].'
     prizeItems: '[PLAYER] has received [AMOUNT] [ITEM] as prize in arena [ARENA].'
 feedback:

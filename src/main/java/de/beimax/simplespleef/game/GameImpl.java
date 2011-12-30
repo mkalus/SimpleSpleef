@@ -417,7 +417,10 @@ public class GameImpl extends Game {
 			for (Spleefer spleefer : spleefers.get()) {
 				spleefer.getPlayer().sendMessage(message);
 			}
-			// TODO: spectators
+			// spectators
+			for (Player player : this.spectators) {
+				player.sendMessage(message);
+			}
 			// send to console, too
 			SimpleSpleef.log.info(message);
 		}
@@ -451,7 +454,8 @@ public class GameImpl extends Game {
 		}
 		// spectators
 		for (Player player : this.spectators) {
-			player.sendMessage(message);
+			if (exception != player)
+				player.sendMessage(message);
 		}
 		// send to console, too
 		SimpleSpleef.log.info(message);
@@ -484,7 +488,7 @@ public class GameImpl extends Game {
 					sendMessage(broadcastMessage, player);
 				}
 				// Ha, lost!
-				playerLoses(player);
+				playerLoses(player, true);
 				return;
 			}
 		}
@@ -499,7 +503,7 @@ public class GameImpl extends Game {
 				sendMessage(broadcastMessage, player);
 			}
 			// Ha, lost!
-			playerLoses(player);
+			playerLoses(player, true);
 			return;			
 		}
 	}
@@ -558,12 +562,20 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onPlayerDeath(Player player) {
-		// remove shovel of player, if needed
-		removeShovelItem(player, true);
 		// delete original position, because player spawns somewhere else anyhow
 		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
-		// TODO Auto-generated method stub
-		
+		if (configuration.getBoolean("looseOnDeath", true)) {
+			// broadcast message of somebody loosing
+			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByDeath", "[PLAYER]", player.getName(), "[ARENA]", getName());
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			} else {
+				// send message to all receivers
+				sendMessage(broadcastMessage, player);
+			}
+			// player looses, if set to true
+			playerLoses(player, false); // do not teleport dead players...
+		} // else - do nothing...
 	}
 
 	@Override
@@ -600,8 +612,9 @@ public class GameImpl extends Game {
 	 * called when player loses a game
 	 * (broadcast message has to be sent by calling method)
 	 * @param player
+	 * @param teleport true, if player should be teleported to loose spawn, if possible
 	 */
-	protected void playerLoses(Player player) {
+	protected void playerLoses(Player player, boolean teleport) {
 		// set player to lost
 		spleefers.setLost(player);
 		// message to player
@@ -610,7 +623,7 @@ public class GameImpl extends Game {
 		// shovel lost, too
 		removeShovelItem(player, true);
 		// teleport player to loose spawn
-		teleportPlayer(player, "loose");
+		if (teleport) teleportPlayer(player, "loose");
 		// determine if game is over...
 		if (spleefers.inGame() <= configuration.getInt("remainingPlayersWin", 1))
 			gameOver();
