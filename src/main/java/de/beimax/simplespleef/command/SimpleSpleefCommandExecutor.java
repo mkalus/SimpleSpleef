@@ -25,7 +25,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * list of all commands
 	 */
-	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "admin" };
+	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin" };
 	/**
 	 * commands possible from the console
 	 */
@@ -305,7 +305,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		if (tooManyArguments(sender, args, 1)) return;
 		// get game from 2nd argument
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
-		if (arena != null) { // no errors - then try to announce new game
+		if (arena != null) { // no errors - then try watch a game
 			SimpleSpleef.getGameHandler().watch(sender, arena);
 		}
 	}
@@ -318,6 +318,17 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	protected void adminCommand(CommandSender sender, String[] args) {
 		// delegate all further stuff to admin class
 		SimpleSpleef.getPlugin().getAdminClass().executeCommand(sender, args);
+	}
+	
+	/**
+	 * Back command
+	 * @param sender
+	 * @param args
+	 */
+	protected void backCommand(CommandSender sender, String[] args) {
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		SimpleSpleef.getGameHandler().back(sender);		
 	}
 	
 	//TODO: add further commands here...

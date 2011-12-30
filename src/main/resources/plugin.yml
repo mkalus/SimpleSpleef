@@ -51,6 +51,9 @@ permissions:
   simplespleef.watch:
     description: Watch a game
     default: true
+  simplespleef.back:
+    description: Teleport back from arena
+    default: true
   simplespleef.admin:
     description: Admin commands
     default: op

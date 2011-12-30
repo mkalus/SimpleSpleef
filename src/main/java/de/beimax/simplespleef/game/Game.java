@@ -118,16 +118,30 @@ public abstract class Game {
 	public abstract boolean delete(CommandSender sender);
 
 	/**
-	 * Spectate game
-	 * @return boolean successful?
+	 * Watch command issued
+	 * @param player
+	 * @return
 	 */
-	public abstract boolean spectate();
+	public abstract boolean watch(Player player);
+	
+	/**
+	 * Back command issued
+	 * @param player
+	 * @return
+	 */
+	public abstract boolean back(Player player);
 
 	/**
-	 * Check if player is in arena X
+	 * Check if player is in arena
 	 * @return boolean
 	 */
 	public abstract boolean hasPlayer(Player player);
+
+	/**
+	 * Check if player is spectator in arena
+	 * @return boolean
+	 */
+	public abstract boolean hasSpectator(Player player);
 	
 	/**
 	 * Called when a spleefer moves in this game

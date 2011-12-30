@@ -425,8 +425,7 @@ public class GameHandler {
 			}
 		} else { // otherwise try to get arena by name
 			game = getGameByName(arena);
-			if (game == null) {
-				// print error, arena was not found
+			if (game == null) { // print error, arena was not found
 				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
 				return;
 			}
@@ -440,7 +439,58 @@ public class GameHandler {
 	 * @param arena (may not be null)
 	 */
 	public void watch(CommandSender sender, String arena) {
-		// TODO Auto-generated method stub
+		Player player;
+		try {
+			player = (Player) sender; // cast to player
+		} catch (Exception e) { // handle possible cast error
+			sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
+			return;
+		}
+		// player part of an active game?
+		Game game = checkPlayerInGame(player);
+		if (game != null) { // part of a game - may not spectate
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchDouble", "[ARENA]", game.getName()));
+			return;
+		}
+		if (!gameTypeOrNameExists(arena)) { // print error, arena was not found
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+			return;
+		}
+		Game activeGame = getGameByName(arena);
+		if (activeGame == null) { // game is not active
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchNoGame", "[ARENA]", arena));
+			return;
+		}
+		// ok, player not in active game, game exists, let's watch!
+		activeGame.watch(player); // attempt to watch game
+	}
+
+	/**
+	 * Attempt to teleport back to original position
+	 * @param sender
+	 */
+	public void back(CommandSender sender) {
+		Player player;
+		try {
+			player = (Player) sender; // cast to player
+		} catch (Exception e) { // handle possible cast error
+			sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
+			return;
+		}
+		// check, if player is spleefer or spectator
+		Game game = checkPlayerInGame(player);
+		if (game == null) game = checkSpectatorInGame(player);
+		if (game != null) {
+			game.back(player);
+		} else { // otherwise look up player in OriginalPositionKeeper and teleport him/her back
+			Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
+			if (originalLocation != null) {
+				player.teleport(originalLocation);
+				player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.back"));
+			} else {
+				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.backNoLocation"));
+			}
+		}
 	}
 
 	/**
@@ -451,6 +501,18 @@ public class GameHandler {
 	public Game checkPlayerInGame(Player player) {
 		for (Game checkGame :  getGames()) {
 			if (checkGame.hasPlayer(player)) return checkGame;
+		}
+		return null;
+	}
+	
+	/**
+	 * checks whether the player is watching a game or not
+	 * @param player
+	 * @return Game the player is part of or null, if not
+	 */
+	public Game checkSpectatorInGame(Player player) {
+		for (Game checkGame :  getGames()) {
+			if (checkGame.hasSpectator(player)) return checkGame;
 		}
 		return null;
 	}

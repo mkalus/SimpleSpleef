@@ -44,6 +44,11 @@ public class GameImpl extends Game {
 	protected SpleeferList spleefers;
 	
 	/**
+	 * Reference to spectators
+	 */
+	protected LinkedList<Player> spectators;
+	
+	/**
 	 * Reference to configuration
 	 */
 	protected ConfigurationSection configuration;
@@ -96,6 +101,7 @@ public class GameImpl extends Game {
 	public GameImpl(String name) {
 		super(name);
 		this.spleefers = new SpleeferList();
+		this.spectators = new LinkedList<Player>();
 		this.countdown = null;
 		this.teleportOkList = new HashSet<Player>();
 	}
@@ -186,6 +192,8 @@ public class GameImpl extends Game {
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
 			return false;
 		}
+		// remove from spectators, if needed
+		unwatch(player);
 		// inform/broadcast join is done by the game handler
 		// remember player's last position
 		if (configuration.getBoolean("enableBackCommand", true))
@@ -277,8 +285,8 @@ public class GameImpl extends Game {
 	 * @return
 	 */
 	protected boolean endGame() {
-		//TODO => check what the current status is and end game then
-		//isInProgress() 
+		//check what the current status is and end game then
+		boolean wasInProgress = isInProgress(); 
 		//isJoinable()
 		// + other cases?
 		// still in countdown? if yes, kill it!
@@ -286,33 +294,107 @@ public class GameImpl extends Game {
 			countdown.interrupted = true;
 		// change game status
 		status = STATUS_FINISHED;
-		// possibly take away shovel items
-		removeShovelItems();
-		// possibly restore inventories
-		restoreAllInventories();
-		// teleport remaining players to lounge
-		for (Spleefer spleefer : spleefers.get()) {
-			if (!spleefer.hasLost())
-				teleportPlayer(spleefer.getPlayer(), "lounge");
+		// only do this when game was in progress
+		if (wasInProgress) {
+			// possibly take away shovel items
+			removeShovelItems();
+			// possibly restore inventories
+			restoreAllInventories();
+			// teleport remaining players to lounge
+			for (Spleefer spleefer : spleefers.get()) {
+				if (!spleefer.hasLost())
+					teleportPlayer(spleefer.getPlayer(), "lounge");
+			}
+			// restore arena
+			restoreArena();
 		}
-		// restore arena
-		restoreArena();
 		// change game status
 		status = STATUS_NEW;
 		return true;
 	}
 
 	@Override
-	public boolean spectate() {
-		// TODO Auto-generated method stub
+	public boolean watch(Player player) {
+		// check, if player is spleefer
+		if (spleefers.hasSpleefer(player)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchSpleefer", "[ARENA]", getName()));
+			return false;
+		}
+		// check, if player is in spectator list already
+		if (spectators.contains(player)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchAlready", "[ARENA]", getName()));
+			return false;
+		}
+		// check, if we have a spectator spawn defined
+		if (!configuration.isConfigurationSection("spectatorSpawn") || !configuration.getBoolean("spectatorSpawn.enabled", false)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchNoSpawnDefined", "[ARENA]", getName()));
+			return false;
+		}
 		// save spectator's original position
-		//addOriginalLocation(spectator);
-		return false;
+		if (configuration.getBoolean("enableBackCommand", true))
+			SimpleSpleef.getOriginalPositionKeeper().keepPosition(player);
+		// teleport spectator
+		Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection("spectatorSpawn"));
+		player.teleport(teleportTo);
+		// add to spectator list
+		spectators.add(player);
+		// send message to player
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.watch", "[ARENA]", getName()));
+		return true;
+	}
+	
+	@Override
+	public boolean back(Player player) {
+		// not allowed
+		if (!configuration.getBoolean("enableBackCommand", true)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.commandNotAllowed", "[ARENA]", getName()));
+			return false;
+		}
+		// check, if player is spleefer
+		if (spleefers.hasSpleefer(player)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.backSpleefer", "[ARENA]", getName()));
+			return false;
+		}
+		// check, if player is not a spectator
+		if (!spectators.contains(player)) {
+			player.sendMessage(ChatColor.DARK_RED + "Internal error while back occured! Please tell the SimpleSpleef creator!");
+			return false;
+		}
+		// get original position
+		Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
+		if (originalLocation == null) { // no position
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.backNoLocation"));
+			return false;
+		}
+		// remove player from watch list
+		unwatch(player);
+		// teleport player to original position
+		player.teleport(originalLocation);
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.back"));
+		return true;
+	}
+	
+	/**
+	 * Helper method to remove player from spectator list
+	 * @param player
+	 * @return
+	 */
+	protected boolean unwatch(Player player) {
+		// check if player is in specator list
+		if (!spectators.contains(player)) return false;
+		// remove from spectator list
+		spectators.remove(player);
+		return true;
 	}
 
 	@Override
 	public boolean hasPlayer(Player player) {
 		return spleefers.hasSpleefer(player);
+	}
+	
+	@Override
+	public boolean hasSpectator(Player player) {
+		return spectators.contains(player);
 	}
 
 	/**
@@ -367,7 +449,10 @@ public class GameImpl extends Game {
 			if (exception != spleefer.getPlayer())
 				spleefer.getPlayer().sendMessage(message);
 		}
-		// TODO: spectators
+		// spectators
+		for (Player player : this.spectators) {
+			player.sendMessage(message);
+		}
 		// send to console, too
 		SimpleSpleef.log.info(message);
 	}
@@ -574,7 +659,7 @@ public class GameImpl extends Game {
 		// give money to player
 		SimpleSpleef.economy.depositPlayer(player.getName(), win);
 		// player gets message
-		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feeback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
+		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feedback.prizeMoney", "[ARENA]", getName(), "[MONEY]", formated));
 		// broadcast prize?
 		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
@@ -603,7 +688,7 @@ public class GameImpl extends Game {
 		// give prizes to player
 		player.getInventory().addItem(itemStack);
 		// player gets message
-		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feeback.prizeItems", "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount())));
+		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("feedback.prizeItems", "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount())));
 		// broadcast prize?
 		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeItems", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount()));
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
@@ -855,6 +940,7 @@ public class GameImpl extends Game {
 		// dereference stuff
 		this.configuration = null;
 		this.spleefers = null;
+		this.spectators = null;
 		this.looseOnTouchMaterial = null;
 		this.countdown = null;
 		this.teleportOkList = null;
