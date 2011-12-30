@@ -246,6 +246,16 @@ public class GameHandler {
 		}
 		return map;
 	}
+	
+	/**
+	 * check, if arena has been disabled
+	 * @param arena
+	 * @return
+	 */
+	public boolean isArenaDisabled(String arena) {
+		arena = arena.toLowerCase();
+		return !SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false);
+	}
 
 	/**
 	 * get the default arena name
@@ -266,6 +276,11 @@ public class GameHandler {
 		// does the game exist already?
 		if (game != null) {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaExistsAlready", "[ARENA]", game.getName()));
+			return null;
+		}
+		// check if game is disabled
+		if (isArenaDisabled(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
 			return null;
 		}
 		game = createNewGame(arena);
@@ -289,7 +304,7 @@ public class GameHandler {
 		// does the game not exist?
 		if (game == null) {
 			// check if game is disabled
-			if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
+			if (isArenaDisabled(arena)) {
 				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
 				return;
 			}
@@ -352,7 +367,7 @@ public class GameHandler {
 		// does the game not exist?
 		if (game == null) {
 			// check if game is disabled
-			if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false)) {
+			if (isArenaDisabled(arena)) {
 				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
 				return;
 			}
