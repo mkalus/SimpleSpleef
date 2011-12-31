@@ -1,0 +1,130 @@
+# Sprachdatei Deutsch (Language file German)
+command:
+    help: 'help|Zeige Hilfe'
+    announce: 'announce [arena]|Neues Spiel ankündigen (in Arena)'
+    join: 'join [arena]|Mitspielen (in Arena)'
+    arenas: 'arenas|Arenen auflisten'
+    info: 'info [arena]|Zeige Infos (zur Arena)'
+    list: 'list [arena]|Liste Spleefers (in arena)'
+    start: 'start|Starte Spiel (für Spleefer)'
+    countdown: 'countdown [arena]|Starte Countdown (in Arena)'
+    leave: 'leave|Verlasse das Spiel'
+    stop: 'stop|Beende ein Spiel'
+    delete: 'delete|Lösche ein Spiel'
+    reset: 'reset arena|Lösche ein Spiel in einer Arena (für Admins/Moderatoren)'
+    watch: 'watch [arena]|Schaue bei einem Spiel (in Arena) zu'
+    back: 'back|Zur ursprünglichen Position zurückteleportieren'
+    admin: 'admin [kommando]|Führt ein Admin-Kommando aus'
+errors:
+    noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
+    unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
+    unknownArena: 'Unbekannte Arena "[ARENA]"'
+    noDig: 'Du darfst hier nicht graben!'
+    noPlacement: 'Du darfst hier keine Blöcke setzen!'
+    notAPlayer: '[PLAYER] ist kein Spieler!'
+    arenaDisabled: '"[ARENA]" ist nicht aktiviert.'
+    tooFewArguments: 'Zu wenige Parameter für diesen Befehl. Minimum ist [MIN].'
+    tooManyArguments: 'Zu viele Parameter für diesen Befehl. Maximum ist [MAX].'
+    commandNotAllowed: 'Dieser Befehl ist in der Arena [ARENA] nicht erlaubt.'
+    arenaExistsAlready: 'Arena [ARENA] existiert bereits.'
+    announceBeforeJoin: 'Jemand muss in der Arena [ARENA] ein Spiel ankündigen, bevor du dort spielen darfst.'
+    noGameAnnounced: 'Es wurde kein Spiel in Arena [ARENA] angekündigt. Du musst zuerst ein Spiel ankündigen!'
+    join: 'Es läuft bereits ein Spiel in Arena [ARENA].'
+    joinMax: 'Arena ist voll! Nur [NUMBER] Spleefer können in der Arena [ARENA] mitspielen.'
+    joinDouble: 'Du spielst bereits in der Arena [ARENA]. Du musst erst dieses Spiel verlassen, um an einem neuen Spiel teilnehmen zu können.'
+    joinFee: 'Du hast nicht die nötigen [AMOUNT], um am Spiel teilzunehmen.'
+    start: 'Du musst an einem Spleef teilnehmen, bevor du ein Spiel starten kannst!'
+    startNoSpleefer: 'In dieser Arena darf kein Spieler mit /spl start ein Spiel starten - versuche es mit /spl countdown [ARENA].'
+    startMin: 'Du brauchst mindestens [NUMBER] Spieler, um ein Spiel in Arena [ARENA] starten zu können.'
+    startDouble: 'Das Spiel läuft bereits in der Arena [ARENA].'
+    stop: 'Kein aktives Spiel in Arena [ARENA].'
+    stopNoPlaying: 'Du spielst kein Spleef. Kein Spiel gestoppt!'
+    deleteNoPlaying: 'Du spielst kein Spleef. Kein Spiel gelöscht!'
+    watchDouble: 'Du spielst bereits in der Arena [ARENA]. Du musst erst dieses Spiel verlassen, um ein neues Spiel anzuschauen.'
+    watchNoGame: 'There is no active game in arena [ARENA].'
+    watchAlready: 'Du schaust dir bereits das Spiel in Arena [ARENA] an.'
+    watchNoSpawnDefined: 'Der Zuschauer-Spawn ist für Arena [ARENA] nicht definiert.'
+    watchSpleefer: 'Du bist Spleefer in der Arena [ARENA]. Du kannst nicht gleichzeitig Zuschauer sein!'
+    backNoLocation: 'Keinen ursprünglichen Ort gefunden.'
+    backSpleefer: 'Du bist Spleefer in der Arena [ARENA]. Du musst dein Spiel erst beenden, um zurück zu teleportieren.'
+    leave: 'Du spielst kein Spiel mit!'
+    teleport: 'Teleportation ist während des Spiels in Arena [ARENA] nicht erlaubt.'
+    gamemodeChange: 'Du kannst wärend des Spleefens deinen game mode nicht ändern!'
+broadcasts:
+    announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
+    join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
+    leave: '[PLAYER] verlässt das Spiel. So ein Feigling!'
+    lostByTouching: '[PLAYER] hat [MATERIAL] berührt und ist damit aus dem Spiel in [ARENA].'
+    lostByCuboid: '[PLAYER] ist aus dem Spiel in [ARENA].'
+    lostByDeath: '[PLAYER] starb grausam in der Arena [ARENA] und ist damit aus dem Spiel...'
+    lostByQuitting: '[PLAYER] verlässt das Spiel. So ein Feigling!'
+    prizeMoney: '[PLAYER] hat [MONEY] als Preisgeld in Arena [ARENA] erhalten.'
+    prizeItems: '[PLAYER] hat [AMOUNT] [ITEM] in Arena [ARENA] gewonnen.'
+    winNone: 'Komischerweise gab es keinen Gewinner in der Arena [ARENA].'
+    winOne: '[PLAYER] hat das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
+    winMulti: '[PLAYER] haben das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
+    winMultiAnd: ' und '
+feedback:
+    arenaDisabled: abgeschaltet
+    arenaOff: 'kein Spiel'
+    arenaJoinable: offen
+    arenaInProgress: 'Spiel aktiv'
+    announce: 'Du hast ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Du kannst nun Leute zum Spielen einladen!'
+    join: 'Du nimmst am Spleef in der Arena [ARENA] teil.'
+    leave: 'Du verlässt das Spiel.'
+    joinFee: '[AMOUNT] für die Teilnahme am Spiel gezahlt.'
+    gamemodeChanged: 'Dein game mode wurde geändert.'
+    countdownStart: 'Starte Spleef-Spiel. Es kann nur einen geben!'
+    countdown: '[ARENA]: [COUNT]'
+    countdownGo: 'LOOOOOS!'
+    countdownInterrupted: 'Countdown abgebrochen.'
+    stop: '[PLAYER] stoppte das Spleef in der Arena [ARENA].'
+    delete: 'Das Spiel in der  Arena [ARENA] wurde durch [PLAYER] gestoppt und gelöscht.'
+    watch: 'Schaue Spiel in Arena [ARENA].'
+    back: 'Zoooooom...'
+    won: 'Du hast ein Spleef gewonnen - herzlichen Glückwunsch!'
+    lost: 'Du hast beim Spleef verloren!'
+    prizeMoney: '[MONEY] las Preisgeld erhalten.'
+    prizeItems: 'Du hast [AMOUNT] [ITEM] gewonnen.'
+    update: 'SimpleSpleef [OLDVERSION] bitte auf Version [NEWVERSION] updaten.'
+    infoHeader: 'Arena: [ARENA]'
+    infoName: 'Name: [NAME]'
+    infoStatus: 'Status: [STATUS]'
+    infoSpleefers: 'Spieler: [SPLEEFERS]'
+    infoSpectators: 'Zuschauer: [SPECTATORS]'
+    infoComma: ', '
+    infoAnd: ' und '
+admin:
+    help: |
+      Adminkommandos (/spl admin...)
+      help|Zeige Admin-Hilfe.
+      selected|Zeige aktuelle Arena + Liste.
+      setarena arena|Setze aktuelle Arena.
+      addarena arena|Erstelle neue Arena.
+      delarena arena|Lösche Arena.
+      arena a/b|Definiere Punkt a/b der Arena.
+      floor a/b|Definiere Punkt a/b des Bodens.
+      loose a/b|Definiere Punkt a/b des Loose-Kubus.
+      spawn lounge/game/spectator/loose|Setze Spawnpunkt.
+      disable/enable arena|(De)aktiviere Arena.
+      reload|Neuladen der config.yml.
+adminerrors:
+    oneArgument: '[COMMAND] erwartet genau einen Parameter - Name/Id einer Arena'
+    twoArguments: '[COMMAND] erwartet genau zwei Parameter - Name + neuer Wert'
+    aOrB: '[COMMAND] erwartet genau einen Parameter a oder b.'
+    addarenaArenaExists: 'Arena [ARENA] existiert bereits.'
+    oneArgumentSpawn: 'spawn erwartet genau einen Parameter lounge, game, spectator oder loose.'
+    worldEditRegion: 'Keine WorldEdit-Region ausgewählt.'
+adminfeedback:
+    setarena: 'Arena [ARENA] ausgewählt!'
+    addarena: 'Arena [ARENA] erstellt!'
+    delarena: 'Arena [ARENA] gelöscht!'
+    defineArenaPoint: 'Punkt [POINT] von [SECTION] in der Arena [ARENA] gesetzt.'
+    defineArenaPointWorldEdit: 'Region [SECTION] in der Arena [ARENA] mit Hilfe von WorldEdit gesetzt.'
+    defineSpawnPoint: 'Spawn [SPAWN] in der Arena [ARENA] gesetzt.'
+    enable: '[ARENA] aktiviert.'
+    disable: '[ARENA] deaktiviert.'
+    reload: 'Konfiguration neu geladen.'
+material:
+    STATIONARY_WATER: Wasser
+    STATIONARY_LAVA: Lava

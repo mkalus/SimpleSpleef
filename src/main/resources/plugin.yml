@@ -1,91 +1,59 @@
 name: SimpleSpleef
 main: de.beimax.simplespleef.SimpleSpleef
-version: 1.8.3
+version: 2.0.0-beta1
 author: maxkalus
 description: >
              Simple Spleef Plugin
+softdepend: ['Vault','WorldEdit']
 commands:
   spleef:
     description: Control your spleef games
-    aliases: [spl]
-    usage: |
-      /<command> join Join a dog-eats-dog game.
-      /<command> 1 o. blue Join team blue
-      /<command> 2 o. red Join team red
-      /<command> start Start game
-      /<command> stop Stop game
-      /<command> delete Delete current game
-      /<command> leave Leave game
-      /<command> list Show game information
-      /<command> prize money 1000 The next winner receives 1000 money (admin command).
-      /<command> prize 322 The next winner receives a golden apple (item id) (admin command).
-      /<command> reload Reload configuration
-      /<command> startsingle Op command to test game start with only one person
-      /<command> spectate Spectate the game
-      /<command> back Teleport back (player of spectator)
+    aliases: [spl,spla]
+    usage: /<command> is the SimpleSpleef command - you have no permission to use it at all!
 
 permissions:
-  simplespleef.*:
-    description: Access to all spleef commands
-    children:
-      simplespleef.list: true
-      simplespleef.play: true
-      simplespleef.team: true
-      simplespleef.initialize: true
-      simplespleef.initializeteam: true
-      simplespleef.leave: true
-      simplespleef.start: true
-      simplespleef.stop: true
-      simplespleef.delete: true
-      simplespleef.reload: true
-      simplespleef.prize: true
-      simplespleef.spectate: true
-      simplespleef.startsingle: true
-  simplespleef.list:
-    description: List command
-    default: true
-  simplespleef.play:
-    description: Join dog-eats-dog command.
+  simplespleef.help:
+    description: Display help
     default: true
   simplespleef.announce:
-    description: Announce a new dog-eats-dog game people can join.
-    default: op
-  simplespleef.team:
-    description: Join team commands.
+    description: Announce a new game (in arena)
     default: true
-  simplespleef.initialize:
-    description: Join dog-eats-dog command (initialize game).
+  simplespleef.join:
+    description: Join a game (in arena)
     default: true
-  simplespleef.initializeteam:
-    description: Join team commands (initialize game).
+  simplespleef.arenas:
+    description: List available arenas
     default: true
-  simplespleef.leave:
-    description: Leave command.
+  simplespleef.info:
+    description: Show information (on arena)
+    default: true
+  simplespleef.list:
+    description: List spleefers (in arena)
     default: true
   simplespleef.start:
-    description: Start game.
+    description: Start game (spleefers only)
+    default: true
+  simplespleef.countdown:
+    description: Start count down (of arena)
+    default: true
+  simplespleef.leave:
+    description: Leave a game
     default: true
   simplespleef.stop:
-    description: Stop game.
+    description: Stop a game
     default: true
   simplespleef.delete:
-    description: Delete game.
+    description: Delete a game
     default: true
-  simplespleef.reload:
-    description: Reload configuration file.
+  simplespleef.reset:
+    description: Reset a game (admin/moderator delete game)
     default: op
-  simplespleef.prize:
-    description: Use the prize command to set a prize for the next winner (money or item id).
-    default: op
-  simplespleef.startsingle:
-    description: Start the game, even if there is only one person. Good for Ops to test arenas.
-    default: op
-  simplespleef.spectate:
-    description: Spectate a game (teleport to spectation area)
+  simplespleef.watch:
+    description: Watch a game
     default: true
   simplespleef.back:
-    description: Teleport back to original position (player or spectator)
+    description: Teleport back from arena
     default: true
   simplespleef.admin:
-    description: Administrative commands.
-    default: op 
+    description: Admin commands
+    default: op

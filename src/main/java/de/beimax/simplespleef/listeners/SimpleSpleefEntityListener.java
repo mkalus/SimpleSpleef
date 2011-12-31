@@ -1,11 +1,14 @@
 /**
  * 
  */
-package de.beimax.simplespleef;
+package de.beimax.simplespleef.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
+
+import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.Game;
 
 /**
  * Handle events for all Entity related events
@@ -13,30 +16,17 @@ import org.bukkit.event.entity.EntityListener;
  * @author mkalus
  */
 public class SimpleSpleefEntityListener extends EntityListener {
-	//private final SimpleSpleef plugin;
-	private final SimpleSpleefGame game;
-
-	/**
-	 * Constructor
-	 * @param instance
-	 * @param game
-	 */
-	public SimpleSpleefEntityListener(SimpleSpleef instance,
-			SimpleSpleefGame game) {
-		//plugin = instance;
-		this.game = game;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.bukkit.event.entity.EntityListener#onEntityDeath(org.bukkit.event.entity.EntityDeathEvent)
 	 */
 	@Override
 	public void onEntityDeath(EntityDeathEvent event) {
-		// check if the entity is a player
-		if (event.getEntity() instanceof Player) {
+		// check if games are running and the entity is indeed a player
+		if (SimpleSpleef.getGameHandler().hasGames() && event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();
-			// possibly remove player on death
-			game.removePlayerOnQuitorDeath(player, true);
+			// player part of a game?
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(player);
+			if (game != null) game.onPlayerDeath(player);
 		}
 	}
 }
