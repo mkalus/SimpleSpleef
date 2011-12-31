@@ -66,6 +66,7 @@ broadcasts:
     winMultiAnd: ', and '
 feedback:
     arenaDisabled: disabled
+    arenaOff: 'no game'
     arenaJoinable: open
     arenaInProgress: 'in progress'
     announce: 'You have announced a new game in arena [ARENA]. You can now invite people to join!'
@@ -86,6 +87,13 @@ feedback:
     prizeMoney: 'You have received [MONEY] as prize money in arena [ARENA].'
     prizeItems: 'You have received [AMOUNT] [ITEM] as prize in arena [ARENA].'
     update: 'Please update SimpleSpleef [OLDVERSION] to [NEWVERSION].'
+    infoHeader: 'Arena: [ARENA]'
+    infoName: 'Name: [NAME]'
+    infoStatus: 'Status: [STATUS]'
+    infoSpleefers: 'Spleefers: [SPLEEFERS]'
+    infoSpectators: 'Spectators: [SPECTATORS]'
+    infoComma: ', '
+    infoAnd: ', and '
 admin:
     help: |
       Admin Commands (/spl admin...)

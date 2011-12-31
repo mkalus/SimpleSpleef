@@ -218,6 +218,18 @@ public abstract class Game {
 	 * @return something like (1/2)
 	 */
 	public abstract String getNumberOfPlayers();
+	
+	/**
+	 * return a comma separated list of spleefers (or null)
+	 * @return
+	 */
+	public abstract String getListOfSpleefers();
+	
+	/**
+	 * return a comma separated list of spectators (or null)
+	 * @return
+	 */
+	public abstract String getListOfSpectators();
 
 	/**
 	 * is game joinable?

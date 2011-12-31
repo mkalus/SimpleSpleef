@@ -213,8 +213,52 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void infoCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("Not implemented yet.");
-		//TODO: implement
+		// remember, we have 20 chat lines maximum...
+		// get game from 2nd argument
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		if (arena == null) return; // no arena found
+		
+		SimpleSpleef plugin = SimpleSpleef.getPlugin();
+		
+		// is game active?
+		Game game = SimpleSpleef.getGameHandler().getGameByName(arena);
+		
+		// ok, define information on arena and print it
+		sender.sendMessage(plugin.ll("feedback.infoHeader", "[ARENA]", ChatColor.DARK_AQUA + arena));
+		// full name of arena
+		sender.sendMessage(plugin.ll("feedback.infoName", "[NAME]", ChatColor.DARK_AQUA + plugin.getConfig().getString("arenas." + arena + ".name", "---")));
+		// status of arena
+		String information;
+		ChatColor color;
+		if (game != null) { // game running
+			if (game.isJoinable()) {
+				information = SimpleSpleef.getPlugin().ll("feedback.arenaJoinable");
+				color = ChatColor.GREEN;
+			} else {
+				information = SimpleSpleef.getPlugin().ll("feedback.arenaInProgress");
+				color = ChatColor.LIGHT_PURPLE;
+			}
+			// ok, gather some more information on the game to display
+			information = information + " " + game.getNumberOfPlayers();
+		} else { // no game running
+			if (plugin.getConfig().getBoolean("arenas." + arena + ".enabled", true)) {
+				information = SimpleSpleef.getPlugin().ll("feedback.arenaDisabled");
+				color = ChatColor.DARK_GRAY;
+			} else {
+				information = SimpleSpleef.getPlugin().ll("feedback.arenaOff");
+				color = ChatColor.GRAY;
+			}
+		}
+		sender.sendMessage(plugin.ll("feedback.infoStatus", "[STATUS]", color + information));
+		// list of spleefers and spectators
+		if (game != null) {
+			String spleefers = game.getListOfSpleefers();
+			if (spleefers != null)
+				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
+			String spectators = game.getListOfSpectators();
+			if (spectators != null)
+				sender.sendMessage(plugin.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
+		}
 	}
 	
 	/**
@@ -431,6 +475,6 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			return null;
 		}
 		
-		return name;
+		return name.toLowerCase();
 	}
 }

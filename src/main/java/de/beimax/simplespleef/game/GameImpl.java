@@ -489,7 +489,43 @@ public class GameImpl extends Game {
 		}
 		return "(" + active + "/" + (max>0?max:"-") + ")";
 	}
-	
+
+	@Override
+	public String getListOfSpleefers() {
+		// no spleefers - return null
+		if (spleefers == null || spleefers.size() == 0) return null;
+		// create list of spleefers
+		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+		for (Spleefer spleefer : spleefers.get()) {
+			if (i > 0 && i == spleefers.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("feedback.infoAnd")); // last element with end
+			else if (i > 0) builder.append(comma);  // other elements with ,
+			// lost or in game?
+			if (spleefer.hasLost()) builder.append(ChatColor.RED);
+			else builder.append(ChatColor.GREEN);
+			builder.append(spleefer.getPlayer().getDisplayName());
+			builder.append(ChatColor.GRAY);
+			i++;
+		}
+		return builder.toString();
+	}
+
+	@Override
+	public String getListOfSpectators() {
+		// no spectators - return null
+		if (spectators == null || spectators.size() == 0) return null;
+		// create list of spectators
+		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < spectators.size(); i++) {
+			if (i > 0 && i == spectators.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("feedback.infoAnd")); // last element with end
+			else if (i > 0) builder.append(comma);  // other elements with ,
+			builder.append(spectators.get(i).getDisplayName());
+		}
+		return builder.toString();
+	}
+
 	/**
 	 * Send a message to broadcast, or to players and spectators
 	 * @param message
@@ -730,7 +766,7 @@ public class GameImpl extends Game {
 			// build list of winners
 			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i < winners.size(); i++) {
-				if (i == winners.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("broadcasts.winMultiAnd")); // last element with end
+				if (i > 0 && i == winners.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("broadcasts.winMultiAnd")); // last element with end
 				else if (i > 0) builder.append(", "); // other elements with ,
 				builder.append(winners.get(i).getDisplayName());
 			}
