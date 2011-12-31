@@ -57,6 +57,7 @@ broadcasts:
     lostByTouching: '[PLAYER] has touched [MATERIAL] and fell out of game [ARENA].'
     lostByCuboid: '[PLAYER] fell out of game [ARENA].'
     lostByDeath: '[PLAYER] died horribly in arena [ARENA] and lost...'
+    lostByQuitting: '[PLAYER] left the game - what a whimp!'
     prizeMoney: '[PLAYER] has received [MONEY] as prize money in arena [ARENA].'
     prizeItems: '[PLAYER] has received [AMOUNT] [ITEM] as prize in arena [ARENA].'
     winNone: 'Strangely there was no winner in arena [ARENA].'

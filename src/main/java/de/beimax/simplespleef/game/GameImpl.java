@@ -589,27 +589,40 @@ public class GameImpl extends Game {
 
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		// remove shovel of player, if needed
-		removeShovelItem(event.getPlayer(), true);
-		// TODO Auto-generated method stub
-		
+		// call helper method
+		looseOnQuitOrKick(event.getPlayer());
 	}
 
 	@Override
 	public void onPlayerKick(PlayerKickEvent event) {
-		// remove shovel of player, if needed
-		removeShovelItem(event.getPlayer(), true);
+		// call helper method
+		looseOnQuitOrKick(event.getPlayer());
 		// delete original position, because player is banned anyhow
 		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
-		// TODO Auto-generated method stub
-		
+	}
+	
+	/**
+	 * helper method for onPlayerQuit and onPlayerKick
+	 * @param player
+	 */
+	protected void looseOnQuitOrKick(Player player) {
+		if (configuration.getBoolean("looseOnLogout", true)) {
+			// broadcast message of somebody loosing
+			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByQuitting", "[PLAYER]", player.getName(), "[ARENA]", getName());
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			} else {
+				// send message to all receivers
+				sendMessage(broadcastMessage, player);
+			}
+			// player looses, if set to true
+			playerLoses(player, false); // do not teleport dead players...
+		} // else - do nothing...
 	}
 
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		// TODO: restore shovel item, if player is autojoined again
-		// TODO Auto-generated method stub
-		
+		// right now, do nothing... later on maybe give shovel back or so (if it has been taken away before the game ended - that gets complicated...)
 	}
 
 	@Override
