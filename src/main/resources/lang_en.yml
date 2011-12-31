@@ -84,6 +84,7 @@ feedback:
     lost: 'You lost your spleef game!'
     prizeMoney: 'You have received [MONEY] as prize money in arena [ARENA].'
     prizeItems: 'You have received [AMOUNT] [ITEM] as prize in arena [ARENA].'
+    update: 'Please update SimpleSpleef [OLDVERSION] to [NEWVERSION].'
 admin:
     help: |
       Admin Commands (/spl admin...)

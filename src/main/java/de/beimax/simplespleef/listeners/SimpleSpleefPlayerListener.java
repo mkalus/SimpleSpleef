@@ -1,6 +1,7 @@
 package de.beimax.simplespleef.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -12,6 +13,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
+import de.beimax.simplespleef.util.UpdateChecker;
 
 /**
  * Handle events for all Player related events
@@ -24,6 +26,26 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		// update checker activated
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.updateNotificationOnLogin", true)) {
+			Player player = event.getPlayer();
+			// Check for updates whenever an operator or user with the right simplespleef.admin joins the game
+			if (player.isOp() || player.hasPermission("simplespleef.admin")) {
+				UpdateChecker checker = new UpdateChecker();
+				try {
+					// compare versions
+					String oldVersion = SimpleSpleef.getPlugin().getDescription().getVersion();
+					String newVersion = checker.checkForUpdate(oldVersion);
+					if (newVersion != null) // do we have a version update? => notify player
+						player.sendMessage(SimpleSpleef.getPlugin().ll("feedback.update", "[OLDVERSION]", oldVersion, "[NEWVERSION]", newVersion));
+				} catch (Exception e) {
+					player.sendMessage("SimpleSpleef could not get version update - see log for details.");
+					SimpleSpleef.log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
+				}
+			}
+		}
+
+		// tell games about somebody joining, too
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// tell all games about it
 			for (Game game : SimpleSpleef.getGameHandler().getGames()) {

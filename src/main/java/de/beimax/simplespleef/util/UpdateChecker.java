@@ -18,9 +18,9 @@ public class UpdateChecker {
 	 * actually check for an update
 	 * @param String version version of current system to check
 	 * 
-	 * @return true if there is an update out there...
+	 * @return new version number, if there is an update or null, if there is no new version available
 	 */
-	public boolean checkForUpdate(String version) throws Exception {
+	public String checkForUpdate(String version) throws Exception {
 		// open HTTP connection
 		URL url = new URL("http://mc.auxc.de/SimpleSpleef.version");
 		URLConnection connection = url.openConnection();
@@ -30,9 +30,9 @@ public class UpdateChecker {
 		String inputLine = in.readLine();
 		in.close();
 		
-		if (inputLine != null && inputLine.equals(version)) return false;
+		if (inputLine != null && inputLine.equals(version)) return null; // no new update
 
-		return true;
+		return inputLine; // new version
 	}
 
 	/**

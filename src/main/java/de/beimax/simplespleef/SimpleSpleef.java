@@ -213,8 +213,9 @@ public class SimpleSpleef extends JavaPlugin {
 		// possibly check for updates in the internet on startup
 		if (this.getConfig().getBoolean("settings.updateNotificationOnStart", true)) {
 			try {
-				if (checker.checkForUpdate(this.getDescription().getVersion()))
-					log.info("[SimpleSpleef] Update found for SimpleSpleef - please go to http://dev.bukkit.org/server-mods/simple-spleef/ to download newest version!");
+				String newVersion = checker.checkForUpdate(this.getDescription().getVersion());
+				if (newVersion != null)
+					log.info("[SimpleSpleef] Update found for SimpleSpleef - please go to http://dev.bukkit.org/server-mods/simple-spleef/ to download version " + newVersion + "!");
 			} catch (Exception e) {
 				log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
 			}

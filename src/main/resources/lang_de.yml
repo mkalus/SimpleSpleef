@@ -84,6 +84,7 @@ feedback:
     lost: 'Du hast beim Spleef verloren!'
     prizeMoney: '[MONEY] las Preisgeld erhalten.'
     prizeItems: 'Du hast [AMOUNT] [ITEM] gewonnen.'
+    update: 'SimpleSpleef [OLDVERSION] bitte auf Version [NEWVERSION] updaten.'
 admin:
     help: |
       Adminkommandos (/spl admin...)
