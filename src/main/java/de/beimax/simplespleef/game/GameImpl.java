@@ -701,8 +701,28 @@ public class GameImpl extends Game {
 			if (configuration.getBoolean("enableBackCommand", true))
 				SimpleSpleef.getOriginalPositionKeeper().updateOriginalLocationTimestamp(player);
 		}
-		//TODO: winning message! <= get the total winners from winners list
-		//announceWin
+		// get the total winners from winners list
+		String broadcastKey;
+		String replacePlayer = "";
+		// no winner?
+		if (winners.size() == 0) broadcastKey = "None";
+		if (winners.size() == 1) { // one winner?
+			broadcastKey = "One";
+			replacePlayer = winners.getFirst().getDisplayName();
+		} else { // multiple winners
+			broadcastKey = "Multi";
+			// build list of winners
+			StringBuilder builder = new StringBuilder();
+			for (int i = 0; i < winners.size(); i++) {
+				if (i == winners.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("broadcasts.winMultiAnd")); // last element with end
+				else if (i > 0) builder.append(", "); // other elements with ,
+				builder.append(winners.get(i).getDisplayName());
+			}
+			replacePlayer = builder.toString();
+		}
+		// broadcast message
+		String broadcastMessage = ChatColor.GOLD + SimpleSpleef.getPlugin().ll("broadcasts.win" + broadcastKey, "[PLAYER]", replacePlayer, "[ARENA]", getName());
+		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));
 		
 		// clean up game and end it
 		endGame();

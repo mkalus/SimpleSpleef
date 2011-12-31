@@ -213,7 +213,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 * @param args
 	 */
 	protected void infoCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("TODO - " + args[0]);
+		sender.sendMessage("Not implemented yet.");
 		//TODO: implement
 	}
 	

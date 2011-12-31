@@ -100,6 +100,7 @@ public class SimpleSpleefAdmin {
 					checkArena = true;
 		} else if (adminCommand.equals("set")) {
 			//TODO
+			sender.sendMessage("Not implemented yet.");
 		} else // unknown command feedback
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownCommand", "[COMMAND]", adminCommand));
 		

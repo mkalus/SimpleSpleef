@@ -59,6 +59,10 @@ broadcasts:
     lostByDeath: '[PLAYER] starb grausam in der Arena [ARENA] und ist damit aus dem Spiel...'
     prizeMoney: '[PLAYER] hat [MONEY] als Preisgeld in Arena [ARENA] erhalten.'
     prizeItems: '[PLAYER] hat [AMOUNT] [ITEM] in Arena [ARENA] gewonnen.'
+    winNone: 'Komischerweise gab es keinen Gewinner in der Arena [ARENA].'
+    winOne: '[PLAYER] hat das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
+    winMulti: '[PLAYER] haben das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
+    winMultiAnd: ' und '
 feedback:
     arenaDisabled: abgeschaltet
     arenaJoinable: offen
