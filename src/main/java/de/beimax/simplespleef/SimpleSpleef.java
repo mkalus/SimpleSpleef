@@ -324,9 +324,11 @@ public class SimpleSpleef extends JavaPlugin {
 				economy = economyProvider.getProvider();
 			}
 	
+			SimpleSpleef.log.info("[SimpleSpleef] Vault hooked as economy plugin.");
 			return (economy != null);
 		}
 		economy = null; // in the slim chance, that the plugin is reloaded during play
+		SimpleSpleef.log.info("[SimpleSpleef] Vault plugin not found - not using economy.");
 		return false;
 	}
 	
