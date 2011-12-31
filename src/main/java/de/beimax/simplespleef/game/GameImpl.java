@@ -700,7 +700,9 @@ public class GameImpl extends Game {
 	protected void gameOver() {
 		// determine winners
 		LinkedList<Player> winners = new LinkedList<Player>();
+		System.out.println(winners.size());
 		for (Spleefer spleefer : spleefers.get()) {
+			System.out.println(winners.size());
 			Player player = spleefer.getPlayer();
 			if (!spleefer.hasLost()) { // not lost?
 				//this guy is a winner - send a message
@@ -714,12 +716,13 @@ public class GameImpl extends Game {
 			if (configuration.getBoolean("enableBackCommand", true))
 				SimpleSpleef.getOriginalPositionKeeper().updateOriginalLocationTimestamp(player);
 		}
+		System.out.println(winners.size());
 		// get the total winners from winners list
 		String broadcastKey;
 		String replacePlayer = "";
 		// no winner?
 		if (winners.size() == 0) broadcastKey = "None";
-		if (winners.size() == 1) { // one winner?
+		else if (winners.size() == 1) { // one winner?
 			broadcastKey = "One";
 			replacePlayer = winners.getFirst().getDisplayName();
 		} else { // multiple winners
