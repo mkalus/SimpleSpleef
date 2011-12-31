@@ -98,9 +98,8 @@ public class SimpleSpleefAdmin {
 			if (checkThreeArgs(sender, args, adminCommand))
 				if (disableArena(sender, args[2]))
 					checkArena = true;
-		} else if (adminCommand.equals("set")) {
-			//TODO
-			sender.sendMessage("Not implemented yet.");
+		} else if (adminCommand.equals("reload")) {
+			reloadConfig(sender);
 		} else // unknown command feedback
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownCommand", "[COMMAND]", adminCommand));
 		
@@ -120,6 +119,32 @@ public class SimpleSpleefAdmin {
 		if (args.length != 3) {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
 			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * checks, if there are exactly four arguments in the list 
+	 * @param sender
+	 * @param args
+	 * @param adminCommand
+	 * @return
+	 */
+	protected boolean checkFourArgs(CommandSender sender, String[] args, String adminCommand) {
+		// check argument length
+		if (args.length < 4) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.twoArguments", "[COMMAND]", adminCommand));
+			return false;
+		}
+		// more than four arguments -> reduce number three
+		if (args.length > 4) {
+			StringBuilder builder = new StringBuilder();
+			for (int i = 3; i < args.length; i++) {
+				if (i > 3) builder.append(' ');
+				builder.append(args[i]);
+			}
+			// replace arg 4
+			args[3] = builder.toString();
 		}
 		return true;
 	}
@@ -407,14 +432,21 @@ public class SimpleSpleefAdmin {
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineSpawnPoint", "[ARENA]", arena, "[SPAWN]", spawn));
 	}
 
-	// TODO add new commands here
-
 	/**
 	 * check arena changed by sender -> do updates
 	 */
 	protected void checkArena(CommandSender sender) {
 		// reload the configuration of everything
 		SimpleSpleef.getGameHandler().reloadConfig();
+	}
+	
+	/**
+	 * reload the config
+	 * @param sender
+	 */
+	protected void reloadConfig(CommandSender sender) {
+		SimpleSpleef.getPlugin().configurePlugin();
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.reload"));
 	}
 
 	/**
@@ -452,7 +484,6 @@ public class SimpleSpleefAdmin {
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.disable", "[ARENA]", arena));
 		return true;
 	}
-
 
 	/**
 	 * gets or defines currently selected arena

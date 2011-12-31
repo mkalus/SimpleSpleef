@@ -188,7 +188,7 @@ public class SimpleSpleef extends JavaPlugin {
 	/**
 	 * Run some configuration stuff at the initialization of the plugin
 	 */
-	protected void configurePlugin() {
+	public void configurePlugin() {
 		// define that default config should be copied
 		this.getConfig().options().copyDefaults(true);
 

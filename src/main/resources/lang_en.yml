@@ -99,9 +99,10 @@ admin:
       loose a/b|Define point a/b of loose cube.
       spawn lounge/game/spectator/loose|Set spawn point.
       enable/disable arena|Enable/disable arena.
-      set x y|Set variable x to y.
+      reload|Reload config.
 adminerrors:
     oneArgument: '[COMMAND] expects one parameter - name/id of arena'
+    twoArguments: '[COMMAND] expects two parameters - name + new value'
     aOrB: '[COMMAND] expects one parameter a or b.'
     addarenaArenaExists: 'Arena [ARENA] exists already.'
     oneArgumentSpawn: 'spawn expects one parameter named lounge, game, spectator, or loose.'
@@ -115,6 +116,7 @@ adminfeedback:
     defineSpawnPoint: 'Set spawn [SPAWN] in arena [ARENA].'
     enable: '[ARENA] enabled.'
     disable: '[ARENA] disabled.'
+    reload: 'configuration reloaded.'
 material:
     STATIONARY_WATER: water
     STATIONARY_LAVA: lava
