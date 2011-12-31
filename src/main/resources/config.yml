@@ -11,6 +11,7 @@ settings:
 # "default" arena
     defaultArena: default
 # active arena command signs to join/spectate/return/etc.
+# Not implemented yet
     enableSigns: true
 # globally announce when a game is created by someone not joining the game
     announceGame: true
@@ -108,7 +109,6 @@ arenas:
 # Players dying loose
         looseOnDeath: true
 # Players logging out loose
-# Not implemented yet
         looseOnLogout: false
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
