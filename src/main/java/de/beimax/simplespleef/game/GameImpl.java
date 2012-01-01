@@ -96,7 +96,7 @@ public class GameImpl extends Game {
 	/**
 	 * blocks that can be dug or (if allowDigBlocks is false) cannot
 	 */
-	private HashSet<ItemStack> digBlocks;
+	private LinkedList<ItemStack> digBlocks;
 
 	/**
 	 * Constructor
@@ -149,13 +149,13 @@ public class GameImpl extends Game {
 		// block destruction/keep hashes
 		if (conf.isList("allowDigBlocks")) {
 			allowDigBlocks = true;
-			digBlocks = new HashSet<ItemStack>();
+			digBlocks = new LinkedList<ItemStack>();
 			for (String line : conf.getStringList("allowDigBlocks")) {
 				digBlocks.add(MaterialHelper.getItemStackFromString(line));
 			}
 		} else if (conf.isList("disallowDigBlocks")) {
 			allowDigBlocks = false;
-			digBlocks = new HashSet<ItemStack>();
+			digBlocks = new LinkedList<ItemStack>();
 			for (String line : conf.getStringList("disallowDigBlocks")) {
 				digBlocks.add(MaterialHelper.getItemStackFromString(line));
 			}
@@ -994,8 +994,17 @@ public class GameImpl extends Game {
 		// allowed blocks? => allowDigBlocks
 		// alternatively: disallowDigBlocks
 		if (digBlocks != null) {
-			ItemStack checkblock = new ItemStack(block.getType(), 1, block.getData());
-			if (digBlocks.contains(checkblock)) return allowDigBlocks; // found -> return state
+			for (ItemStack compareBlock : digBlocks) { // cycle through blocks to compare stuff
+				if (compareBlock != null && block.getTypeId() == compareBlock.getTypeId()) {
+					try {
+						// either type is -1 or data value matches
+						if (compareBlock.getData() == null || block.getData() == compareBlock.getData().getData())
+							return allowDigBlocks; // found -> return state						
+					} catch (NullPointerException e) { // possibly thrown by compareBlock.getData() if data was -1
+						return allowDigBlocks;
+					}
+				}
+			}
 			// not found
 			return !allowDigBlocks; // negate
 		}
