@@ -1038,8 +1038,8 @@ public class GameImpl extends Game {
 		// output file
 		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + ".save");
 		// delete old file
-		if (file.exists()) {
-			if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
+		if (file.exists() && !file.delete()) {
+			SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
 			return;
 		}
 		try {
