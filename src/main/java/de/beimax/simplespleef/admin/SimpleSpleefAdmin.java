@@ -445,7 +445,7 @@ public class SimpleSpleefAdmin {
 	 * @param sender
 	 */
 	protected void reloadConfig(CommandSender sender) {
-		SimpleSpleef.getPlugin().configurePlugin();
+		SimpleSpleef.getPlugin().reloadSimpleSpleefConfiguration();
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.reload"));
 	}
 

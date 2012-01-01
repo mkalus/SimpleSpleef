@@ -202,6 +202,17 @@ public class SimpleSpleef extends JavaPlugin {
 		// initialize the translator
 		lang = new Translator(this, this.getConfig().getString("language", "en"));
 	}
+	
+	/**
+	 * reload configuration and translation
+	 */
+	public void reloadSimpleSpleefConfiguration() {
+		// reload the config file
+		this.reloadConfig();
+
+		// re-initialize the translator
+		lang = new Translator(this, this.getConfig().getString("language", "en"));
+	}
 
 	/**
 	 * Check for updates
