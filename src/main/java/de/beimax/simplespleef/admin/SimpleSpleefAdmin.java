@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -30,6 +31,10 @@ import de.beimax.simplespleef.util.LocationHelper;
  * Admin handler that solves admins' actions
  */
 public class SimpleSpleefAdmin {
+	/**
+	 * commands possible from the console
+	 */
+	private final static String[] consoleCommands = {"help", "addarena", "delarena", "disable", "enable", "reload"};
 	/**
 	 * saves which command senders have selected which arena as current one
 	 */
@@ -54,11 +59,19 @@ public class SimpleSpleefAdmin {
 			helpCommand(sender);
 			return;
 		}
-		
+
 		// check arena definition after command
 		boolean checkArena = false;
 		// get admin command
 		String adminCommand = args[1].toLowerCase();
+		
+		// is it a console command and it cannot be executed from the console?
+		if (isConsole(sender) && !isConsoleCommand(adminCommand)) {
+			sender.sendMessage("This command cannot be executed from the consolse");
+			return;
+		}
+
+		// what command is selected?
 		if (adminCommand.equals("help")) {
 			helpCommand(sender);
 		} else if (adminCommand.equals("selected")) {
@@ -511,5 +524,27 @@ public class SimpleSpleefAdmin {
 		if (selectedArenas.containsKey(sender))
 			selectedArenas.remove(sender);
 		selectedArenas.put(sender, id);
+	}
+
+	/**
+	 * Checks if sender is console
+	 * @param sender
+	 * @return
+	 */
+	protected boolean isConsole(CommandSender sender) {
+		if (sender instanceof ConsoleCommandSender) return true;
+		return false;
+	}
+	
+	/**
+	 * checks whether given command is allowed on the console
+	 * @param command
+	 * @return
+	 */
+	protected boolean isConsoleCommand(String command) {
+		for (String c : SimpleSpleefAdmin.consoleCommands) {
+			if (c.equals(command)) return true;
+		}
+		return false;
 	}
 }

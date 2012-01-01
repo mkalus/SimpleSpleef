@@ -29,7 +29,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * commands possible from the console
 	 */
-	private final static String[] consoleCommands = {"help", "announce", "arenas", "info", "list", "countdown", "reset"};
+	private final static String[] consoleCommands = {"help", "announce", "arenas", "info", "list", "countdown", "reset", "admin"};
 
 	/**
 	 * Print command string from settings line
