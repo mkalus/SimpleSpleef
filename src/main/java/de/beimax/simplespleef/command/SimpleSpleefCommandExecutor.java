@@ -181,6 +181,8 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			// color and information on game
 			ChatColor color;
 			String name = arena.getKey(); // id of arena
+			// name of arena
+			String fullName = SimpleSpleef.getPlugin().getConfig().getString("arenas." + name + ".name");
 			String information;
 			if (arena.getValue() == false) {
 				color = ChatColor.DARK_GRAY; // arena has been disabled in the the config
@@ -203,7 +205,12 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 				color = ChatColor.GRAY; // not an active game
 				information = null; // no information
 			}
-			sender.sendMessage(color + name + (information!=null?(ChatColor.GRAY + " - " + information):""));
+			// create feedback
+			StringBuilder builder = new StringBuilder();
+			builder.append(color).append(name);
+			if (information != null) builder.append(ChatColor.GRAY).append(" - ").append(information);
+			if (fullName != null) builder.append(ChatColor.GRAY).append(" (").append(fullName).append(')');
+			sender.sendMessage(builder.toString());
 		}
 	}
 	
@@ -242,11 +249,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			information = information + " " + game.getNumberOfPlayers();
 		} else { // no game running
 			if (plugin.getConfig().getBoolean("arenas." + arena + ".enabled", true)) {
-				information = SimpleSpleef.getPlugin().ll("feedback.arenaDisabled");
-				color = ChatColor.DARK_GRAY;
-			} else {
 				information = SimpleSpleef.getPlugin().ll("feedback.arenaOff");
 				color = ChatColor.GRAY;
+			} else {
+				information = SimpleSpleef.getPlugin().ll("feedback.arenaDisabled");
+				color = ChatColor.DARK_GRAY;
 			}
 		}
 		sender.sendMessage(plugin.ll("feedback.infoStatus", "[STATUS]", color + information));
@@ -258,6 +265,36 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			String spectators = game.getListOfSpectators();
 			if (spectators != null)
 				sender.sendMessage(plugin.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
+		}
+	}
+	
+	/**
+	 * List spleefers in arena
+	 * @param sender
+	 * @param args
+	 */
+	protected void listCommand(CommandSender sender, String[] args) {
+		// remember, we have 20 chat lines maximum...
+		// get game from 2nd argument
+		String arena = this.getArenaNameFromArgument(sender, args, 1);
+		if (arena == null) return; // no arena found
+		
+		SimpleSpleef plugin = SimpleSpleef.getPlugin();
+		
+		// is game active?
+		Game game = SimpleSpleef.getGameHandler().getGameByName(arena);
+		// list of spleefers and spectators
+		if (game != null) {
+			String spleefers = game.getListOfSpleefers();
+			if (spleefers != null)
+				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
+			String spectators = game.getListOfSpectators();
+			if (spectators != null)
+				sender.sendMessage(plugin.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
+			if (spleefers == null && spectators == null)
+				sender.sendMessage(plugin.ll("feedback.listNone", "[ARENA]", arena));
+		} else {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.list", "[ARENA]", arena));			
 		}
 	}
 	

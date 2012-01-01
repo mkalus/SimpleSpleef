@@ -48,6 +48,7 @@ errors:
     backNoLocation: 'Keinen ursprünglichen Ort gefunden.'
     backSpleefer: 'Du bist Spleefer in der Arena [ARENA]. Du musst dein Spiel erst beenden, um zurück zu teleportieren.'
     leave: 'Du spielst kein Spiel mit!'
+    list: 'Kein Spiel in Arena [ARENA]!'
     teleport: 'Teleportation ist während des Spiels in Arena [ARENA] nicht erlaubt.'
     gamemodeChange: 'Du kannst wärend des Spleefens deinen game mode nicht ändern!'
 broadcasts:
@@ -94,6 +95,7 @@ feedback:
     infoSpectators: 'Zuschauer: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ' und '
+    listNone: 'Weder Spleefer noch Zuschauer in Arena [ARENA].'
 admin:
     help: |
       Adminkommandos (/spl admin...)

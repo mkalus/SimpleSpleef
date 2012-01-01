@@ -48,6 +48,7 @@ errors:
     backNoLocation: 'No original location found.'
     backSpleefer: 'You are a spleefer in arena [ARENA]. You have to leave the game before teleporting back.'
     leave: 'You are not part of any game.'
+    list: 'No game in [ARENA]!'
     teleport: 'Teleportation is not allowed during the game in arena [ARENA].'
     gamemodeChange: 'You cannot change your gamemode while spleefing!'
 broadcasts:
@@ -94,6 +95,7 @@ feedback:
     infoSpectators: 'Spectators: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ', and '
+    listNone: 'There are no spleefers or spectators in arena [ARENA].'
 admin:
     help: |
       Admin Commands (/spl admin...)
