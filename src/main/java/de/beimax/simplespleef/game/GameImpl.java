@@ -222,22 +222,10 @@ public class GameImpl extends Game {
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while leave occured! Please tell the SimpleSpleef creator!");
 			return false;
 		}
-		// check game status
-		if (isJoinable()) { //still joinable - not so bad!
-			// just remove spleefer
-			spleefers.removeSpleefer(player);
-		} else if (countdown != null) { // during countdown - end the game...
-			// set player to lost, so that the player is not teleported twice
-			spleefers.setLost(player);
-			endGame(); // actually end the game
-		} else { // game is in progress - player looses - simple as that
-			// player looses
-			playerLoses(player, false); // do not teleport leaving players...
-		}
 		// inform player
 		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.leave"));
 		// broadcast message of somebody loosing
-		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.leave", "[PLAYER]", player.getName(), "[ARENA]", getName());
+		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.leave", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName());
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) {
 			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 		} else {
@@ -252,9 +240,23 @@ public class GameImpl extends Game {
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.backNoLocation"));
 				return false;
 			}
+			// add player to teleport ok list
+			this.teleportOkList.add(player);
 			// teleport player to original position
 			player.teleport(originalLocation);
 			player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.back"));
+		}
+		// check game status
+		if (isJoinable()) { //still joinable - not so bad!
+			// just remove spleefer
+			spleefers.removeSpleefer(player);
+		} else if (countdown != null) { // during countdown - end the game...
+			// set player to lost, so that the player is not teleported twice
+			spleefers.setLost(player);
+			endGame(); // actually end the game
+		} else { // game is in progress - player looses - simple as that
+			// player looses
+			playerLoses(player, false); // do not teleport leaving players...
 		}
 		return true;
 	}
@@ -736,9 +738,7 @@ public class GameImpl extends Game {
 	protected void gameOver() {
 		// determine winners
 		LinkedList<Player> winners = new LinkedList<Player>();
-		System.out.println(winners.size());
 		for (Spleefer spleefer : spleefers.get()) {
-			System.out.println(winners.size());
 			Player player = spleefer.getPlayer();
 			if (!spleefer.hasLost()) { // not lost?
 				//this guy is a winner - send a message
@@ -752,7 +752,6 @@ public class GameImpl extends Game {
 			if (configuration.getBoolean("enableBackCommand", true))
 				SimpleSpleef.getOriginalPositionKeeper().updateOriginalLocationTimestamp(player);
 		}
-		System.out.println(winners.size());
 		// get the total winners from winners list
 		String broadcastKey;
 		String replacePlayer = "";
