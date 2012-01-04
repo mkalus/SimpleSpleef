@@ -16,7 +16,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
@@ -371,7 +370,7 @@ public class SimpleSpleefAdmin {
 		Region region;
 		try {
 			region = session.getSelection(session.getSelectionWorld());
-		} catch (IncompleteRegionException e) { // error in selection
+		} catch (Exception e) { // error in selection
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.worldEditRegion"));
 			return;
 		}
