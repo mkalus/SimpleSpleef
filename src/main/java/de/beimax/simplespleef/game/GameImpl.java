@@ -89,9 +89,16 @@ public class GameImpl extends Game {
 	private boolean allowDigBlocks = true;
 	
 	/**
-	 * shortcut for setting
+	 * shortcuts for digging settings
 	 */
-	private boolean allowDiggingOutsideArena;
+	protected static final int DIGGING_NONE = 0;
+	protected static final int DIGGING_EVERYWHERE = 1;
+	protected static final int DIGGING_FLOOR_ONLY = 2;
+	protected static final int DIGGING_IN_ARENA = 3;
+	protected static final int DIGGING_OUTSIDE_ARENA = 4;
+	
+	private int diggingIfArenaUndefined;
+	private int diggingIfFloorUndefined;
 	
 	/**
 	 * blocks that can be dug or (if allowDigBlocks is false) cannot
@@ -160,7 +167,20 @@ public class GameImpl extends Game {
 				digBlocks.add(MaterialHelper.getItemStackFromString(line));
 			}
 		} else digBlocks = null; // delete previous settings
-		allowDiggingOutsideArena = conf.getBoolean("allowDiggingOutsideArena", false);
+
+		// get dig settings
+		String dig = conf.getString("diggingIfArenaUndefined", "floorOnly").toLowerCase();
+		if (dig.equals("none")) diggingIfArenaUndefined = GameImpl.DIGGING_NONE;
+		else if (dig.equals("everywhere")) diggingIfArenaUndefined = GameImpl.DIGGING_EVERYWHERE;
+		else if (floor == null) diggingIfArenaUndefined = GameImpl.DIGGING_EVERYWHERE;
+		else diggingIfArenaUndefined = GameImpl.DIGGING_FLOOR_ONLY;
+		
+		dig = conf.getString("diggingIfFloorUndefined", "inArena").toLowerCase();
+		if (dig.equals("none")) diggingIfFloorUndefined = GameImpl.DIGGING_NONE;
+		else if (dig.equals("everywhere")) diggingIfFloorUndefined = GameImpl.DIGGING_EVERYWHERE;
+		else if (arena == null) diggingIfFloorUndefined = GameImpl.DIGGING_EVERYWHERE;
+		else if (dig.equals("outsidearena")) diggingIfFloorUndefined = GameImpl.DIGGING_OUTSIDE_ARENA;
+		else diggingIfFloorUndefined = GameImpl.DIGGING_IN_ARENA;
 		//TODO: more definitions/shortcuts
 	}
 
@@ -1018,14 +1038,28 @@ public class GameImpl extends Game {
 	 */
 	private boolean checkMayBreakBlockLocation(Block block) {
 		Location blockLocation = block.getLocation();
-		// arena floor defined?
-		if (this.floor != null) return this.floor.contains(blockLocation); // only arena floor can be broken during game
-		// otherwise, can blocks outside the defined arena be broken?
-		else if (!allowDiggingOutsideArena) return false; // no, they can't
-		// if allowDiggingOutsideArena is true, allow digging outside arena, but not within
-		else if (this.arena != null) return !this.arena.contains(blockLocation);
-		// on all other cases - allow block breaks, like in original simple spleef games
-		return true;		
+		// is arena undefined?
+		if (arena == null) {
+			switch (diggingIfArenaUndefined) {
+			case GameImpl.DIGGING_NONE: return false; // digging is not allowed
+			case GameImpl.DIGGING_EVERYWHERE: return true; // digging is allowed everywhere
+			default: // allowed in the arena floor in all other cases
+				return this.floor.contains(blockLocation);
+			}
+		} else { // arena defined
+			// is floor undefined?
+			if (floor == null) {
+				switch (diggingIfFloorUndefined) {
+				case GameImpl.DIGGING_NONE: return false; // digging is not allowed
+				case GameImpl.DIGGING_EVERYWHERE: return true; // digging is allowed everywhere
+				case GameImpl.DIGGING_OUTSIDE_ARENA: return !this.arena.contains(blockLocation); // digging is allowed outside of arena
+				default: // allowed within the arena in other cases
+					return this.arena.contains(blockLocation);
+				}
+			} else { // floor and arena defined
+				return this.floor.contains(blockLocation); // only arena floor can be broken during game
+			}
+		}
 	}
 	
 	/**

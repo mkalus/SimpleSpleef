@@ -1,6 +1,6 @@
 # Simple Spleef configuration
 # Version number of configuration - do not touch! It is used for automatic updates of configuration settings. 
-version: 1
+version: 2
 # Language - reads configuration from specific language file
 language: en
 settings:
@@ -131,8 +131,10 @@ arenas:
         allowBlockPlacing: false
 # If instantDig is false, do dug blocks drop blocks that can be picked up by players?
         blockDropping: true
-# Can spleefers actually dig/break blocks outside defined arena? If set to true, blocks outside defined arena can be broken
-        allowDiggingOutsideArena: false
+# If arena not defined: none, floorOnly, everywhere (if floor is also undefined, floorOnly will default to everywhere)
+        diggingIfArenaUndefined: floorOnly
+# If floor not defined: none, inArena, outsideArena, everywhere (if arena is undefined, inArena and outsideArena will default to everywhere)
+        diggingIfFloorUndefined: inArena
 # Protect arena against changes by non-players
         protectArena: true
 # Restore arena after the game

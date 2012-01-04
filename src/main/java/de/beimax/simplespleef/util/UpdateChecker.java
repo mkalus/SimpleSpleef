@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.bukkit.configuration.Configuration;
+
 import de.beimax.simplespleef.SimpleSpleef;
 
 /**
@@ -40,6 +42,24 @@ public class UpdateChecker {
 	 * @param simpleSpleef
 	 */
 	public void updateConfigurationVersion(SimpleSpleef simpleSpleef) {
-		// right now, nothing is done here - in the future, check version number in config file, update stuff, increase version number
+		Configuration config = SimpleSpleef.getPlugin().getConfig();
+		// check version number in config file
+		int version = config.getInt("version", 1);
+		// changed?
+		boolean changed = false;
+		
+		// update stuff
+		if (version <= 1) {
+			config.set("allowDiggingOutsideArena", null); // delete obsolete setting allowDiggingOutsideArena
+			changed = true;
+		}
+		// add new update versions here
+		
+		// increase version number
+		if (changed) {
+			SimpleSpleef.log.info("[SimpleSpleef] Updating configuration from version " + version + " to version 2.");
+			config.set("version", 2);
+			SimpleSpleef.getPlugin().saveConfig();
+		}
 	}
 }
