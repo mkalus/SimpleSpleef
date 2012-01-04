@@ -22,7 +22,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
@@ -49,7 +51,28 @@ import de.beimax.simplespleef.util.UpdateChecker;
 public class SimpleSpleef extends JavaPlugin {
 	public static final Logger log = Logger.getLogger("Minecraft");
 	
+	/**
+	 * reference to Vault economy
+	 */
 	public static Economy economy = null;
+	
+	/**
+	 * reference to Vault permissions
+	 */
+	public static Permission permission = null;
+	
+	/**
+	 * checks permission, either Vault-based or using builtin system
+	 * @param sender
+	 * @return
+	 */
+	public static boolean checkPermission(CommandSender sender, String permission) {
+		if (SimpleSpleef.permission != null) { // use Vault to check permissions
+			return SimpleSpleef.permission.has(sender, permission);
+		}
+		// fallback to default Bukkit permission checking system
+		return sender.hasPermission(permission);
+	}
 	
 	/**
 	 * self reference to singleton
@@ -152,6 +175,7 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// register vault stuff
 		setupEconomy();
+		setupPermission();
 		
 		// add event listeners
 		registerEvents();
@@ -339,8 +363,27 @@ public class SimpleSpleef extends JavaPlugin {
 			SimpleSpleef.log.info("[SimpleSpleef] Vault hooked as economy plugin.");
 			return (economy != null);
 		}
-		economy = null; // in the slim chance, that the plugin is reloaded during play
+		economy = null; // if the plugin is reloaded during play, possibly kill economy
 		SimpleSpleef.log.info("[SimpleSpleef] Vault plugin not found - not using economy.");
+		return false;
+	}
+	
+	/**
+	 * set up permissions - see http://dev.bukkit.org/server-mods/vault/
+	 * @return
+	 */
+	private boolean setupPermission() {
+		if (this.getServer().getPluginManager().getPlugin("Vault") != null) {
+			RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+	        if (permissionProvider != null) {
+	            permission = permissionProvider.getProvider();
+	        }
+	
+			SimpleSpleef.log.info("[SimpleSpleef] Vault hooked as permission plugin.");
+	        return (permission != null);
+		}
+		permission = null; // if the plugin is reloaded during play, possibly kill permissions
+		SimpleSpleef.log.info("[SimpleSpleef] Vault plugin not found - defaulting to Bukkit permission system.");
 		return false;
 	}
 	

@@ -112,7 +112,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected boolean helpCommand(CommandSender sender) {
 		// last option...
-		if (!sender.hasPermission("simplespleef.help")) return false;
+		if (!SimpleSpleef.checkPermission(sender, "simplespleef.help")) return false;
 		
 		// get all commands in language file
 		Map<String, String> commands = SimpleSpleef.getPlugin().lls("command");
@@ -121,7 +121,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// cycle through commands
 		for (String command : commands.keySet()) {
 			// check permission on command
-			if (!sender.hasPermission("simplespleef." + command)) continue;
+			if (!SimpleSpleef.checkPermission(sender, "simplespleef." + command)) continue;
 			// check if we are on the console and check command in that case
 			if (isConsole(sender) && !isConsoleCommand(command)) continue;
 			// we are cleared and may output the command nicely

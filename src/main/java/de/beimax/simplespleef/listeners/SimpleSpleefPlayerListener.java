@@ -30,7 +30,7 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.updateNotificationOnLogin", true)) {
 			Player player = event.getPlayer();
 			// Check for updates whenever an operator or user with the right simplespleef.admin joins the game
-			if (player.isOp() || player.hasPermission("simplespleef.admin")) {
+			if (player.isOp() || SimpleSpleef.checkPermission(player, "simplespleef.admin")) {
 				UpdateChecker checker = new UpdateChecker();
 				try {
 					// compare versions
