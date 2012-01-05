@@ -20,7 +20,7 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.2 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.3 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
 			<groupId>net.milkbowl</groupId>
 			<version>[1.1.9,)</version>
 			<artifactId>vault</artifactId>

@@ -60,7 +60,7 @@ public class GameHandler {
 			if (cuboid != null)
 				arenaCubes.add(cuboid); // add to list
 			else
-				SimpleSpleef.log.warning("[SimpleSpleef] Unable to load coordinates of arena for arena " + game);
+				SimpleSpleef.log.warning("[SimpleSpleef] Unable to load coordinates of arena for arena " + game + ". Maybe the arena is not finished yet, or its world was deleted.");
 		}
 	}
 	
@@ -603,8 +603,10 @@ public class GameHandler {
 		if (!conf.isConfigurationSection("arenas." + arena + "." + section) ||
 				!conf.getBoolean("arenas." + arena + ".arena.enabled", false)) return null;
 		// now, check sane coords
-		World firstWorld = SimpleSpleef.getPlugin().getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".a.world"));
-		World secondWorld = SimpleSpleef.getPlugin().getServer().getWorld(conf.getString("arenas." + arena + "." + section + ".b.world"));
+		String firstWorldString = conf.getString("arenas." + arena + "." + section + ".a.world");
+		String secondWorldString = conf.getString("arenas." + arena + "." + section + ".b.world");
+		World firstWorld = firstWorldString!=null?SimpleSpleef.getPlugin().getServer().getWorld(firstWorldString):null;
+		World secondWorld = secondWorldString!=null?SimpleSpleef.getPlugin().getServer().getWorld(secondWorldString):null;
 		if (firstWorld == null || secondWorld == null || firstWorld != secondWorld) return null; // non-sane worlds
 		int firstX = conf.getInt("arenas." + arena + "." + section + ".a.x", 0);
 		int firstY = conf.getInt("arenas." + arena + "." + section + ".a.y", 0);
