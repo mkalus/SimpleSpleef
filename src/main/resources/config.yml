@@ -58,6 +58,8 @@ arenas:
 # Not implemented yet
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid
+# If you use numbers for IDs and data values, make sure that you use an amount! E.g.: 1:35:5 or WOOL:5 works, but not 35:5!
+# RED_WOOL does not work! Use WOOL:14 instead!
 # Not implemented yet
         addToInventory: false
         addInventoryItems:
