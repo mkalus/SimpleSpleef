@@ -17,6 +17,7 @@ command:
     admin: 'admin [cammand]|Execute an admin command.'
 errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
+    permissionMissing: 'You do not have the permission for the command [COMMAND]. You need the permission simplespleef.[COMMAND].'
     unknownCommand: 'Unknown command "[COMMAND]"'
     unknownArena: 'Unknown arena "[ARENA]"'
     noDig: 'You may not dig here!'

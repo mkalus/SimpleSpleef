@@ -70,7 +70,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		if (args.length == 0 || args[0].equalsIgnoreCase("help")) return helpCommand(sender);
 		
 		// first argument is subcommand
-		String subcommand = args[0];
+		String subcommand = args[0].toLowerCase();
 
 		// parse commands - does it exist?
 		boolean found = false;
@@ -88,6 +88,10 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			sender.sendMessage("This command cannot be executed from the consolse");
 			return true;
 		}
+
+		// check permissions
+		if (!SimpleSpleef.checkPermission(sender, "simplespleef." + subcommand))
+			return permissionMissing(sender, subcommand);
 
 		// Ok, we are clear...
 		try {
@@ -433,6 +437,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected boolean unknownArena(CommandSender sender, String arena) {
 		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		return true;
+	}
+	
+	protected boolean permissionMissing(CommandSender sender, String command) {
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.permissionMissing", "[COMMAND]", command));
 		return true;
 	}
 
