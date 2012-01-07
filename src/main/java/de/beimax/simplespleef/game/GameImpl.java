@@ -959,16 +959,34 @@ public class GameImpl extends Game {
 		}
 		// take if, if player still has it - yes, there are exploits, but I do
 		// not want to handle them ;-)
+		// We have to find the shovel item - it might have been used and its damage number be lowered due to use... So we have to
+		// find the shovel that has been used most and delete that one...
 		Inventory inventory = player.getInventory();
-		if (inventory.contains(shovelItem)) {
-			int index = inventory.first(shovelItem);
-			// get the first stack
-			ItemStack stack = inventory.getItem(index);
-			if (stack.getAmount() > 1) { // shovels should only come in packs of one, but who knows?
-				stack.setAmount(stack.getAmount() - 1); // reduce amount by one
-				inventory.setItem(index, stack);
-			} else
-				inventory.setItem(index, null); // remove item
+		Material shovelMaterial = MaterialHelper.getMaterialFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		// find all shovel items, if there are more than one to be removed
+		for (int i = 0; i < shovelItem.getAmount(); i++) {
+			int indexFound = -1; // keeps found shovels
+			short durability = Short.MIN_VALUE; // keeps status of worst shovel found
+			// get all possible shovel items
+			for (Integer index : inventory.all(shovelMaterial).keySet()) {
+				ItemStack current = inventory.getItem(index);
+				short currentDurability = current.getDurability();
+				if (currentDurability > durability) { // is this the worst shovel found?
+					indexFound = index;
+					durability = currentDurability;
+				}
+			}
+			
+			// worst shovel found?
+			if (indexFound > -1) {
+				// get item
+				ItemStack stack = inventory.getItem(indexFound);
+				if (stack.getAmount() > 1) { // shovels should only come in packs of one, but who knows?
+					stack.setAmount(stack.getAmount() - 1); // reduce amount by one
+					inventory.setItem(indexFound, stack);
+				} else
+					inventory.setItem(indexFound, null); // remove item completely
+			}
 		}
 		
 		return true;
