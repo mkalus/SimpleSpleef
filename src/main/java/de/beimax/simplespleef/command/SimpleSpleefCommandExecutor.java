@@ -122,8 +122,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		Map<String, String> commands = SimpleSpleef.getPlugin().lls("command");
 		// control if there is any output:
 		boolean output = false;
+		// either commands for player or for console
+		String[] commandList = isConsole(sender)?SimpleSpleefCommandExecutor.consoleCommands:SimpleSpleefCommandExecutor.commands;
+		
 		// cycle through commands
-		for (String command : commands.keySet()) {
+		for (String command : commandList) {
 			// check permission on command
 			if (!SimpleSpleef.checkPermission(sender, "simplespleef." + command)) continue;
 			// check if we are on the console and check command in that case
