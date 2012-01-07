@@ -68,10 +68,10 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public static boolean checkPermission(CommandSender sender, String permission) {
 		if (SimpleSpleef.permission != null) { // use Vault to check permissions
-			return SimpleSpleef.permission.has(sender, permission);
+			return SimpleSpleef.permission.has(sender, permission) || SimpleSpleef.permission.has(sender, "simplespleef.*");
 		}
 		// fallback to default Bukkit permission checking system
-		return sender.hasPermission(permission);
+		return sender.hasPermission(permission) || sender.hasPermission("simplespleef.*");
 	}
 	
 	/**
