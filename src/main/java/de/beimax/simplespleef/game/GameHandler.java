@@ -19,6 +19,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.plugin.Plugin;
+
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.util.Cuboid;
@@ -597,27 +603,49 @@ public class GameHandler {
 		FileConfiguration conf = SimpleSpleef.getPlugin().getConfig();
 		arena = arena.toLowerCase();
 		section = section.toLowerCase();
+		String confbase = "arenas." + arena + "." + section; // shorten stuff later on
 		// is arena protected? If not, ignore to save resources
 		if (!conf.getBoolean("arenas." + arena + ".protectArena", true)) return null;
 		// get arena cube, if possible
-		if (!conf.isConfigurationSection("arenas." + arena + "." + section) ||
+		if (!conf.isConfigurationSection(confbase) ||
 				!conf.getBoolean("arenas." + arena + ".arena.enabled", false)) return null;
-		// now, check sane coords
-		String firstWorldString = conf.getString("arenas." + arena + "." + section + ".a.world");
-		String secondWorldString = conf.getString("arenas." + arena + "." + section + ".b.world");
-		World firstWorld = firstWorldString!=null?SimpleSpleef.getPlugin().getServer().getWorld(firstWorldString):null;
-		World secondWorld = secondWorldString!=null?SimpleSpleef.getPlugin().getServer().getWorld(secondWorldString):null;
-		if (firstWorld == null || secondWorld == null || firstWorld != secondWorld) return null; // non-sane worlds
-		int firstX = conf.getInt("arenas." + arena + "." + section + ".a.x", 0);
-		int firstY = conf.getInt("arenas." + arena + "." + section + ".a.y", 0);
-		int firstZ = conf.getInt("arenas." + arena + "." + section + ".a.z", 0);
-		int secondX = conf.getInt("arenas." + arena + "." + section + ".b.x", 0);
-		int secondY = conf.getInt("arenas." + arena + "." + section + ".b.y", 0);
-		int secondZ = conf.getInt("arenas." + arena + "." + section + ".b.z", 0);
-		if (firstX == 0 && firstY == 0 && firstZ == 0 && secondX == 0 && secondY == 0 && secondZ == 0) return null;
-		// create cube
-		return new Cuboid(firstWorld, (firstX<secondX?firstX:secondX), (firstY<secondY?firstY:secondY), (firstZ<secondZ?firstZ:secondZ),
-				(firstX>secondX?firstX:secondX), (firstY>secondY?firstY:secondY), (firstZ>secondZ?firstZ:secondZ));
+		// do we have a world guard region here?
+		if (conf.getString(confbase + ".worldguardRegion") != null && conf.getString(confbase + ".worldguardWorld") != null && getWorldGuard() != null) {
+			// get world guard region
+			World world = SimpleSpleef.getPlugin().getServer().getWorld(conf.getString(confbase + ".worldguardWorld"));
+			// get region manager
+			RegionManager regionManager = world!=null?getWorldGuard().getRegionManager(world):null;
+			// error?
+			if (world == null || regionManager == null) return null;
+			// get region
+			ProtectedRegion region = regionManager.getRegion(conf.getString(confbase + ".worldguardRegion"));
+			if (region == null) return null;
+			BlockVector max = region.getMaximumPoint();
+			BlockVector min = region.getMinimumPoint();
+			return new Cuboid(world, (min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
+					(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
+					(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
+					(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
+					(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
+					(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ()));
+		} else { // normal, non WorldGuard coordinates
+			// now, check sane coords
+			String firstWorldString = conf.getString(confbase + ".a.world");
+			String secondWorldString = conf.getString(confbase + ".b.world");
+			World firstWorld = firstWorldString!=null?SimpleSpleef.getPlugin().getServer().getWorld(firstWorldString):null;
+			World secondWorld = secondWorldString!=null?SimpleSpleef.getPlugin().getServer().getWorld(secondWorldString):null;
+			if (firstWorld == null || secondWorld == null || firstWorld != secondWorld) return null; // non-sane worlds
+			int firstX = conf.getInt(confbase + ".a.x", 0);
+			int firstY = conf.getInt(confbase + ".a.y", 0);
+			int firstZ = conf.getInt(confbase + ".a.z", 0);
+			int secondX = conf.getInt(confbase + ".b.x", 0);
+			int secondY = conf.getInt(confbase + ".b.y", 0);
+			int secondZ = conf.getInt(confbase + ".b.z", 0);
+			if (firstX == 0 && firstY == 0 && firstZ == 0 && secondX == 0 && secondY == 0 && secondZ == 0) return null;
+			// create cube
+			return new Cuboid(firstWorld, (firstX<secondX?firstX:secondX), (firstY<secondY?firstY:secondY), (firstZ<secondZ?firstZ:secondZ),
+					(firstX>secondX?firstX:secondX), (firstY>secondY?firstY:secondY), (firstZ>secondZ?firstZ:secondZ));
+		}
 	}
 	
 	/**
@@ -657,5 +685,20 @@ public class GameHandler {
 		game.clean();
 		// remove game from active list
 		removeGame(game);
+	}
+	
+	/**
+	 * get a world guard instance if it exists - see http://wiki.sk89q.com/wiki/WorldGuard/Regions/API for source
+	 * @return
+	 */
+	private WorldGuardPlugin getWorldGuard() {
+	    Plugin plugin = SimpleSpleef.getPlugin().getServer().getPluginManager().getPlugin("WorldGuard");
+	 
+	    // WorldGuard may not be loaded
+	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+	        return null; // Maybe you want throw an exception instead
+	    }
+	 
+	    return (WorldGuardPlugin) plugin;
 	}
 }

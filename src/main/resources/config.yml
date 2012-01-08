@@ -154,6 +154,11 @@ arenas:
 # Arena cube that will be protected (saved in memory for restoration)
         arena:
             enabled: false
+#Instead of a and b, you can also set up a world guard region () bot here (you have to have world guard installed, of course...):
+#           worldguardRegion: arena
+#           worldguardWorld: world
+# Note: If you use WorldGuard and regions, regions will be read at server start and when reloading plugin configuration.
+# So, if you change SimpleSpleef related regions, make sure to reload SimpleSpleef, too (/spla reload).
             a:
                 world: world
                 x: 0

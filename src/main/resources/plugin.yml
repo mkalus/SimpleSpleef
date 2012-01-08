@@ -4,7 +4,7 @@ version: 2.1.0
 author: maxkalus
 description: >
              Simple Spleef Plugin
-softdepend: ['Vault','WorldEdit']
+softdepend: ['Vault','WorldEdit','WorldGuard']
 commands:
   spleef:
     description: Control your spleef games
