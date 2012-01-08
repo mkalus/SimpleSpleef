@@ -1,6 +1,7 @@
 package de.beimax.simplespleef.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -12,6 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.command.SimpleSpleefSignCommandExecutor;
 import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.util.UpdateChecker;
 
@@ -103,6 +105,12 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		// clicked on a sign and signs enabled?
+		if (event.getClickedBlock().getState() instanceof Sign && SimpleSpleef.getPlugin().getConfig().getBoolean("settings.enableSigns", true)) {
+			// let the sign command executor do the rest
+			new SimpleSpleefSignCommandExecutor().parseSimpleSpleefSign(event.getPlayer(), (Sign)event.getClickedBlock().getState());
+		}
+		
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
 			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());

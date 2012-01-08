@@ -11,8 +11,14 @@ settings:
 # "default" arena
     defaultArena: default
 # active arena command signs to join/spectate/return/etc.
-# Not implemented yet
     enableSigns: true
+# if signs are used, look for this on the first line to make the sign a SimpleSpleef command sign
+# command parameters are then one per line, e.g.:
+# [Spleef]
+# join
+# coolarena
+# => will execute /spl join coolarena for a player hitting the sign
+    signsFirstLine: '[Spleef]'
 # globally announce when a game is created by someone not joining the game
     announceGame: true
 # globally announce when players join games
