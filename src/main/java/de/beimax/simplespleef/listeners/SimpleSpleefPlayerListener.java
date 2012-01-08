@@ -3,6 +3,7 @@ package de.beimax.simplespleef.listeners;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -107,8 +108,11 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		// clicked on a sign and signs enabled?
 		if (event.getClickedBlock().getState() instanceof Sign && SimpleSpleef.getPlugin().getConfig().getBoolean("settings.enableSigns", true)) {
-			// let the sign command executor do the rest
-			new SimpleSpleefSignCommandExecutor().parseSimpleSpleefSign(event.getPlayer(), (Sign)event.getClickedBlock().getState());
+			// only right click allowed?
+			boolean signsOnlyRightClick = SimpleSpleef.getPlugin().getConfig().getBoolean("settings.signsOnlyRightClick", false);
+			if (!signsOnlyRightClick || (signsOnlyRightClick && event.getAction() == Action.RIGHT_CLICK_BLOCK))
+				// let the sign command executor do the rest
+				new SimpleSpleefSignCommandExecutor().parseSimpleSpleefSign(event.getPlayer(), (Sign)event.getClickedBlock().getState());
 		}
 		
 		if (SimpleSpleef.getGameHandler().hasGames()) {

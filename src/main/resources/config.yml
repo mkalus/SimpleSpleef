@@ -19,6 +19,8 @@ settings:
 # coolarena
 # => will execute /spl join coolarena for a player hitting the sign
     signsFirstLine: '[Spleef]'
+# only right click will execute the command
+    signsOnlyRightClick: false
 # globally announce when a game is created by someone not joining the game
     announceGame: true
 # globally announce when players join games
