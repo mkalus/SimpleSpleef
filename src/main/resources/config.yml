@@ -159,6 +159,7 @@ arenas:
 #           worldguardWorld: world
 # Note: If you use WorldGuard and regions, regions will be read at server start and when reloading plugin configuration.
 # So, if you change SimpleSpleef related regions, make sure to reload SimpleSpleef, too (/spla reload).
+# Cubes only at the moment!
             a:
                 world: world
                 x: 0
