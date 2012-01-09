@@ -120,8 +120,12 @@ arenas:
             - 4:SMOOTH_BRICK:1
 # Winner gets this amount of price money for each player in game - Vault required
         prizeMoneyPerPlayer: 5.0
-# Winner gets this amount of price money fixed (toal is per player + fixed) - Vault required
+# Winner gets this amount of price money fixed (total is per player + fixed) - Vault required
         prizeMoneyFixed: 0.0
+# Winner gets this amount of experience for each player in game
+        expPerPlayer: 0.0
+# Winner gets this amount of experience fixed (total is per player + fixed)
+        expFixed: 0.0
 # Loose game by touching certain blocks?
         looseOnTouchBlocks: true
 # Loose game by touching these blocks (in them/standing on them - name/id)
@@ -132,6 +136,8 @@ arenas:
         looseOnDeath: true
 # Players logging out loose
         looseOnLogout: false
+# Players do not starve while playing in the arena
+        noHunger: true
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
             - DIRT

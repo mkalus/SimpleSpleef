@@ -21,6 +21,7 @@ package de.beimax.simplespleef.listeners;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
@@ -42,6 +43,22 @@ public class SimpleSpleefEntityListener extends EntityListener {
 			// player part of a game?
 			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(player);
 			if (game != null) game.onPlayerDeath(player);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bukkit.event.entity.EntityListener#onFoodLevelChange(org.bukkit.event.entity.FoodLevelChangeEvent)
+	 */
+	@Override
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		// check if games are running and the entity is indeed a player
+		if (SimpleSpleef.getGameHandler().hasGames() && event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			// player part of a game?
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(player);
+			// if setting noHunger has been set for this arena, do not feel any hunger
+			if (game != null && SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + game.getId() + ".noHunger", true))
+				event.setCancelled(true);
 		}
 	}
 }

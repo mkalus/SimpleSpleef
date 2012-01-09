@@ -287,6 +287,7 @@ public class SimpleSpleef extends JavaPlugin {
 		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Low, this);
 		
 		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Highest, this);
+		pm.registerEvent(Type.FOOD_LEVEL_CHANGE, entityListener, Priority.Highest, this);
 		
 		pm.registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Normal, this);
