@@ -1,6 +1,8 @@
 # Simple Spleef configuration
 # Note on materials: If you use numbers for IDs and data values, make sure that you use an amount! E.g.: 1:35:5 or WOOL:5 works, but not 35:5!
 # RED_WOOL does not work! Use WOOL:14 instead!
+# Also, if you use single item ids (like 42 for iron block, make sure to suround them with ' - e.g. '42'. If you forget to do this, Bukkit
+# will interpret the value as integer and bug SimpleSpleef...
 # Material ids/names can be found at https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/Material.java
 # Version number of configuration - do not touch! It is used for automatic updates of configuration settings. 
 version: 2
@@ -73,8 +75,7 @@ arenas:
         readyAutoStart: true
 # If useReady has the value block or commandAndBlock, use the following material block that can be touched to ready the game (default iron block = 42)
 # If you use colored wool, please use WOOL:15 (for red wool)
-# Not implemented yet
-        readyBlockMaterial: 42
+        readyBlockMaterial: '42'
 # Clear inventory at game start and restore after game has ended
 # Not implemented yet
         clearInventory: false

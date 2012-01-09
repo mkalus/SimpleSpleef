@@ -17,6 +17,8 @@ public abstract class MaterialHelper {
 	 * @return
 	 */
 	public static Material getMaterialFromString(String material) {
+		if (material == null) return null; // ignore null strings
+
 		Material m;
 		// try to convert material from number
 		try {
@@ -34,6 +36,7 @@ public abstract class MaterialHelper {
 	 * @return
 	 */
 	public static ItemStack getItemStackFromString(String line) {
+		if (line == null) return null; // ignore null strings
 		// split string to stack
 		String[] parts = line.split(":");
 		int number;

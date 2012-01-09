@@ -740,16 +740,38 @@ public class GameImpl extends Game {
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
+		if (block == null || event.getPlayer() == null) return; // ignore null blocks and null players
+
 		// check instant dig and block may be broken
-		if (event.getAction() == Action.LEFT_CLICK_BLOCK && block != null && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block)) {
+		if (event.getAction() == Action.LEFT_CLICK_BLOCK && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block)) {
 			// cancel event
 			event.setCancelled(true);
 			// set block to air
 			event.getClickedBlock().setType(Material.AIR);
 			event.getClickedBlock().setData((byte) 0);
-		}
-		
-		//TODO do sign interactions here
+		} else
+		//check if player clicked on a "ready" block (e.g. iron block) and the game is readyable
+			if (configuration.getBoolean("useReady", false) && isJoinable()) {
+				ItemStack readyBlockMaterial;
+				try {
+					readyBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("readyBlockMaterial", null));
+				} catch (Exception e) {
+					return; // ignore exceptions
+				}
+				if (readyBlockMaterial == null) return; // ignore null materials
+				// material has been checked, now test, if clicked block is of the same material
+				if (readyBlockMaterial.getTypeId() == block.getTypeId()) {
+					try {
+						// either type is -1 or data value matches
+						if (readyBlockMaterial.getData() == null || block.getData() == readyBlockMaterial.getData().getData()) {
+							// found matching block! => Ready the player!
+							ready(event.getPlayer());
+						}
+					} catch (NullPointerException e) { // possibly thrown by compareBlock.getData() if data was -1
+						return;
+					}
+				}
+			}
 	}
 
 	@Override
