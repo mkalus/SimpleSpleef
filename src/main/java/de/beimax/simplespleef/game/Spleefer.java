@@ -11,6 +11,13 @@ import org.bukkit.entity.Player;
  */
 public class Spleefer {
 	/**
+	 * team ids
+	 */
+	public static final int TEAM_NONE = 0;
+	public static final int TEAM_BLUE = 1;
+	public static final int TEAM_RED = 2;
+	
+	/**
 	 * reference to player object
 	 */
 	private Player player;
@@ -20,7 +27,15 @@ public class Spleefer {
 	 */
 	private boolean lost = false;
 	
-	//TODO: teams
+	/**
+	 * is player ready to play?
+	 */
+	private boolean ready = false;
+
+	/**
+	 * Team of this player
+	 */
+	private int team = TEAM_NONE;
 	
 	/**
 	 * Constructor
@@ -56,5 +71,33 @@ public class Spleefer {
 	 */
 	public void setLost(boolean lost) {
 		this.lost = lost;
+	}
+
+	/**
+	 * @return the ready
+	 */
+	public boolean isReady() {
+		return ready;
+	}
+
+	/**
+	 * @param ready the ready to set
+	 */
+	public void setReady(boolean ready) {
+		this.ready = ready;
+	}
+
+	/**
+	 * @return the team
+	 */
+	public int getTeam() {
+		return team;
+	}
+
+	/**
+	 * @param team the team to set
+	 */
+	public void setTeam(int team) {
+		this.team = team;
 	}
 }

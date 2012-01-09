@@ -339,7 +339,21 @@ public class GameHandler {
 			game.sendMessage(broadcastMessage, player); // notify players and spectators
 		}
 	}
-	
+
+	/**
+	 * Attempt to set ready for a gamer (spleefers only)
+	 * @param sender
+	 */
+	public void ready(CommandSender sender) {
+		// only senders in a game may start a game
+		Player player = (Player) sender; // cast to player
+		// find player in arena
+		Game checkGame = checkPlayerInGame(player);
+		if (checkGame != null) checkGame.ready(player);
+		// sender not part of any game
+		else sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyNoGame"));		
+	}
+
 	/**
 	 * Attempt to start a game (spleefers only)
 	 * @param sender
@@ -352,8 +366,8 @@ public class GameHandler {
 		if (checkGame != null) {
 			String arena = checkGame.getId();
 			//is config "spleeferStart" of arena is set to true? - isJoinable added to avoid error message and let game do this instead
-			if (checkGame.isJoinable() && !SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", arena));
+			if (checkGame.isReady() && !SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
+				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", checkGame.getName()));
 			else // spleeferStart is true: attempt to start countdown
 				countdown(sender, arena);
 			return;

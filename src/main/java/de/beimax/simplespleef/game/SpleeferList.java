@@ -125,4 +125,16 @@ public class SpleeferList {
 	public List<Spleefer> get() {
 		return spleefers;
 	}
+	
+	/**
+	 * count unready spleefers
+	 * @return
+	 */
+	public int countUnreadyPlayers() {
+		int unready = 0;
+		for (Spleefer spleefer : spleefers) {
+			if (!spleefer.isReady()) unready++;
+		}
+		return unready;
+	}
 }

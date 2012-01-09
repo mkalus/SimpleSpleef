@@ -25,7 +25,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * list of all commands
 	 */
-	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin" };
+	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "ready", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin" };
 	/**
 	 * commands possible from the console
 	 */
@@ -198,7 +198,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			else if (games.contains(name)) { // is it an active game?
 				// game active or still joinable?
 				Game activeGame = SimpleSpleef.getGameHandler().getGameByName(name);
-				if (activeGame.isJoinable()) {
+				if (activeGame.isJoinable() || activeGame.isReady()) {
 					color = ChatColor.GREEN; // joinable
 					information = SimpleSpleef.getPlugin().ll("feedback.arenaJoinable");
 				}
@@ -245,7 +245,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		String information;
 		ChatColor color;
 		if (game != null) { // game running
-			if (game.isJoinable()) {
+			if (game.isJoinable() || game.isReady()) {
 				information = SimpleSpleef.getPlugin().ll("feedback.arenaJoinable");
 				color = ChatColor.GREEN;
 			} else {
@@ -303,6 +303,17 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		} else {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.list", "[ARENA]", arena));			
 		}
+	}
+	
+	/**
+	 * Ready for the game (spleefers only)
+	 * @param sender
+	 * @param args
+	 */
+	protected void readyCommand(CommandSender sender, String[] args) {
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		SimpleSpleef.getGameHandler().ready(sender);
 	}
 	
 	/**

@@ -220,6 +220,10 @@ public class GameImpl extends Game {
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while joining occured! Please tell the SimpleSpleef creator!");
 			return false;
 		}
+		// unready game, if needed
+		if (configuration.getBoolean("useReady", false)) {
+			this.status = Game.STATUS_NEW;
+		}
 		// remove from spectators, if needed
 		unwatch(player);
 		// inform/broadcast join is done by the game handler
@@ -267,7 +271,7 @@ public class GameImpl extends Game {
 			player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.back"));
 		}
 		// check game status
-		if (isJoinable()) { //still joinable - not so bad!
+		if (isJoinable() || isReady()) { //still joinable or ready state - not so bad!
 			// just remove spleefer
 			spleefers.removeSpleefer(player);
 		} else if (countdown != null) { // during countdown - end the game...
@@ -277,6 +281,59 @@ public class GameImpl extends Game {
 		} else { // game is in progress - player looses - simple as that
 			// player looses
 			playerLoses(player, false); // do not teleport leaving players...
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean ready(Player player) {
+		// game started already?
+		if (isInProgress() || countdown != null) { // avoid possible memory leak
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyAlreadyStarted", "[ARENA]", getName()));
+			return false;
+		}
+		// readying is not used in this game
+		if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyNotUsed", "[ARENA]", getName()));
+			return false;
+		}
+		// get spleefer
+		Spleefer spleefer = spleefers.getSpleefer(player);
+		if (spleefer == null) { // internal error
+			player.sendMessage(ChatColor.DARK_RED + "Internal error: Player " + player.getName() + " should be in spleefers list, but isn't!");
+			return false;
+		}
+		// player already ready?
+		if (spleefer.isReady()) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyAlready", "[ARENA]", getName()));
+			return false;
+		}
+		// ok, ready player now
+		spleefer.setReady(true);
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.ready", "[ARENA]", getName()));
+		// broadcast message of somebody loosing
+		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.ready", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName());
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceReady", false)) {
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		} else {
+			// send message to all receivers
+			sendMessage(broadcastMessage, player);
+		}
+		// is the game ready?
+		if (spleefers.countUnreadyPlayers() == 0) {
+			// autostart game once all are ready
+			if (configuration.getBoolean("readyAutoStart", false)) {
+				// test for minumum players
+				int minimumPlayers = configuration.getInt("minimumPlayers", 0);
+				if (minimumPlayers > 0 && spleefers.size() < minimumPlayers) {
+					// wait for more players to join and ready
+					sendMessage(SimpleSpleef.getPlugin().ll("broadcasts.ready", "[NUMBER]", String.valueOf(spleefers.size() - minimumPlayers)), false);
+					this.status = Game.STATUS_READY;
+				}
+				else startGameOrCountdown(); // start game right away
+			}
+			// otherwise, just set game as ready
+			else this.status = Game.STATUS_READY;
 		}
 		return true;
 	}
@@ -294,6 +351,25 @@ public class GameImpl extends Game {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startMin", "[ARENA]", getName(), "[NUMBER]", String.valueOf(minimumPlayers)));
 			return false;
 		}
+		// game is not ready yet?
+		if (!isReady()) {
+			//get list of unready spleefers
+			String unreadyList = getListOfUnreadySpleefers();
+			if (unreadyList == null) unreadyList = "---"; // in any case...
+			// send error message to player
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startNotReady", "[ARENA]", getName(), "[PLAYERS]", unreadyList));
+			return false;
+		}
+		// start game or countdown
+		startGameOrCountdown();
+		
+		return true;
+	}
+	
+	/**
+	 * helper to start game or countdown - used by ready and countdown methods
+	 */
+	private void startGameOrCountdown() {
 		// start countdown, if setting is 0 or higher
 		if (configuration.getInt("countdownFrom", 10) == 0) {
 			start(); // if countdown is null, start game right away
@@ -303,7 +379,6 @@ public class GameImpl extends Game {
 			countdown.start();
 		}
 		
-		return true;
 	}
 
 	@Override
@@ -359,6 +434,7 @@ public class GameImpl extends Game {
 		//check what the current status is and end game then
 		boolean wasInProgress = isInProgress(); 
 		//isJoinable()
+		//isReady()
 		// + other cases?
 		// still in countdown? if yes, kill it!
 		if (countdown != null)
@@ -547,6 +623,34 @@ public class GameImpl extends Game {
 			builder.append(spectators.get(i).getDisplayName());
 		}
 		return builder.toString();
+	}
+	
+	/**
+	 * get a list of unready spleefers
+	 * @return
+	 */
+	public String getListOfUnreadySpleefers() {
+		// no spleefers - return null
+		if (spleefers == null || spleefers.size() == 0) return null;
+		// create list of spleefers
+		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
+		// get unready spleefers
+		LinkedList<String> list = new LinkedList<String>();
+		for (Spleefer spleefer : spleefers.get()) {
+			if (!spleefer.isReady()) list.add(spleefer.getPlayer().getDisplayName());
+		}
+		// is the list empty?
+		if (list.size() == 0) return null; // no unready spleefes
+		// compile list
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+		for (String spleefer : list) {
+			if (i > 0 && i == spleefers.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("feedback.infoAnd")); // last element with end
+			else if (i > 0) builder.append(comma);  // other elements with ,
+			builder.append(spleefer);
+			i++;
+		}
+		return builder.toString();		
 	}
 
 	/**
