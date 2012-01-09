@@ -522,6 +522,7 @@ public class GameHandler {
 	 * @return Game the player is part of or null, if not
 	 */
 	public Game checkPlayerInGame(Player player) {
+		if (player == null) return null; // sanity check
 		for (Game checkGame :  getGames()) {
 			if (checkGame.hasPlayer(player)) return checkGame;
 		}
@@ -534,6 +535,7 @@ public class GameHandler {
 	 * @return Game the player is part of or null, if not
 	 */
 	public Game checkSpectatorInGame(Player player) {
+		if (player == null) return null; // sanity check
 		for (Game checkGame :  getGames()) {
 			if (checkGame.hasSpectator(player)) return checkGame;
 		}

@@ -460,6 +460,7 @@ public class GameImpl extends Game {
 
 	@Override
 	public boolean hasPlayer(Player player) {
+		if (spleefers == null || player == null) return false;
 		return spleefers.hasSpleefer(player);
 	}
 	
