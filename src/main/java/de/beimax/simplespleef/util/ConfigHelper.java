@@ -73,6 +73,8 @@ public class ConfigHelper {
 				else if (key.equals("loungeSpawn") || key.startsWith("loungeSpawn.")) continue; // ignore
 				else if (key.equals("spectatorSpawn") || key.startsWith("spectatorSpawn.")) continue; // ignore
 				else if (key.equals("looseSpawn") || key.startsWith("looseSpawn.")) continue; // ignore
+				else if (key.equals("redSpawn") || key.startsWith("redSpawn.")) continue; // ignore
+				else if (key.equals("blueSpawn") || key.startsWith("blueSpawn.")) continue; // ignore
 				else newSection.set(key, section.get(key)); // copy into the newly created section
 			}
 
