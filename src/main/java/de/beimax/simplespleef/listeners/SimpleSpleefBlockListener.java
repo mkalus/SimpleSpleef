@@ -36,6 +36,8 @@ public class SimpleSpleefBlockListener extends BlockListener {
 	 */
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
+		if (event.isCancelled()) return;
+
 		// check block breaks globally, since blocks could be broken from a protected arena
 		SimpleSpleef.getGameHandler().checkBlockBreak(event);
 	}
@@ -45,6 +47,8 @@ public class SimpleSpleefBlockListener extends BlockListener {
 	 */
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
+		if (event.isCancelled()) return;
+
 		// check block breaks globally, since blocks could be places in a protected arena
 		SimpleSpleef.getGameHandler().checkBlockPlace(event);
 	}

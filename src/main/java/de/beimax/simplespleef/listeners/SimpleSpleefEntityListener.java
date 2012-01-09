@@ -19,6 +19,7 @@
 package de.beimax.simplespleef.listeners;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -51,6 +52,8 @@ public class SimpleSpleefEntityListener extends EntityListener {
 	 */
 	@Override
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (event.isCancelled()) return;
+
 		// check if games are running and the entity is indeed a player
 		if (SimpleSpleef.getGameHandler().hasGames() && event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();

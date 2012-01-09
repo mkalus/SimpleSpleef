@@ -80,6 +80,8 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerKick(PlayerKickEvent event) {
+		if (event.isCancelled()) return;
+
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
 			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
@@ -124,6 +126,8 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.isCancelled()) return;
+
 		// clicked on a sign and signs enabled?
 		if (event.getPlayer() != null && event.getClickedBlock() != null && event.getClickedBlock().getState() instanceof Sign && SimpleSpleef.getPlugin().getConfig().getBoolean("settings.enableSigns", true)) {
 			// only right click allowed?
@@ -145,6 +149,8 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		if (event.isCancelled()) return;
+
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
 			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
@@ -163,6 +169,8 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	 */
 	@Override
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		if (event.isCancelled()) return;
+
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
 			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(event.getPlayer());
