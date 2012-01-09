@@ -1,4 +1,6 @@
 # Simple Spleef configuration
+# Note on materials: If you use numbers for IDs and data values, make sure that you use an amount! E.g.: 1:35:5 or WOOL:5 works, but not 35:5!
+# RED_WOOL does not work! Use WOOL:14 instead!
 # Version number of configuration - do not touch! It is used for automatic updates of configuration settings. 
 version: 2
 # Language - reads configuration from specific language file
@@ -49,7 +51,7 @@ arenas:
     default:
 # fancy name of arena
         name: 'Spleef Arena'
-# type - this can contain either standard or a class name like com.mystuff.MySpleefGameImpl
+# type - this can contain either standard, randomteams (for balanced, random teams) or a class name like com.mystuff.MySpleefGameImpl
         type: standard
 # enabled?
         enabled: true
@@ -62,12 +64,17 @@ arenas:
         announceOnJoin: true
 # Start the countdown by typing "/spleef start" - otherwise someone has to "/spleef countdown" the arena)
         spleeferStart: true
+# game has to be "ready" to start playing - takes false, command, block, and commandAndBlock as arguments - if false, game has not to be ready to start
+# Not implemented yet
+        useReady: false
+# If useReady has the value block or commandAndBlock, use the following material block that can be touched to ready the game (default iron block = 42)
+# If you use colored wool, please use WOOL:15 (for red wool)
+# Not implemented yet
+        readyBlockMaterial: 42
 # Clear inventory at game start and restore after game has ended
 # Not implemented yet
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid
-# If you use numbers for IDs and data values, make sure that you use an amount! E.g.: 1:35:5 or WOOL:5 works, but not 35:5!
-# RED_WOOL does not work! Use WOOL:14 instead!
 # Not implemented yet
         addToInventory: false
         addInventoryItems:
@@ -207,6 +214,24 @@ arenas:
             z: 0.0
 # Teleport point where players are sent to after starting game
         gameSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where players are sent to after starting game (red team, if using teams)
+        redSpawn:
+            enabled: false
+            world: world
+            pitch: 0.0
+            yaw: 0.0
+            x: 0.0
+            y: 0.0
+            z: 0.0
+# Teleport point where players are sent to after starting game (blue team, if using teams)
+        blueSpawn:
             enabled: false
             world: world
             pitch: 0.0
