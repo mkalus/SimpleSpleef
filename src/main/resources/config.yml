@@ -1,6 +1,7 @@
 # Simple Spleef configuration
 # Note on materials: If you use numbers for IDs and data values, make sure that you use an amount! E.g.: 1:35:5 or WOOL:5 works, but not 35:5!
 # RED_WOOL does not work! Use WOOL:14 instead!
+# Material ids/names can be found at https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/Material.java
 # Version number of configuration - do not touch! It is used for automatic updates of configuration settings. 
 version: 2
 # Language - reads configuration from specific language file
@@ -27,6 +28,8 @@ settings:
     announceGame: true
 # globally announce when players join games
     announceJoin: true
+# globally announce when player ready for the game    
+    announceReady: false
 # globally announce when game starts
     announceStart: true
 # globally announce when game stops
@@ -65,8 +68,9 @@ arenas:
 # Start the countdown by typing "/spleef start" - otherwise someone has to "/spleef countdown" the arena)
         spleeferStart: true
 # game has to be "ready" to start playing - takes false, command, block, and commandAndBlock as arguments - if false, game has not to be ready to start
-# Not implemented yet
         useReady: false
+# Should the game start automatically, once all players are ready?
+        readyAutoStart: true
 # If useReady has the value block or commandAndBlock, use the following material block that can be touched to ready the game (default iron block = 42)
 # If you use colored wool, please use WOOL:15 (for red wool)
 # Not implemented yet

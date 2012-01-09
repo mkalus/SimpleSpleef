@@ -14,6 +14,8 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import de.beimax.simplespleef.SimpleSpleef;
+
 /**
  * @author mkalus
  *
@@ -23,9 +25,10 @@ public abstract class Game {
 	 * game status constants
 	 */
 	protected static final int STATUS_NEW = 1;
-	protected static final int STATUS_COUNTDOWN = 2;
-	protected static final int STATUS_STARTED = 3;
-	protected static final int STATUS_FINISHED = 4;
+	protected static final int STATUS_READY = 2;
+	protected static final int STATUS_COUNTDOWN = 3;
+	protected static final int STATUS_STARTED = 4;
+	protected static final int STATUS_FINISHED = 5;
 
 	/**
 	 * name of the game/arena
@@ -89,6 +92,12 @@ public abstract class Game {
 	 * @return boolean successful?
 	 */
 	public abstract boolean leave(Player player);
+
+	/**
+	 * Mark player as ready
+	 * @return boolean successful?
+	 */
+	public abstract boolean ready(Player player);
 
 	/**
 	 * Countdown started
@@ -236,7 +245,18 @@ public abstract class Game {
 	 * @return true for joinable
 	 */
 	public boolean isJoinable() {
-		return this.status == STATUS_NEW;
+		return this.status <= STATUS_READY;
+	}
+
+	/**
+	 * is game ready?
+	 * @return true for game ready
+	 */
+	public boolean isReady() {
+		// game must be readied?
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false))
+			return this.status == STATUS_READY;
+		return this.status <= STATUS_READY; // without using ready, game is ready automatically
 	}
 
 	/**
