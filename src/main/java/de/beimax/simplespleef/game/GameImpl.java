@@ -621,6 +621,8 @@ public class GameImpl extends Game {
 
 	@Override
 	public boolean playerMayTeleport(Player player) {
+		// at the start of game, teleportation is ok
+		if (isJoinable() && (spleefers == null || spleefers.size() == 0)) return true;
 		// check if the player is on the teleport-ok-list, delete him/her from list and return true
 		if (this.teleportOkList.contains(player)) {
 			this.teleportOkList.remove(player);
