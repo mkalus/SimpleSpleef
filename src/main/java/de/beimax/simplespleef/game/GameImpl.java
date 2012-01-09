@@ -910,6 +910,7 @@ public class GameImpl extends Game {
 				winners.add(player); // aggregate the winners to broadcast them later on
 				// pay prizes
 				payPrizeMoney(player);
+				payPrizeExperience(player);
 				payPrizeItems(player);
 			}
 			// update original positions
@@ -968,6 +969,29 @@ public class GameImpl extends Game {
 			} else {
 				sendMessage(broadcastMessage, player); // send message to all receivers
 			}
+		}
+	}
+	
+	/**
+	 * Pay a prize in experience
+	 * @param player
+	 */
+	protected void payPrizeExperience(Player player) {
+		// get configuration and look, if we actually add experience
+		int prizeExperienceFixed = configuration.getInt("prizeExperienceFixed", 0);
+		int prizeExperiencePerPlayer = configuration.getInt("prizeExperiencePerPlayer", 0);
+		int win = prizeExperienceFixed + prizeExperiencePerPlayer * spleefers.size();
+		if (win == 0) return; // if no prize xps is payed, return without telling anybody
+		// add player experience
+		player.setExperience(player.getExperience() + win);
+		// player gets message
+		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeExperience", "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win)));
+		// broadcast prize?
+		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeExperience", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win));
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		} else {
+			sendMessage(broadcastMessage, player); // send message to all receivers
 		}
 	}
 

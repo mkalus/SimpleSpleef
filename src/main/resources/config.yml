@@ -123,9 +123,9 @@ arenas:
 # Winner gets this amount of price money fixed (total is per player + fixed) - Vault required
         prizeMoneyFixed: 0.0
 # Winner gets this amount of experience for each player in game
-        expPerPlayer: 0.0
+        prizeExperiencePerPlayer: 0
 # Winner gets this amount of experience fixed (total is per player + fixed)
-        expFixed: 0.0
+        prizeExperienceFixed: 0
 # Loose game by touching certain blocks?
         looseOnTouchBlocks: true
 # Loose game by touching these blocks (in them/standing on them - name/id)
