@@ -283,18 +283,18 @@ public class SimpleSpleef extends JavaPlugin {
 		// Register our events
 		pm.registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
 		
-		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.High, this);
-		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.High, this);
+		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.Low, this);
+		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Low, this);
 		
-		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Low, this);
+		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Highest, this);
 		
 		pm.registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.High, this);
-		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Highest, this);
-		pm.registerEvent(Type.PLAYER_GAME_MODE_CHANGE, playerListener, Priority.Highest, this);
+		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Low, this);
+		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this);
+		pm.registerEvent(Type.PLAYER_GAME_MODE_CHANGE, playerListener, Priority.Lowest, this);
 	}
 
 	/**
