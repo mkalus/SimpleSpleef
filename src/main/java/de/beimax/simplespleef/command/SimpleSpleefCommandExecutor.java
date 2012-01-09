@@ -28,6 +28,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
@@ -247,6 +248,10 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		if (arena == null) return; // no arena found
 		
+		// if player and no arena defined - arena is unset, so player can start current arena
+		String possibleArena = getPossiblePlayerSpectatorArena(sender, args, arena);
+		if (possibleArena != null) arena = possibleArena;
+
 		SimpleSpleef plugin = SimpleSpleef.getPlugin();
 		
 		// is game active?
@@ -301,6 +306,10 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		String arena = this.getArenaNameFromArgument(sender, args, 1);
 		if (arena == null) return; // no arena found
 		
+		// if player and no arena defined - arena is unset, so player can start current arena
+		String possibleArena = getPossiblePlayerSpectatorArena(sender, args, arena);
+		if (possibleArena != null) arena = possibleArena;
+
 		SimpleSpleef plugin = SimpleSpleef.getPlugin();
 		
 		// is game active?
@@ -551,5 +560,22 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		}
 		
 		return name.toLowerCase();
+	}
+
+	/**
+	 * helper function to find a possible arena if no args are defined (info, list commands)
+	 * @param sender
+	 * @param args
+	 * @param arena
+	 * @return
+	 */
+	private String getPossiblePlayerSpectatorArena(CommandSender sender, String[] args, String arena) {
+		// if player and no arena defined - arena is unset, so player can start current arena
+		if (arena != null && args.length < 2 && !isConsole(sender)) {
+			Game checkGame = SimpleSpleef.getGameHandler().checkPlayerInGame((Player) sender);
+			if (checkGame == null) checkGame = SimpleSpleef.getGameHandler().checkSpectatorInGame((Player) sender);
+			if (checkGame != null) return checkGame.getId();
+		}
+		return null;
 	}
 }
