@@ -38,7 +38,7 @@ public abstract class GameFactory {
 	public static Game createGame(String type, String name) {
 		// standard games
 		if (type == null || type.equalsIgnoreCase("standard"))
-			return new GameImpl(name);
+			return new GameStandard(name);
 		// inject other game types
 		try {
 			// define constructor parameters

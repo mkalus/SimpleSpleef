@@ -47,7 +47,7 @@ import de.beimax.simplespleef.util.*;
  * @author mkalus
  * Simple Game implementation
  */
-public class GameImpl extends Game {
+public class GameStandard extends Game {
 	/**
 	 * static reference to random generator
 	 */
@@ -125,7 +125,7 @@ public class GameImpl extends Game {
 	 * @param gameHandler
 	 * @param name
 	 */
-	public GameImpl(String name) {
+	public GameStandard(String name) {
 		super(name);
 		this.spleefers = new SpleeferList();
 		this.spectators = new LinkedList<Player>();
@@ -185,17 +185,17 @@ public class GameImpl extends Game {
 
 		// get dig settings
 		String dig = conf.getString("diggingIfArenaUndefined", "floorOnly").toLowerCase();
-		if (dig.equals("none")) diggingIfArenaUndefined = GameImpl.DIGGING_NONE;
-		else if (dig.equals("everywhere")) diggingIfArenaUndefined = GameImpl.DIGGING_EVERYWHERE;
-		else if (floor == null) diggingIfArenaUndefined = GameImpl.DIGGING_EVERYWHERE;
-		else diggingIfArenaUndefined = GameImpl.DIGGING_FLOOR_ONLY;
+		if (dig.equals("none")) diggingIfArenaUndefined = GameStandard.DIGGING_NONE;
+		else if (dig.equals("everywhere")) diggingIfArenaUndefined = GameStandard.DIGGING_EVERYWHERE;
+		else if (floor == null) diggingIfArenaUndefined = GameStandard.DIGGING_EVERYWHERE;
+		else diggingIfArenaUndefined = GameStandard.DIGGING_FLOOR_ONLY;
 		
 		dig = conf.getString("diggingIfFloorUndefined", "inArena").toLowerCase();
-		if (dig.equals("none")) diggingIfFloorUndefined = GameImpl.DIGGING_NONE;
-		else if (dig.equals("everywhere")) diggingIfFloorUndefined = GameImpl.DIGGING_EVERYWHERE;
-		else if (arena == null) diggingIfFloorUndefined = GameImpl.DIGGING_EVERYWHERE;
-		else if (dig.equals("outsidearena")) diggingIfFloorUndefined = GameImpl.DIGGING_OUTSIDE_ARENA;
-		else diggingIfFloorUndefined = GameImpl.DIGGING_IN_ARENA;
+		if (dig.equals("none")) diggingIfFloorUndefined = GameStandard.DIGGING_NONE;
+		else if (dig.equals("everywhere")) diggingIfFloorUndefined = GameStandard.DIGGING_EVERYWHERE;
+		else if (arena == null) diggingIfFloorUndefined = GameStandard.DIGGING_EVERYWHERE;
+		else if (dig.equals("outsidearena")) diggingIfFloorUndefined = GameStandard.DIGGING_OUTSIDE_ARENA;
+		else diggingIfFloorUndefined = GameStandard.DIGGING_IN_ARENA;
 		//TODO: more definitions/shortcuts
 	}
 
@@ -1227,8 +1227,8 @@ public class GameImpl extends Game {
 		// is arena undefined?
 		if (arena == null) {
 			switch (diggingIfArenaUndefined) {
-			case GameImpl.DIGGING_NONE: return false; // digging is not allowed
-			case GameImpl.DIGGING_EVERYWHERE: return true; // digging is allowed everywhere
+			case GameStandard.DIGGING_NONE: return false; // digging is not allowed
+			case GameStandard.DIGGING_EVERYWHERE: return true; // digging is allowed everywhere
 			default: // allowed in the arena floor in all other cases
 				return this.floor.contains(blockLocation);
 			}
@@ -1236,9 +1236,9 @@ public class GameImpl extends Game {
 			// is floor undefined?
 			if (floor == null) {
 				switch (diggingIfFloorUndefined) {
-				case GameImpl.DIGGING_NONE: return false; // digging is not allowed
-				case GameImpl.DIGGING_EVERYWHERE: return true; // digging is allowed everywhere
-				case GameImpl.DIGGING_OUTSIDE_ARENA: return !this.arena.contains(blockLocation); // digging is allowed outside of arena
+				case GameStandard.DIGGING_NONE: return false; // digging is not allowed
+				case GameStandard.DIGGING_EVERYWHERE: return true; // digging is allowed everywhere
+				case GameStandard.DIGGING_OUTSIDE_ARENA: return !this.arena.contains(blockLocation); // digging is allowed outside of arena
 				default: // allowed within the arena in other cases
 					return this.arena.contains(blockLocation);
 				}
@@ -1360,7 +1360,7 @@ public class GameImpl extends Game {
 					else {
 						start = start + 1000;
 						// Broadcast countdown
-						sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", GameImpl.this.getName()), broadcast);
+						sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", GameStandard.this.getName()), broadcast);
 						count--;
 					}
 				}
@@ -1374,12 +1374,12 @@ public class GameImpl extends Game {
 				// send message
 				sendMessage(ChatColor.RED + SimpleSpleef.getPlugin().ll("feedback.countdownInterrupted"), broadcast);
 				// end the game
-				GameImpl.this.endGame();
+				GameStandard.this.endGame();
 			} else {
 				// send message
 				sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownGo"), broadcast);
 				// start the game itself!
-				GameImpl.this.start();
+				GameStandard.this.start();
 			}
 		}
 	}
