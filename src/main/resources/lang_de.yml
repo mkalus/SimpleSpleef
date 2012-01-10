@@ -104,6 +104,7 @@ feedback:
     infoName: 'Name: [NAME]'
     infoStatus: 'Status: [STATUS]'
     infoSpleefers: 'Spieler: [SPLEEFERS]'
+    infoUnreadySpleefers: 'Noch nicht bereit: [SPLEEFERS]'
     infoSpectators: 'Zuschauer: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ' und '

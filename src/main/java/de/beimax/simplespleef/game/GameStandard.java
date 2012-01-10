@@ -236,7 +236,7 @@ public class GameStandard extends Game {
 			return false;
 		}
 		// unready game, if needed
-		if (configuration.getBoolean("useReady", false)) {
+		if (supportsReady()) {
 			this.status = Game.STATUS_NEW;
 		}
 		// remove from spectators, if needed
@@ -308,7 +308,7 @@ public class GameStandard extends Game {
 			return false;
 		}
 		// readying is not used in this game
-		if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false)) {
+		if (!supportsReady()) {
 			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyNotUsed", "[ARENA]", getName()));
 			return false;
 		}
@@ -640,10 +640,7 @@ public class GameStandard extends Game {
 		return builder.toString();
 	}
 	
-	/**
-	 * get a list of unready spleefers
-	 * @return
-	 */
+	@Override
 	public String getListOfUnreadySpleefers() {
 		// no spleefers - return null
 		if (spleefers == null || spleefers.size() == 0) return null;
@@ -766,7 +763,7 @@ public class GameStandard extends Game {
 			event.getClickedBlock().setData((byte) 0);
 		} else
 		//check if player clicked on a "ready" block (e.g. iron block) and the game is readyable
-			if (configuration.getBoolean("useReady", false) && isJoinable()) {
+			if (supportsReady() && isJoinable()) {
 				ItemStack readyBlockMaterial;
 				try {
 					readyBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("readyBlockMaterial", null));

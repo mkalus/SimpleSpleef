@@ -61,13 +61,6 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	}
 	
 	/**
-	 * Constructor
-	 * @param gameHandler reference to game handler
-	 */
-	public SimpleSpleefCommandExecutor() {
-	}
-
-	/**
 	 * Executed whenever simplespeef is hit by a command
 	 */
 	public boolean onCommand(CommandSender sender, Command command, String label,
@@ -285,14 +278,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		}
 		sender.sendMessage(plugin.ll("feedback.infoStatus", "[STATUS]", color + information));
 		// list of spleefers and spectators
-		if (game != null) {
-			String spleefers = game.getListOfSpleefers();
-			if (spleefers != null)
-				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
-			String spectators = game.getListOfSpectators();
-			if (spectators != null)
-				sender.sendMessage(plugin.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
-		}
+		printGamePlayersAndSpectators(sender, game);
 	}
 	
 	/**
@@ -309,24 +295,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// if player and no arena defined - arena is unset, so player can start current arena
 		String possibleArena = getPossiblePlayerSpectatorArena(sender, args, arena);
 		if (possibleArena != null) arena = possibleArena;
-
-		SimpleSpleef plugin = SimpleSpleef.getPlugin();
 		
 		// is game active?
 		Game game = SimpleSpleef.getGameHandler().getGameByName(arena);
 		// list of spleefers and spectators
-		if (game != null) {
-			String spleefers = game.getListOfSpleefers();
-			if (spleefers != null)
-				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
-			String spectators = game.getListOfSpectators();
-			if (spectators != null)
-				sender.sendMessage(plugin.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
-			if (spleefers == null && spectators == null)
-				sender.sendMessage(plugin.ll("feedback.listNone", "[ARENA]", arena));
-		} else {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.list", "[ARENA]", arena));			
-		}
+		printGamePlayersAndSpectators(sender, game);
 	}
 	
 	/**
@@ -577,5 +550,28 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			if (checkGame != null) return checkGame.getId();
 		}
 		return null;
+	}
+
+	/**
+	 * sends a list of players and spectators of a specific game to a sender
+	 * @param sender
+	 * @param game
+	 */
+	protected void printGamePlayersAndSpectators(CommandSender sender, Game game) {
+		// list of spleefers and spectators
+		if (game != null && sender != null) {
+			SimpleSpleef plugin = SimpleSpleef.getPlugin();
+			String spleefers = game.getListOfSpleefers();
+			if (spleefers != null)
+				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
+			if (game.supportsReady()) {
+				String unready = game.getListOfUnreadySpleefers();
+				if (unready != null)
+					sender.sendMessage(plugin.ll("feedback.infoUnreadySpleefers", "[SPLEEFERS]", unready));
+			}
+			String spectators = game.getListOfSpectators();
+			if (spectators != null)
+				sender.sendMessage(plugin.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
+		}		
 	}
 }

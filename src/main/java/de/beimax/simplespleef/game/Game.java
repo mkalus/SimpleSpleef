@@ -113,6 +113,14 @@ public abstract class Game {
 	 * @return boolean successful?
 	 */
 	public abstract boolean ready(Player player);
+	
+	/**
+	 * Return true, if game supports a "ready" players list. Override for your own inventions.
+	 * @return
+	 */
+	public boolean supportsReady() {
+		return SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false);
+	}
 
 	/**
 	 * Countdown started
@@ -250,6 +258,12 @@ public abstract class Game {
 	public abstract String getListOfSpleefers();
 	
 	/**
+	 * get a list of unready spleefers
+	 * @return
+	 */
+	public abstract String getListOfUnreadySpleefers();
+	
+	/**
 	 * return a comma separated list of spectators (or null)
 	 * @return
 	 */
@@ -269,7 +283,7 @@ public abstract class Game {
 	 */
 	public boolean isReady() {
 		// game must be readied?
-		if (SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false))
+		if (supportsReady())
 			return this.status == STATUS_READY;
 		return this.status <= STATUS_READY; // without using ready, game is ready automatically
 	}
