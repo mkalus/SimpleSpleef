@@ -160,7 +160,13 @@ public class ConfigHelper {
 		for (String language : ConfigHelper.languagesAvailable) {
 			// load saved file from data folder
 			File languageFile = new File(SimpleSpleef.getPlugin().getDataFolder(), "lang_" + language + ".yml");
-			FileConfiguration languageConfig = YamlConfiguration.loadConfiguration(languageFile);
+			FileConfiguration languageConfig;
+			try {
+				languageConfig = YamlConfiguration.loadConfiguration(languageFile);
+			} catch (Exception e) {
+				SimpleSpleef.log.severe("[SimpleSpleef] Could not load language file " + languageFile + "! Please convert it to UTF-8.");
+				continue; // ignore updating language files
+			}
 			
 			// get default config from resource
 			InputStream languageConfigStream = SimpleSpleef.getPlugin().getResource("lang_" + language + ".yml");
