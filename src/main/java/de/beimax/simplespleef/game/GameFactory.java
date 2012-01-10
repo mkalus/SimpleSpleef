@@ -39,6 +39,9 @@ public abstract class GameFactory {
 		// standard games
 		if (type == null || type.equalsIgnoreCase("standard"))
 			return new GameStandard(name);
+		// randomteams games
+		if (type.equalsIgnoreCase("randomteams"))
+			return new GameWithTeams(name);
 		// inject other game types
 		try {
 			// define constructor parameters
