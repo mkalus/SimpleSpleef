@@ -565,9 +565,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			if (spleefers != null)
 				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
 			if (game.supportsReady()) {
+				System.out.println("Unready");
 				String unready = game.getListOfUnreadySpleefers();
 				if (unready != null)
-					sender.sendMessage(plugin.ll("feedback.infoUnreadySpleefers", "[SPLEEFERS]", unready));
+					sender.sendMessage(plugin.ll("feedback.infoUnreadySpleefers", "[SPLEEFERS]", ChatColor.RED + unready));
+				else sender.sendMessage(ChatColor.GREEN + plugin.ll("feedback.infoAllReady"));
 			}
 			String spectators = game.getListOfSpectators();
 			if (spectators != null)

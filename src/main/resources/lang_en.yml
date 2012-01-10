@@ -105,6 +105,7 @@ feedback:
     infoStatus: 'Status: [STATUS]'
     infoSpleefers: 'Spleefers: [SPLEEFERS]'
     infoUnreadySpleefers: 'Not ready yet: [SPLEEFERS]'
+    infoAllReady: 'All are ready for spleefing!'
     infoSpectators: 'Spectators: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ', and '

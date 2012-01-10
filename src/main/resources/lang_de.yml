@@ -105,6 +105,7 @@ feedback:
     infoStatus: 'Status: [STATUS]'
     infoSpleefers: 'Spieler: [SPLEEFERS]'
     infoUnreadySpleefers: 'Noch nicht bereit: [SPLEEFERS]'
+    infoAllReady: 'Alle bereit zum Spiel!'
     infoSpectators: 'Zuschauer: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ' und '
