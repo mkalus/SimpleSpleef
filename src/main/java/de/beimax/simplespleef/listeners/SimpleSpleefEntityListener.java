@@ -19,6 +19,7 @@
 package de.beimax.simplespleef.listeners;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
@@ -62,6 +63,35 @@ public class SimpleSpleefEntityListener extends EntityListener {
 			// if setting noHunger has been set for this arena, do not feel any hunger
 			if (game != null && SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + game.getId() + ".noHunger", true))
 				event.setCancelled(true);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bukkit.event.entity.EntityListener#onEntityDamage(org.bukkit.event.entity.EntityDamageEvent)
+	 */
+	@Override
+	public void onEntityDamage(EntityDamageEvent event) {
+		if (event.isCancelled()) return;
+
+		// check if games are running and the entity is indeed a player
+		if (SimpleSpleef.getGameHandler().hasGames() && event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			// no PVP is allowed anyway
+			if (!player.getWorld().getPVP()) return;
+			
+			// player part of a game?
+			Game game = SimpleSpleef.getGameHandler().checkPlayerInGame(player);
+			// if setting noPvP has been set for this arena, check further
+			if (game != null && SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + game.getId() + ".noPvP", true)) {
+				// get cause of damage - only consider damage by other entities
+				if (event instanceof EntityDamageByEntityEvent) {
+					EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
+					// only consider player damage
+					if (damageEvent.getDamager() instanceof Player) {
+						event.setCancelled(true); // cancel damage event by caused by other players
+					}
+				}
+			}
 		}
 	}
 }

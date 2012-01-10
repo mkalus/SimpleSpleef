@@ -138,6 +138,8 @@ arenas:
         looseOnLogout: false
 # Players do not starve while playing in the arena
         noHunger: true
+# Disallow PVP while spleefing (no effect on no-pvp worlds)
+        noPvP: true
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
             - DIRT
