@@ -30,6 +30,9 @@ permissions:
   simplespleef.list:
     description: List spleefers (in arena)
     default: true
+  simplespleef.ready:
+    description: Ready for a game (spleefers only)
+    default: true
   simplespleef.start:
     description: Start game (spleefers only)
     default: true
