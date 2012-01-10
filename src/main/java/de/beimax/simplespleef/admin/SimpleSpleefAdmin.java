@@ -188,7 +188,8 @@ public class SimpleSpleefAdmin {
 		if (!checkThreeArgs(sender, args, adminCommand)) return false;
 		// check third argument
 		String spawn = args[2].toLowerCase();
-		if (spawn.equals("lounge") || spawn.equals("game") || spawn.equals("spectator") || spawn.equals("loose"))
+		if (spawn.equals("lounge") || spawn.equals("game") || spawn.equals("spectator") || spawn.equals("loose")
+				 || spawn.equals("red") || spawn.equals("blue"))
 			return true;
 		// error feedback
 		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgumentSpawn"));
