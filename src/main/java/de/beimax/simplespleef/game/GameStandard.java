@@ -1318,6 +1318,15 @@ public class GameStandard extends Game {
 		this.loose = null;
 		//TODO add more
 	}
+	
+	/**
+	 * teleport players to arena
+	 */
+	protected void teleportPlayersAtGameStart() {
+		for (Spleefer spleefer : spleefers.get()) {
+			teleportPlayer(spleefer.getPlayer(), "game");
+		}
+	}
 
 	/**
 	 * Countdown class
@@ -1342,9 +1351,7 @@ public class GameStandard extends Game {
 			sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownStart"), broadcast);
 			
 			// teleport players to arena
-			for (Spleefer spleefer : spleefers.get()) {
-				teleportPlayer(spleefer.getPlayer(), "game");
-			}
+			teleportPlayersAtGameStart();
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;

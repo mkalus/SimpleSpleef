@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.util.LocationHelper;
 
 /**
  * @author mkalus
@@ -122,6 +124,21 @@ public class GameWithTeams extends GameStandard {
 		// broadcast message
 		String broadcastMessage = ChatColor.GOLD + SimpleSpleef.getPlugin().ll("broadcasts.winTeam" + broadcastKey, "[PLAYER]", replacePlayer, "[ARENA]", getName(), "[TEAM]", team);
 		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));		
+	}
+
+	@Override
+	protected void teleportPlayersAtGameStart() {
+		// do red or blue spawns exist?
+		Location blue = LocationHelper.configToExactLocation(configuration.getConfigurationSection("blueSpawn"));
+		Location red = LocationHelper.configToExactLocation(configuration.getConfigurationSection("redSpawn"));
+		for (Spleefer spleefer : spleefers.get()) {
+			int team = spleefer.getTeam();
+			// if spawn of player is not defined, teleport to normal game spawn
+			if ((team == Spleefer.TEAM_BLUE && blue == null)
+					|| (team == Spleefer.TEAM_RED && red == null))
+				teleportPlayer(spleefer.getPlayer(), "game");
+			else teleportPlayer(spleefer.getPlayer(), Spleefer.getTeamId(team) + "Spawn");
+		}
 	}
 
 	/**
