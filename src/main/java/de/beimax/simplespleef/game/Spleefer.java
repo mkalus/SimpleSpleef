@@ -33,6 +33,19 @@ public class Spleefer {
 	public static final int TEAM_RED = 2;
 	
 	/**
+	 * get String id of team name (or "none" for errors)
+	 * @param team
+	 * @return
+	 */
+	public static String getTeamId(int team) {
+		switch (team) {
+		case TEAM_BLUE: return "blue";
+		case TEAM_RED: return "red";
+		}
+		return "none";
+	}
+	
+	/**
 	 * reference to player object
 	 */
 	private Player player;

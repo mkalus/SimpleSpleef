@@ -63,7 +63,7 @@ arenas:
 # Minimum and maximum players
         minimumPlayers: 2
         maximumPlayers: 0
-# Number of players still in the game to determine winning (each of these will get a prize)
+# Number of players still in the game to determine winning (each of these will get a prize) - setting is ignored in team games
         remainingPlayersWin: 1
 # Initiate game on joining (otherwise someone has to "/spleef announce" the arena)
         announceOnJoin: true

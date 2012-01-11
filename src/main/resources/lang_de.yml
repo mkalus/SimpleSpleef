@@ -74,7 +74,8 @@ broadcasts:
     winNone: 'Komischerweise gab es keinen Gewinner in der Arena [ARENA].'
     winOne: '[PLAYER] hat das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
     winMulti: '[PLAYER] haben das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
-    winMultiAnd: ' und '
+    winTeamNone: 'Komischerweise gab es kein Gewinnerteam in der Arena [ARENA].'
+    winTeam: 'Team [TEAM] hat das Spiel in der [ARENA] gewonnen. Herzlichen Glückwunsch an [PLAYER]!'
 feedback:
     arenaDisabled: abgeschaltet
     arenaOff: 'kein Spiel'
@@ -109,7 +110,10 @@ feedback:
     infoSpectators: 'Zuschauer: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ' und '
+    infoTeam: 'Team [TEAM]:'
     listNone: 'Weder Spleefer noch Zuschauer in Arena [ARENA].'
+    teamblue: 'Blau'
+    teamred: 'Rot'
 admin:
     help: |
       Adminkommandos (/spl admin...)

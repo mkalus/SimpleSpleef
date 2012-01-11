@@ -40,7 +40,7 @@ public abstract class GameFactory {
 		if (type == null || type.equalsIgnoreCase("standard"))
 			return new GameStandard(name);
 		// randomteams games
-		if (type.equalsIgnoreCase("randomteams"))
+		if (type.equalsIgnoreCase("randomteams") || type.equalsIgnoreCase("teams") || type.equalsIgnoreCase("randomteam") || type.equalsIgnoreCase("team"))
 			return new GameWithTeams(name);
 		// inject other game types
 		try {

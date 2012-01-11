@@ -23,11 +23,32 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import de.beimax.simplespleef.SimpleSpleef;
+
 /**
  * @author mkalus
  *
  */
 public class SpleeferList {
+	/**
+	 * Get a compiled list of players with commas and and at the end
+	 * @param players
+	 * @return
+	 */
+	public static String getPrintablePlayerList(LinkedList<Spleefer> players) {
+		// build list of winners
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
+		// compile list of spleefers
+		for (Spleefer spleefer : players) {
+			if (i > 0 && i == players.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("feedback.infoAnd")); // last element with end
+			else if (i > 0) builder.append(comma); // other elements with ,
+			builder.append(spleefer.getPlayer().getDisplayName());
+		}
+		return builder.toString();
+	}
+	
 	/**
 	 *  list of spleefers currently spleefing
 	 *  - Since we have to iterate the list most of the time anyway, we simply use a linked list
@@ -126,6 +147,19 @@ public class SpleeferList {
 	}
 	
 	/**
+	 * counts the spleefers still in the game (team version)
+	 * @param team
+	 * @return
+	 */
+	public int inGame(int team) {
+		int inGame = 0;
+		for (Spleefer spleefer : spleefers) {
+			if (spleefer.getTeam() == team && !spleefer.hasLost()) inGame++;
+		}
+		return inGame;
+	}
+	
+	/**
 	 * counts the size of the spleefers
 	 * @return
 	 */
@@ -139,6 +173,21 @@ public class SpleeferList {
 	 */
 	public List<Spleefer> get() {
 		return spleefers;
+	}
+	
+	/**
+	 * return a specific team list
+	 * @param team
+	 * @return
+	 */
+	public List<Spleefer> getTeam(int team) {
+		LinkedList<Spleefer> compiledTeam = new LinkedList<Spleefer>();
+		for (Spleefer spleefer : spleefers) {
+			if (spleefer.getTeam() == team) compiledTeam.add(spleefer);
+		}
+		
+		// empty teams return null
+		return compiledTeam;
 	}
 	
 	/**

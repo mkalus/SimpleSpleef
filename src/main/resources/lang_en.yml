@@ -73,8 +73,9 @@ broadcasts:
     prizeItems: '[PLAYER] has received [AMOUNT] [ITEM] as prize in arena [ARENA].'
     winNone: 'Strangely there was no winner in arena [ARENA].'
     winOne: '[PLAYER] has won the spleef in arena [ARENA]. Congratulation!'
-    winMulti: '[PLAYER] have won the spleef in arena [ARENA]. Congratulation to all!'
-    winMultiAnd: ', and '
+    winMulti: '[PLAYER] have won the spleef in arena [ARENA]. Congratulations to all!'
+    winTeamNone: 'Strangely there was no winning team in arena [ARENA].'
+    winTeam: 'Team [TEAM] has won a game in area [ARENA]. Congratulations to [PLAYER]!'
 feedback:
     arenaDisabled: disabled
     arenaOff: 'no game'
@@ -109,7 +110,10 @@ feedback:
     infoSpectators: 'Spectators: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ', and '
+    infoTeam: 'Team [TEAM]:'
     listNone: 'There are no spleefers or spectators in arena [ARENA].'
+    teamblue: 'blue'
+    teamred: 'red'
 admin:
     help: |
       Admin Commands (/spl admin...)

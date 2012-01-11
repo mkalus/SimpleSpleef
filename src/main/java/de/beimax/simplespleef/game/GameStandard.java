@@ -591,6 +591,9 @@ public class GameStandard extends Game {
 	
 	@Override
 	public String getNumberOfPlayers() {
+		// no spleefers - return empty string
+		if (spleefers == null || spleefers.size() == 0) return "";
+
 		int active;
 		int max;
 		// shows information depending on state
@@ -644,25 +647,15 @@ public class GameStandard extends Game {
 	public String getListOfUnreadySpleefers() {
 		// no spleefers - return null
 		if (spleefers == null || spleefers.size() == 0) return null;
-		// create list of spleefers
-		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
 		// get unready spleefers
-		LinkedList<String> list = new LinkedList<String>();
+		LinkedList<Spleefer> list = new LinkedList<Spleefer>();
 		for (Spleefer spleefer : spleefers.get()) {
-			if (!spleefer.isReady()) list.add(spleefer.getPlayer().getDisplayName());
+			if (!spleefer.isReady()) list.add(spleefer);
 		}
 		// is the list empty?
 		if (list.size() == 0) return null; // no unready spleefes
 		// compile list
-		StringBuilder builder = new StringBuilder();
-		int i = 0;
-		for (String spleefer : list) {
-			if (i > 0 && i == spleefers.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("feedback.infoAnd")); // last element with end
-			else if (i > 0) builder.append(comma);  // other elements with ,
-			builder.append(spleefer);
-			i++;
-		}
-		return builder.toString();		
+		return SpleeferList.getPrintablePlayerList(list);
 	}
 
 	/**
@@ -889,8 +882,17 @@ public class GameStandard extends Game {
 		// teleport player to loose spawn
 		if (teleport) teleportPlayer(player, "loose");
 		// determine if game is over...
-		if (spleefers.inGame() <= configuration.getInt("remainingPlayersWin", 1))
-			gameOver();
+		if (checkGameOver()) gameOver();
+	}
+	
+	/**
+	 * checks whether the game is over
+	 * @return true for game over conditions are all met
+	 */
+	protected boolean checkGameOver() {
+		// check for number of players that have to remain on the field to tell it a win
+		if (spleefers.inGame() <= configuration.getInt("remainingPlayersWin", 1)) return true;
+		return false;
 	}
 	
 	/**
@@ -898,13 +900,13 @@ public class GameStandard extends Game {
 	 */
 	protected void gameOver() {
 		// determine winners
-		LinkedList<Player> winners = new LinkedList<Player>();
+		LinkedList<Spleefer> winners = new LinkedList<Spleefer>();
 		for (Spleefer spleefer : spleefers.get()) {
 			Player player = spleefer.getPlayer();
 			if (!spleefer.hasLost()) { // not lost?
 				//this guy is a winner - send a message
 				player.sendMessage(ChatColor.DARK_GREEN + SimpleSpleef.getPlugin().ll("feedback.won"));
-				winners.add(player); // aggregate the winners to broadcast them later on
+				winners.add(spleefer); // aggregate the winners to broadcast them later on
 				// pay prizes
 				payPrizeMoney(player);
 				payPrizeExperience(player);
@@ -914,6 +916,19 @@ public class GameStandard extends Game {
 			if (configuration.getBoolean("enableBackCommand", true))
 				SimpleSpleef.getOriginalPositionKeeper().updateOriginalLocationTimestamp(player);
 		}
+		broadcastWinners(winners);
+		
+		// clean up game and end it
+		endGame();
+		// call the game handler to tell it that the game is over
+		SimpleSpleef.getGameHandler().gameOver(this);
+	}
+	
+	/**
+	 * broadcast the winners
+	 * @param winners
+	 */
+	protected void broadcastWinners(LinkedList<Spleefer> winners) {
 		// get the total winners from winners list
 		String broadcastKey;
 		String replacePlayer = "";
@@ -921,26 +936,15 @@ public class GameStandard extends Game {
 		if (winners.size() == 0) broadcastKey = "None";
 		else if (winners.size() == 1) { // one winner?
 			broadcastKey = "One";
-			replacePlayer = winners.getFirst().getDisplayName();
+			replacePlayer = winners.getFirst().getPlayer().getDisplayName();
 		} else { // multiple winners
 			broadcastKey = "Multi";
 			// build list of winners
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < winners.size(); i++) {
-				if (i > 0 && i == winners.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("broadcasts.winMultiAnd")); // last element with end
-				else if (i > 0) builder.append(", "); // other elements with ,
-				builder.append(winners.get(i).getDisplayName());
-			}
-			replacePlayer = builder.toString();
+			replacePlayer = SpleeferList.getPrintablePlayerList(winners);
 		}
 		// broadcast message
 		String broadcastMessage = ChatColor.GOLD + SimpleSpleef.getPlugin().ll("broadcasts.win" + broadcastKey, "[PLAYER]", replacePlayer, "[ARENA]", getName());
-		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));
-		
-		// clean up game and end it
-		endGame();
-		// call the game handler to tell it that the game is over
-		SimpleSpleef.getGameHandler().gameOver(this);
+		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));		
 	}
 
 	/**
