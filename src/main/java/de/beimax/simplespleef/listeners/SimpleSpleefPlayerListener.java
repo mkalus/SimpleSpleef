@@ -49,20 +49,25 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// update checker activated
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.updateNotificationOnLogin", true)) {
-			Player player = event.getPlayer();
+			final Player player = event.getPlayer();
 			// Check for updates whenever an operator or user with the right simplespleef.admin joins the game
 			if (player != null && (player.isOp() || SimpleSpleef.checkPermission(player, "simplespleef.admin"))) {
-				UpdateChecker checker = new UpdateChecker();
-				try {
-					// compare versions
-					String oldVersion = SimpleSpleef.getPlugin().getDescription().getVersion();
-					String newVersion = checker.checkForUpdate(oldVersion);
-					if (newVersion != null) // do we have a version update? => notify player
-						player.sendMessage(SimpleSpleef.getPlugin().ll("feedback.update", "[OLDVERSION]", oldVersion, "[NEWVERSION]", newVersion));
-				} catch (Exception e) {
-					player.sendMessage("SimpleSpleef could not get version update - see log for details.");
-					SimpleSpleef.log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
-				}
+				(new Thread() { // create a new anonymous thread that will check the version asyncronously
+					@Override
+					public void run() {
+						UpdateChecker checker = new UpdateChecker();
+						try {
+							// compare versions
+							String oldVersion = SimpleSpleef.getPlugin().getDescription().getVersion();
+							String newVersion = checker.checkForUpdate(oldVersion);
+							if (newVersion != null) // do we have a version update? => notify player
+								player.sendMessage(SimpleSpleef.getPlugin().ll("feedback.update", "[OLDVERSION]", oldVersion, "[NEWVERSION]", newVersion));
+						} catch (Exception e) {
+							player.sendMessage("SimpleSpleef could not get version update - see log for details.");
+							SimpleSpleef.log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
+						}
+					}
+				}).start();
 			}
 		}
 
