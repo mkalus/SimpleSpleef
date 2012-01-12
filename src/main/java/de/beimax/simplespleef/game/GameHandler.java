@@ -36,13 +36,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.util.Cuboid;
+import de.beimax.simplespleef.util.CuboidImpl;
+import de.beimax.simplespleef.util.CuboidWorldGuard;
 
 /**
  * @author mkalus
@@ -651,14 +652,15 @@ public class GameHandler {
 			// get region
 			ProtectedRegion region = regionManager.getRegion(conf.getString(confbase + ".worldguardRegion"));
 			if (region == null) return null;
-			BlockVector max = region.getMaximumPoint();
+			/*BlockVector max = region.getMaximumPoint();
 			BlockVector min = region.getMinimumPoint();
-			return new Cuboid(world, (min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
+			return new CuboidImpl(world, (min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
 					(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
 					(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
 					(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
 					(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
-					(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ()));
+					(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ()));*/
+			return new CuboidWorldGuard(region, world);
 		} else { // normal, non WorldGuard coordinates
 			// now, check sane coords
 			String firstWorldString = conf.getString(confbase + ".a.world");
@@ -674,7 +676,7 @@ public class GameHandler {
 			int secondZ = conf.getInt(confbase + ".b.z", 0);
 			if (firstX == 0 && firstY == 0 && firstZ == 0 && secondX == 0 && secondY == 0 && secondZ == 0) return null;
 			// create cube
-			return new Cuboid(firstWorld, (firstX<secondX?firstX:secondX), (firstY<secondY?firstY:secondY), (firstZ<secondZ?firstZ:secondZ),
+			return new CuboidImpl(firstWorld, (firstX<secondX?firstX:secondX), (firstY<secondY?firstY:secondY), (firstZ<secondZ?firstZ:secondZ),
 					(firstX>secondX?firstX:secondX), (firstY>secondY?firstY:secondY), (firstZ>secondZ?firstZ:secondZ));
 		}
 	}
