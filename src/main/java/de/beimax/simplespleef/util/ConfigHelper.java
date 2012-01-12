@@ -18,14 +18,17 @@
  **/
 package de.beimax.simplespleef.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -171,7 +174,29 @@ public class ConfigHelper {
 			// get default config from resource
 			InputStream languageConfigStream = SimpleSpleef.getPlugin().getResource("lang_" + language + ".yml");
 		    if (languageConfigStream != null) {
-		        YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(languageConfigStream);
+		    	// read into string
+		    	String config;
+		    	try {
+			    	BufferedReader br = new BufferedReader(new InputStreamReader(languageConfigStream, "UTF-8"));
+			    	StringBuilder sb = new StringBuilder();
+			    	String readLine;
+			    	while ((readLine = br.readLine()) != null) {
+			    		sb.append(readLine).append("\n");
+			    	}
+			    	config =  sb.toString();
+		    	} catch (Exception e) {
+		    		SimpleSpleef.log.severe("[SimpleSpleef] Could not load language file lang_" + language + ".yml! Reason: " + e.getMessage());
+		    		return;
+				}
+		    	
+		        //YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(languageConfigStream);
+		    	YamlConfiguration defConfig = new YamlConfiguration();
+		    	try {
+					defConfig.loadFromString(config);
+				} catch (InvalidConfigurationException e) {
+					SimpleSpleef.log.severe("[SimpleSpleef] Could not convert language file lang_" + language + ".yml to valid conmfiguration! Reason: " + e.getMessage());
+		    		return;
+				}
 		        // update config
 		        languageConfig.setDefaults(defConfig);
 		        languageConfig.options().copyDefaults(true); // copy defaults, too
