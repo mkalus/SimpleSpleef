@@ -174,29 +174,12 @@ public class ConfigHelper {
 			// get default config from resource
 			InputStream languageConfigStream = SimpleSpleef.getPlugin().getResource("lang_" + language + ".yml");
 		    if (languageConfigStream != null) {
-		    	// read into string
-		    	String config;
-		    	try {
-			    	BufferedReader br = new BufferedReader(new InputStreamReader(languageConfigStream, "UTF-8"));
-			    	StringBuilder sb = new StringBuilder();
-			    	String readLine;
-			    	while ((readLine = br.readLine()) != null) {
-			    		sb.append(readLine).append("\n");
-			    	}
-			    	config =  sb.toString();
-		    	} catch (Exception e) {
-		    		SimpleSpleef.log.severe("[SimpleSpleef] Could not load language file lang_" + language + ".yml! Reason: " + e.getMessage());
-		    		return;
-				}
-		    	
+		    	// read into string - this will circumvent breaks in non-UTF-8-environments
+		    	YamlConfiguration defConfig = loadUTF8Stream(languageConfigStream, "lang_" + language + ".yml");
+		    	// the above is the same as
 		        //YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(languageConfigStream);
-		    	YamlConfiguration defConfig = new YamlConfiguration();
-		    	try {
-					defConfig.loadFromString(config);
-				} catch (InvalidConfigurationException e) {
-					SimpleSpleef.log.severe("[SimpleSpleef] Could not convert language file lang_" + language + ".yml to valid conmfiguration! Reason: " + e.getMessage());
-		    		return;
-				}
+		    	// only save...
+		    	if (defConfig == null) continue; // errors have been logged already
 		        // update config
 		        languageConfig.setDefaults(defConfig);
 		        languageConfig.options().copyDefaults(true); // copy defaults, too
@@ -207,6 +190,38 @@ public class ConfigHelper {
 		        	SimpleSpleef.log.warning("[SimpleSpleef] Warning: Could not write lang_" + language + ".yml - reason: " + e.getMessage());
 		        }
 		    }
+		}
+	}
+	
+	/**
+	 * Converts stream to YAML configuration - UTF-8 enconded. Will prevent code breaks - fixes very stupid default behaviour of Bukkit
+	 * @param stream
+	 * @param file
+	 * @return
+	 */
+	protected YamlConfiguration loadUTF8Stream(InputStream stream, String file) {
+    	// read into string - this will circumvent breaks in non-UTF-8-environments
+    	String config;
+    	try {
+	    	BufferedReader br = new BufferedReader(new InputStreamReader(stream, "UTF-8")); // force UTF-8 => why does Bukkit not do this itself???
+	    	StringBuilder sb = new StringBuilder();
+	    	String readLine;
+	    	while ((readLine = br.readLine()) != null) {
+	    		sb.append(readLine).append("\n");
+	    	}
+	    	config =  sb.toString();
+    	} catch (Exception e) {
+    		SimpleSpleef.log.severe("[SimpleSpleef] Could not load resource file " + file + "! Reason: " + e.getMessage());
+    		return null;
+		}
+
+    	YamlConfiguration defConfig = new YamlConfiguration();
+    	try {
+			defConfig.loadFromString(config);
+			return defConfig;
+		} catch (InvalidConfigurationException e) {
+			SimpleSpleef.log.severe("[SimpleSpleef] Could not convert resource file " + file + " to valid configuration! Reason: " + e.getMessage());
+			return null;
 		}
 	}
 }

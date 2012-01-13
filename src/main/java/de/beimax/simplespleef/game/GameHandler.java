@@ -652,15 +652,7 @@ public class GameHandler {
 			// get region
 			ProtectedRegion region = regionManager.getRegion(conf.getString(confbase + ".worldguardRegion"));
 			if (region == null) return null;
-			/*BlockVector max = region.getMaximumPoint();
-			BlockVector min = region.getMinimumPoint();
-			return new CuboidImpl(world, (min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
-					(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
-					(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
-					(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
-					(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
-					(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ()));*/
-			return new CuboidWorldGuard(region, world);
+			return new CuboidWorldGuard(region, world); // create world guard cuboid - very cool!
 		} else { // normal, non WorldGuard coordinates
 			// now, check sane coords
 			String firstWorldString = conf.getString(confbase + ".a.world");
