@@ -1009,7 +1009,10 @@ public class GameStandard extends Game {
 		// get list
 		List<String> prizes = configuration.getStringList("itemPrizes");
 		// random entry...
-		String prize = prizes.get(generator.nextInt(prizes.size() - 1));
+		String prize;
+		if (prizes.size() == 1) { // if there is only one entry...
+			prize = prizes.get(0);
+		} else prize = prizes.get(generator.nextInt(prizes.size() - 1));
 		// interpret line to Item Stack
 		ItemStack itemStack = MaterialHelper.getItemStackFromString(prize);
 		// give prizes to player
