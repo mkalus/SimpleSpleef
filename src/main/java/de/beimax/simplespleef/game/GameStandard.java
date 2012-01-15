@@ -389,6 +389,8 @@ public class GameStandard extends Game {
 		if (configuration.getInt("countdownFrom", 10) == 0) {
 			start(); // if countdown is null, start game right away
 		} else {
+			// teleport players to arena
+			teleportPlayersAtGameStart();
 			// create countdown and start it
 			countdown = new Countdown();
 			countdown.start();
@@ -1354,7 +1356,7 @@ public class GameStandard extends Game {
 			sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownStart"), broadcast);
 			
 			// teleport players to arena
-			teleportPlayersAtGameStart();
+			//teleportPlayersAtGameStart(); // this is incompatible with noLagg and other thread based plugins - moving it a section up
 
 			// get time
 			long start = System.currentTimeMillis() + 1000;
