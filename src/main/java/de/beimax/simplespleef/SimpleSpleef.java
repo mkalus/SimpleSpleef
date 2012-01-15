@@ -67,7 +67,7 @@ public class SimpleSpleef extends JavaPlugin {
 	 * @return
 	 */
 	public static boolean checkPermission(CommandSender sender, String permission) {
-		if (SimpleSpleef.permission != null) { // use Vault to check permissions
+		if (SimpleSpleef.permission != null) { // use Vault to check permissions - actually does nothing different than sender.hasPermission at the moment, but might change
 			try {
 				return SimpleSpleef.permission.has(sender, permission);
 			} catch (Exception e) {
