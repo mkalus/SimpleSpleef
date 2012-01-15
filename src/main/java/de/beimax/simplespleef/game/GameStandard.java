@@ -104,6 +104,11 @@ public class GameStandard extends Game {
 	private boolean allowDigBlocks = true;
 	
 	/**
+	 * block degenerator that keeps track of players standing on something, if needed
+	 */
+	protected PlayerOnBlockDegenerator playerOnBlockDegenerator;
+	
+	/**
 	 * shortcuts for digging settings
 	 */
 	protected static final int DIGGING_NONE = 0;
@@ -196,7 +201,20 @@ public class GameStandard extends Game {
 		else if (arena == null) diggingIfFloorUndefined = GameStandard.DIGGING_EVERYWHERE;
 		else if (dig.equals("outsidearena")) diggingIfFloorUndefined = GameStandard.DIGGING_OUTSIDE_ARENA;
 		else diggingIfFloorUndefined = GameStandard.DIGGING_IN_ARENA;
+		
+		// block degeneration
+		renewPlayerOnBlockGenerator();
+
 		//TODO: more definitions/shortcuts
+	}
+	
+	/**
+	 * renew the block degenerator for players
+	 */
+	protected void renewPlayerOnBlockGenerator() {
+		int blockDegeneration = configuration.getInt("blockDegeneration", -1);
+		if (blockDegeneration >= 0) playerOnBlockDegenerator = new PlayerOnBlockDegenerator(blockDegeneration, configuration.getStringList("degeneratingBlocks"));
+		else playerOnBlockDegenerator = null;		
 	}
 
 	@Override
@@ -272,6 +290,8 @@ public class GameStandard extends Game {
 			// send message to all receivers
 			sendMessage(broadcastMessage, player);
 		}
+		// if degeneration keeper is on, delete player from list
+		if (playerOnBlockDegenerator != null) playerOnBlockDegenerator.removePlayer(player);
 		// teleport him/her back to original position, if supported
 		if (configuration.getBoolean("enableBackCommand", true)) {
 			// get original position
@@ -457,6 +477,11 @@ public class GameStandard extends Game {
 		// still in countdown? if yes, kill it!
 		if (countdown != null)
 			countdown.interrupted = true;
+		// if degeneration keeper is on, delete and renew it
+		if (playerOnBlockDegenerator != null) {
+			playerOnBlockDegenerator.stopBlockDegenerator();
+			renewPlayerOnBlockGenerator(); // renew the degenerator
+		}
 		// change game status
 		status = STATUS_FINISHED;
 		// only do this when game was in progress
@@ -715,6 +740,7 @@ public class GameStandard extends Game {
 				return;
 			}
 		}
+
 		// check location within "lose" cuboid (setting lose)
 		if (lose != null && lose.contains(player.getLocation())) {
 			// broadcast message of somebody loosing
@@ -728,6 +754,11 @@ public class GameStandard extends Game {
 			// Ha, lost!
 			playerLoses(player, true);
 			return;			
+		}
+
+		// check block degeneration
+		if (playerOnBlockDegenerator != null && isInGame()) {
+			playerOnBlockDegenerator.updatePlayer(player);
 		}
 	}
 
@@ -877,6 +908,8 @@ public class GameStandard extends Game {
 	protected void playerLoses(Player player, boolean teleport) {
 		// set player to lost
 		spleefers.setLost(player);
+		// if degeneration keeper is on, delete player from list
+		if (playerOnBlockDegenerator != null) playerOnBlockDegenerator.removePlayer(player);
 		// message to player
 		player.sendMessage(ChatColor.RED + SimpleSpleef.getPlugin().ll("feedback.lost"));
 		// broadcast message has to be sent by calling method
@@ -1252,19 +1285,9 @@ public class GameStandard extends Game {
 		// allowed blocks? => allowDigBlocks
 		// alternatively: disallowDigBlocks
 		if (digBlocks != null) {
-			for (ItemStack compareBlock : digBlocks) { // cycle through blocks to compare stuff
-				if (compareBlock != null && block.getTypeId() == compareBlock.getTypeId()) {
-					try {
-						// either type is -1 or data value matches
-						if (compareBlock.getData() == null || block.getData() == compareBlock.getData().getData())
-							return allowDigBlocks; // found -> return state						
-					} catch (NullPointerException e) { // possibly thrown by compareBlock.getData() if data was -1
-						return allowDigBlocks;
-					}
-				}
-			}
-			// not found
-			return !allowDigBlocks; // negate
+			if (MaterialHelper.isSameBlockType(block, digBlocks)) return allowDigBlocks; // found -> return state
+			else // not found
+				return !allowDigBlocks; // negate
 		}
 		return true;
 	}

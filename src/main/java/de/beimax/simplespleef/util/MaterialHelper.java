@@ -18,7 +18,10 @@
  **/
 package de.beimax.simplespleef.util;
 
+import java.util.List;
+
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -99,5 +102,40 @@ public abstract class MaterialHelper {
 		else stack = new ItemStack(material, number); //-1 to define a generic material (like all wool, not wool:0 = white wool)
 
 		return stack;
+	}
+	
+	/**
+	 * Checks a block an returns true if similar to compareBlock
+	 * @param block
+	 * @param compareBlock
+	 * @return
+	 */
+	public static boolean isSameBlockType(Block block, ItemStack compareBlock) {
+		if (block == null || compareBlock == null) return false; // no NPEs
+		
+		try {
+			// either type is -1 or data value matches
+			if (compareBlock.getData() == null || block.getData() == compareBlock.getData().getData())
+				return true; // found -> return state						
+		} catch (NullPointerException e) { // possibly thrown by compareBlock.getData() if data was -1
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Checks a block an returns true if similar to one of the compareBlocks
+	 * @param block
+	 * @param compareBlocks
+	 * @return
+	 */
+	public static boolean isSameBlockType(Block block, List<ItemStack> compareBlocks) {
+		for (ItemStack compareBlock : compareBlocks) { // cycle through blocks to compare stuff
+			if (isSameBlockType(block, compareBlock)) return true;
+		}
+		// not found
+		return false; // negate
+		
 	}
 }
