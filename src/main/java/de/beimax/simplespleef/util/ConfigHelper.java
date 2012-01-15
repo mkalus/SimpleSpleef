@@ -64,31 +64,10 @@ public class ConfigHelper {
 
 			// get default arena
 			ConfigurationSection section = defConfig.getConfigurationSection("arenas.default");
-			// cycle through sections
-			for (String key: section.getKeys(true)) {
-				if (key.equals("name")) // name set here
-					newSection.set(key, name);
-				else if (key.equals("arena") || key.startsWith("arena.")) continue; // ignore
-				else if (key.equals("floor") || key.startsWith("floor.")) continue; // ignore
-				else if (key.equals("lose") || key.startsWith("lose.")) continue; // ignore
-				else if (key.equals("loose") || key.startsWith("loose.")) {
-					// correct English...
-					key = "l" + key.substring(2);
-					continue; // ignore
-				} else if (key.equals("loungeSpawn") || key.startsWith("loungeSpawn.")) continue; // ignore
-				else if (key.equals("gameSpawn") || key.startsWith("gameSpawn.")) continue; // ignore
-				else if (key.equals("loungeSpawn") || key.startsWith("loungeSpawn.")) continue; // ignore
-				else if (key.equals("spectatorSpawn") || key.startsWith("spectatorSpawn.")) continue; // ignore
-				else if (key.equals("loseSpawn") || key.startsWith("loseSpawn.")) continue; // ignore
-				else if (key.equals("looseSpawn") || key.startsWith("looseSpawn.")) {
-					// correct English...
-					key = "l" + key.substring(2);
-					continue; // ignore
-				} 
-				else if (key.equals("redSpawn") || key.startsWith("redSpawn.")) continue; // ignore
-				else if (key.equals("blueSpawn") || key.startsWith("blueSpawn.")) continue; // ignore
-				else newSection.set(key, section.get(key)); // copy into the newly created section
-			}
+
+			// copy default to target section
+			copySection(newSection, section);
+			newSection.set("name", name); //set new name
 
 			// save configuration now
 			SimpleSpleef.getPlugin().saveConfig();
@@ -98,6 +77,20 @@ public class ConfigHelper {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * copy a whole section from a source to a target
+	 * @param target
+	 * @param source
+	 */
+	public void copySection(ConfigurationSection target, ConfigurationSection source) {
+		if (target == null || source == null) return; //no NPEs!
+		for (String section : source.getKeys(true)) { //copy sections
+			if (source.isConfigurationSection(section)) {
+				target.createSection(section);
+			} else target.set(section, source.get(section));
+		}
 	}
 
 	/**

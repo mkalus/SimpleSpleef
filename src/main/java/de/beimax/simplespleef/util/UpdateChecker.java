@@ -75,6 +75,7 @@ public class UpdateChecker {
 				config.set("announceLose", config.getBoolean("announceLoose", true));
 				config.set("announceLoose", null);
 			}
+			ConfigHelper configHelper = new ConfigHelper();
 			// for each arena
 			for (String arena : config.getConfigurationSection("arenas").getKeys(false)) {
 				ConfigurationSection myConfig = config.getConfigurationSection("arenas." + arena);
@@ -101,20 +102,16 @@ public class UpdateChecker {
 					myConfig.set("playersLooseShovelAtGameEnd", null);
 				}
 				if (myConfig.contains("loose") && myConfig.isConfigurationSection("loose")) {
-					for (String subsection : myConfig.getConfigurationSection("loose").getKeys(true)) { //copy sections
-						if (myConfig.isConfigurationSection("loose." + subsection)) {
-							myConfig.createSection("lose." + subsection);
-						} else myConfig.set("lose." + subsection, myConfig.get("loose." + subsection));
-					}
-					myConfig.set("loose", null);
+					// copy loose to lose
+					ConfigurationSection newSection = myConfig.createSection("lose");
+					configHelper.copySection(newSection, myConfig.getConfigurationSection("loose"));
+					myConfig.set("loose", null); // delete old section
 				}
 				if (myConfig.contains("looseSpawn") && myConfig.isConfigurationSection("looseSpawn")) {
-					for (String subsection : myConfig.getConfigurationSection("looseSpawn").getKeys(true)) { //copy sections
-						if (myConfig.isConfigurationSection("looseSpawn." + subsection)) {
-							myConfig.createSection("loseSpawn." + subsection);
-						} else myConfig.set("loseSpawn." + subsection, myConfig.get("looseSpawn." + subsection));
-					}
-					myConfig.set("looseSpawn", null);
+					// copy looseSpawn to loseSpawn
+					ConfigurationSection newSection = myConfig.createSection("loseSpawn");
+					configHelper.copySection(newSection, myConfig.getConfigurationSection("looseSpawn"));
+					myConfig.set("looseSpawn", null); // delete old section
 				}
 			}
 			changed = true;
