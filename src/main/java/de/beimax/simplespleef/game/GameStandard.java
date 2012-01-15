@@ -1036,8 +1036,21 @@ public class GameStandard extends Game {
 	 * @return
 	 */
 	protected boolean clearInventories() {
-		//TODO implement
-		return false;
+		// check setting in configuration
+		if (!configuration.getBoolean("clearInventory", false)) return false;
+		if (spleefers == null) return false; // no NPE
+
+		InventoryKeeper inventoryKeeper = new InventoryKeeper();
+		for (Spleefer spleefer : spleefers.get()) {
+			Player player = spleefer.getPlayer();
+			if (inventoryKeeper.saveInventory(player)) {
+				player.getInventory().clear(); // clear player's inventory, if saved
+			} else {
+				// log error
+				SimpleSpleef.log.severe("[SimpleSpleef] Could not save inventory of " + player.getName() + ". Keeping it.");
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -1045,8 +1058,14 @@ public class GameStandard extends Game {
 	 * @return
 	 */
 	protected boolean restoreAllInventories() {
-		//TODO implement
-		return false;
+		// check setting in configuration
+		if (!configuration.getBoolean("clearInventory", false)) return false;
+		if (spleefers == null) return false; // no NPE
+
+		for (Spleefer spleefer : spleefers.get()) {
+			restoreInventory(spleefer.getPlayer());
+		}
+		return true;
 	}
 	
 	/**
@@ -1054,8 +1073,11 @@ public class GameStandard extends Game {
 	 * @return
 	 */
 	protected boolean restoreInventory(Player player) {
-		//TODO implement
-		return false;
+		// check setting in configuration
+		if (!configuration.getBoolean("clearInventory", false)) return false;
+		if (player == null) return false; // no NPE
+
+		return new InventoryKeeper().restoreInventory(player);
 	}
 	
 	/**
