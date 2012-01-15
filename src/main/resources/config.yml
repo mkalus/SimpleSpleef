@@ -79,7 +79,6 @@ arenas:
 # Clear inventory at game start and restore after game has ended
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid
-# Not implemented yet
         addToInventory: false
         addInventoryItems:
             - 1:BOW

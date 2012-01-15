@@ -52,9 +52,10 @@ public class InventoryKeeper {
 		} catch (Exception e) {
 			SimpleSpleef.log.severe("[SimpleSpleef] Could not create save player's inventory " + file + "! Skipping save...");
 			return false;
-		}*/
+		}
+		return true;*/
 		SimpleSpleef.log.warning("[SimpleSpleef] ItemStack serialization is broken right now - skipping inventory saving.");
-		return true;
+		return false;
 	}
 	
 	/**

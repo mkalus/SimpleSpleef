@@ -1085,8 +1085,31 @@ public class GameStandard extends Game {
 	 * @return
 	 */
 	protected boolean addToInventories() {
-		//TODO implement
-		return false;
+		// check setting in configuration
+		if (!configuration.getBoolean("addToInventory", false) || !configuration.isList("addInventoryItems")) return false;
+		
+		// create items for the inventory
+		List<String> addInventoryItems = configuration.getStringList("addInventoryItems");
+		LinkedList<ItemStack> itemStack = new LinkedList<ItemStack>();
+		for (String item : addInventoryItems) {
+			ItemStack stack = MaterialHelper.getItemStackFromString(item);
+			if (stack == null)
+				SimpleSpleef.log.warning("[SimpleSpleef] Could not parse addInventoryItems to item stack in arena " + getId() + ", line: " + item);
+			else itemStack.add(stack);
+		}
+		// only continue if stack is greater 0
+		if (itemStack.size() == 0) return false;
+		addInventoryItems = null; // save memory
+		
+		// now give spleefers stack items
+		for (Spleefer spleefer : spleefers.get()) {
+			Player player = spleefer.getPlayer();
+			for (ItemStack item : itemStack) {
+				player.getInventory().addItem(item.clone());
+			}
+		}
+
+		return true;
 	}
 	
 	/**
