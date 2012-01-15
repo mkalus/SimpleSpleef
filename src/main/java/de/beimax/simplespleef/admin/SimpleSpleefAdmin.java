@@ -102,7 +102,8 @@ public class SimpleSpleefAdmin {
 			// check argument length
 			if (checkThreeArgs(sender, args, adminCommand))
 				delarenaCommand(sender, args[2]);
-		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose")) {
+		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose") || adminCommand.equals("lose")) {
+			if (adminCommand.equals("loose")) adminCommand = "lose"; //correct spelling
 			// check for WorldEdit selection
 			if (args.length == 2 && SimpleSpleef.getWorldEditAPI() != null) {
 				defineArenaPointWorldEdit(sender, adminCommand);
@@ -189,7 +190,7 @@ public class SimpleSpleefAdmin {
 		// check third argument
 		String spawn = args[2].toLowerCase();
 		if (spawn.equals("lounge") || spawn.equals("game") || spawn.equals("spectator") || spawn.equals("loose")
-				 || spawn.equals("red") || spawn.equals("blue"))
+				 || spawn.equals("lose") || spawn.equals("red") || spawn.equals("blue"))
 			return true;
 		// error feedback
 		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgumentSpawn"));

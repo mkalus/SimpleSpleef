@@ -71,7 +71,7 @@ public class GameStandard extends Game {
 	/**
 	 * to make game faster:
 	 */
-	protected Set<Material> looseOnTouchMaterial;
+	protected Set<Material> loseOnTouchMaterial;
 
 	/**
 	 * private countdown class
@@ -94,9 +94,9 @@ public class GameStandard extends Game {
 	private Cuboid floor;
 
 	/**
-	 * loose cuboid
+	 * lose cuboid
 	 */
-	private Cuboid loose;
+	private Cuboid lose;
 	
 	/**
 	 * set to false, if disallowDigBlocks has been chosen in config
@@ -151,23 +151,23 @@ public class GameStandard extends Game {
 	public void defineSettings(ConfigurationSection conf) {
 		this.configuration = conf;
 		// define defaults/shortcuts
-		if (conf.getBoolean("looseOnTouchBlocks", true)) {
-			// is looseBlocks a valid list?
-			if (conf.isList("looseBlocks")) { //yes
-				this.looseOnTouchMaterial = new HashSet<Material>();
-				for (String material : conf.getStringList("looseBlocks")) {
+		if (conf.getBoolean("loseOnTouchBlocks", true)) {
+			// is loseBlocks a valid list?
+			if (conf.isList("loseBlocks")) { //yes
+				this.loseOnTouchMaterial = new HashSet<Material>();
+				for (String material : conf.getStringList("loseBlocks")) {
 					Material m = Material.getMaterial(material);
 					// check existence of material
-					if (m == null) SimpleSpleef.log.warning("[SimpleSpleef] " + getId() + " configuration warning! Unknown Material in looseBlocks: " + material);
-					else this.looseOnTouchMaterial.add(m);
+					if (m == null) SimpleSpleef.log.warning("[SimpleSpleef] " + getId() + " configuration warning! Unknown Material in loseBlocks: " + material);
+					else this.loseOnTouchMaterial.add(m);
 				}
-				if (this.looseOnTouchMaterial.size() == 0) this.looseOnTouchMaterial = null; //no
-			} else this.looseOnTouchMaterial = null; //no
-		} else this.looseOnTouchMaterial = null; // reset
-		// define arena, floor and loose cuboids
+				if (this.loseOnTouchMaterial.size() == 0) this.loseOnTouchMaterial = null; //no
+			} else this.loseOnTouchMaterial = null; //no
+		} else this.loseOnTouchMaterial = null; // reset
+		// define arena, floor and lose cuboids
 		arena = SimpleSpleef.getGameHandler().configToCuboid(getId(), "arena");
 		floor = SimpleSpleef.getGameHandler().configToCuboid(getId(), "floor");
-		loose = SimpleSpleef.getGameHandler().configToCuboid(getId(), "loose");
+		lose = SimpleSpleef.getGameHandler().configToCuboid(getId(), "lose");
 		// block destruction/keep hashes
 		if (conf.isList("allowDigBlocks")) {
 			allowDigBlocks = true;
@@ -293,8 +293,8 @@ public class GameStandard extends Game {
 			// set player to lost, so that the player is not teleported twice
 			spleefers.setLost(player);
 			endGame(); // actually end the game
-		} else { // game is in progress - player looses - simple as that
-			// player looses
+		} else { // game is in progress - player loses - simple as that
+			// player loses
 			playerLoses(player, false); // do not teleport leaving players...
 		}
 		return true;
@@ -684,13 +684,13 @@ public class GameStandard extends Game {
 		Player player = event.getPlayer();
 		if (!isInProgress() || spleefers.hasLost(player)) return; // if game is not in progress or player has lost, return
 		
-		//player touched certain block (setting looseOnTouchBlocks)
-		if (looseOnTouchMaterial != null) {
+		//player touched certain block (setting loseOnTouchBlocks)
+		if (loseOnTouchMaterial != null) {
 			Material touchedBlock = event.getTo().getBlock().getType();
 			Material onBlock = player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
 			// what happened exactly?
-			boolean lostByTouching = looseOnTouchMaterial.contains(touchedBlock);
-			boolean lostByStandingOn = looseOnTouchMaterial.contains(onBlock);
+			boolean lostByTouching = loseOnTouchMaterial.contains(touchedBlock);
+			boolean lostByStandingOn = loseOnTouchMaterial.contains(onBlock);
 			if (lostByTouching || lostByStandingOn) {
 				// Block name
 				String blockName;
@@ -701,7 +701,7 @@ public class GameStandard extends Game {
 				if (translatedBlockName != null) blockName = translatedBlockName;
 				// broadcast message of somebody loosing
 				String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MATERIAL]", blockName);
-				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
 					SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 				} else {
 					// send message to all receivers
@@ -712,11 +712,11 @@ public class GameStandard extends Game {
 				return;
 			}
 		}
-		// check location within "loose" cuboid (setting loose)
-		if (loose != null && loose.contains(player.getLocation())) {
+		// check location within "lose" cuboid (setting lose)
+		if (lose != null && lose.contains(player.getLocation())) {
 			// broadcast message of somebody loosing
 			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByCuboid", "[PLAYER]", player.getName(), "[ARENA]", getName());
-			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
 				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				// send message to all receivers
@@ -782,13 +782,13 @@ public class GameStandard extends Game {
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		// call helper method
-		looseOnQuitOrKick(event.getPlayer());
+		loseOnQuitOrKick(event.getPlayer());
 	}
 
 	@Override
 	public void onPlayerKick(PlayerKickEvent event) {
 		// call helper method
-		looseOnQuitOrKick(event.getPlayer());
+		loseOnQuitOrKick(event.getPlayer());
 		// delete original position, because player is banned anyhow
 		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
 	}
@@ -797,17 +797,17 @@ public class GameStandard extends Game {
 	 * helper method for onPlayerQuit and onPlayerKick
 	 * @param player
 	 */
-	protected void looseOnQuitOrKick(Player player) {
-		if (configuration.getBoolean("looseOnLogout", true)) {
+	protected void loseOnQuitOrKick(Player player) {
+		if (configuration.getBoolean("loseOnLogout", true)) {
 			// broadcast message of somebody loosing
 			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByQuitting", "[PLAYER]", player.getName(), "[ARENA]", getName());
-			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
 				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				// send message to all receivers
 				sendMessage(broadcastMessage, player);
 			}
-			// player looses, if set to true
+			// player loses, if set to true
 			playerLoses(player, false); // do not teleport dead players...
 		} // else - do nothing...
 	}
@@ -821,16 +821,16 @@ public class GameStandard extends Game {
 	public void onPlayerDeath(Player player) {
 		// delete original position, because player spawns somewhere else anyhow
 		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
-		if (configuration.getBoolean("looseOnDeath", true)) {
+		if (configuration.getBoolean("loseOnDeath", true)) {
 			// broadcast message of somebody loosing
 			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.lostByDeath", "[PLAYER]", player.getName(), "[ARENA]", getName());
-			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLoose", true)) {
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
 				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				// send message to all receivers
 				sendMessage(broadcastMessage, player);
 			}
-			// player looses, if set to true
+			// player loses, if set to true
 			playerLoses(player, false); // do not teleport dead players...
 		} // else - do nothing...
 	}
@@ -869,7 +869,7 @@ public class GameStandard extends Game {
 	 * called when player loses a game
 	 * (broadcast message has to be sent by calling method)
 	 * @param player
-	 * @param teleport true, if player should be teleported to loose spawn, if possible
+	 * @param teleport true, if player should be teleported to lose spawn, if possible
 	 */
 	protected void playerLoses(Player player, boolean teleport) {
 		// set player to lost
@@ -879,8 +879,8 @@ public class GameStandard extends Game {
 		// broadcast message has to be sent by calling method
 		// shovel lost, too
 		removeShovelItem(player, true);
-		// teleport player to loose spawn
-		if (teleport) teleportPlayer(player, "loose");
+		// teleport player to lose spawn
+		if (teleport) teleportPlayer(player, "lose");
 		// determine if game is over...
 		if (checkGameOver()) gameOver();
 	}
@@ -1100,12 +1100,12 @@ public class GameStandard extends Game {
 	}
 	
 	/**
-	 * if "playersLooseShovelAtGameEnd" setting of area is true, remove shovel from inventory of player
+	 * if "playersLoseShovelAtGameEnd" setting of area is true, remove shovel from inventory of player
 	 * @return
 	 */
 	protected boolean removeShovelItems() {
 		// check setting first
-		if (!configuration.getBoolean("playersLooseShovelAtGameEnd", true)) return false; // no shovels lost
+		if (!configuration.getBoolean("playersLoseShovelAtGameEnd", true)) return false; // no shovels lost
 		// if yes, remove shovels from remaining players
 		for (Spleefer spleefer : spleefers.get()) {
 			if (!spleefer.hasLost())
@@ -1117,12 +1117,12 @@ public class GameStandard extends Game {
 	/**
 	 * remove shovel item from single player
 	 * @param player
-	 * @param checkSetting - if true, setting playersLooseShovelAtGameEnd is checked before removal
+	 * @param checkSetting - if true, setting playersLoseShovelAtGameEnd is checked before removal
 	 * @return
 	 */
 	protected boolean removeShovelItem(Player player, boolean checkSetting) {
 		// should setting be checked first?
-		if (checkSetting && !configuration.getBoolean("playersLooseShovelAtGameEnd", true)) return false; // no shovel lost
+		if (checkSetting && !configuration.getBoolean("playersLoseShovelAtGameEnd", true)) return false; // no shovel lost
 		// get material
 		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
 		if (shovelItem == null) {
@@ -1313,12 +1313,12 @@ public class GameStandard extends Game {
 		this.configuration = null;
 		this.spleefers = null;
 		this.spectators = null;
-		this.looseOnTouchMaterial = null;
+		this.loseOnTouchMaterial = null;
 		this.countdown = null;
 		this.teleportOkList = null;
 		this.arena = null;
 		this.floor = null;
-		this.loose = null;
+		this.lose = null;
 		//TODO add more
 	}
 	

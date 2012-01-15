@@ -5,7 +5,7 @@
 # will interpret the value as integer and bug SimpleSpleef...
 # Material ids/names can be found at https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/Material.java
 # Version number of configuration - do not touch! It is used for automatic updates of configuration settings. 
-version: 2
+version: 3
 # Language - reads configuration from specific language file
 language: en
 settings:
@@ -40,8 +40,8 @@ settings:
     announceDelete: true
 # globally announce countdown
     announceCountdown: false
-# globally announce when players loose
-    announceLoose: true
+# globally announce when players lose
+    announceLose: true
 # globally announce when players win the game
     announceWin: true
 # globally announce the prize won by a player
@@ -126,16 +126,16 @@ arenas:
         prizeExperiencePerPlayer: 0
 # Winner gets this amount of experience fixed (total is per player + fixed)
         prizeExperienceFixed: 0
-# Loose game by touching certain blocks?
-        looseOnTouchBlocks: true
-# Loose game by touching these blocks (in them/standing on them - name/id)
-        looseBlocks:
+# Lose game by touching certain blocks?
+        loseOnTouchBlocks: true
+# Lose game by touching these blocks (in them/standing on them - name/id)
+        loseBlocks:
             - STATIONARY_WATER
             - STATIONARY_LAVA
-# Players dying loose
-        looseOnDeath: true
-# Players logging out loose
-        looseOnLogout: false
+# Players dying lose
+        loseOnDeath: true
+# Players logging out lose
+        loseOnLogout: false
 # Players do not starve while playing in the arena
         noHunger: true
 # Disallow PVP while spleefing (no effect on no-pvp worlds)
@@ -151,8 +151,8 @@ arenas:
         instantDig: true
 # Alternatively: players are given shovel at the start of the game
         playersReceiveShovelAtGameStart: false
-# players loose shovel when leaving game (also stop, etc.)
-        playersLooseShovelAtGameEnd: false
+# players lose shovel when leaving game (also stop, etc.)
+        playersLoseShovelAtGameEnd: false
 # Item (name/id) of shovel/spade
         shovelItem: DIAMOND_SPADE
 # Countdown starts at
@@ -203,8 +203,8 @@ arenas:
                 x: 0
                 y: 0
                 z: 0
-# Entering this cube area will make players loose
-        loose:
+# Entering this cube area will make players lose
+        lose:
             enabled: false
             a:
                 world: world
@@ -262,7 +262,7 @@ arenas:
             y: 0.0
             z: 0.0
 # Teleport point where players are teleported to after loosing game
-        looseSpawn:
+        loseSpawn:
             enabled: false
             world: world
             pitch: 0.0

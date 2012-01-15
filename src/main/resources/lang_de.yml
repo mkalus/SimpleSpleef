@@ -124,8 +124,8 @@ admin:
       delarena arena|Lösche Arena.
       arena a/b|Definiere Punkt a/b der Arena.
       floor a/b|Definiere Punkt a/b des Bodens.
-      loose a/b|Definiere Punkt a/b des Loose-Kubus.
-      spawn lounge/game/spectator/loose|Setze Spawnpunkt.
+      lose a/b|Definiere Punkt a/b des Lose-Kubus.
+      spawn lounge/game/spectator/lose|Setze Spawnpunkt.
       disable/enable arena|(De)aktiviere Arena.
       reload|Neuladen der config.yml.
 adminerrors:
@@ -133,7 +133,7 @@ adminerrors:
     twoArguments: '[COMMAND] erwartet genau zwei Parameter - Name + neuer Wert'
     aOrB: '[COMMAND] erwartet genau einen Parameter a oder b.'
     addarenaArenaExists: 'Arena [ARENA] existiert bereits.'
-    oneArgumentSpawn: 'spawn erwartet genau einen Parameter lounge, game, spectator oder loose.'
+    oneArgumentSpawn: 'spawn erwartet genau einen Parameter lounge, game, spectator oder lose.'
     worldEditRegion: 'Keine WorldEdit-Region ausgewählt.'
 adminfeedback:
     setarena: 'Arena [ARENA] ausgewählt!'

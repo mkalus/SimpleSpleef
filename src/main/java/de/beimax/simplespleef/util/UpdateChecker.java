@@ -24,6 +24,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 
 import de.beimax.simplespleef.SimpleSpleef;
 
@@ -68,11 +69,61 @@ public class UpdateChecker {
 			config.set("allowDiggingOutsideArena", null); // delete obsolete setting allowDiggingOutsideArena
 			changed = true;
 		}
+		if (version <= 2) {
+			//update loose => lose
+			if (config.contains("announceLoose")) {
+				config.set("announceLose", config.getBoolean("announceLoose", true));
+				config.set("announceLoose", null);
+			}
+			// for each arena
+			for (String arena : config.getConfigurationSection("arenas").getKeys(false)) {
+				ConfigurationSection myConfig = config.getConfigurationSection("arenas." + arena);
+				if (myConfig.contains("looseOnTouchBlocks")) {
+					myConfig.set("loseOnTouchBlocks", myConfig.getBoolean("looseOnTouchBlocks", true));
+					myConfig.set("looseOnTouchBlocks", null);
+				}
+				if (myConfig.contains("looseBlocks")) {
+					if (myConfig.isList("looseBlocks"))
+						myConfig.set("loseBlocks", myConfig.getStringList("looseBlocks"));
+					else myConfig.set("loseBlocks", myConfig.get("looseBlocks"));
+					myConfig.set("looseBlocks", null);
+				}
+				if (myConfig.contains("looseOnDeath")) {
+					myConfig.set("loseOnDeath", myConfig.getBoolean("looseOnDeath", true));
+					myConfig.set("looseOnDeath", null);
+				}
+				if (myConfig.contains("looseOnLogout")) {
+					myConfig.set("loseOnLogout", myConfig.getBoolean("looseOnLogout", true));
+					myConfig.set("looseOnLogout", null);
+				}
+				if (myConfig.contains("playersLooseShovelAtGameEnd")) {
+					myConfig.set("playersLoseShovelAtGameEnd", myConfig.getBoolean("playersLooseShovelAtGameEnd", true));
+					myConfig.set("playersLooseShovelAtGameEnd", null);
+				}
+				if (myConfig.contains("loose") && myConfig.isConfigurationSection("loose")) {
+					for (String subsection : myConfig.getConfigurationSection("loose").getKeys(true)) { //copy sections
+						if (myConfig.isConfigurationSection("loose." + subsection)) {
+							myConfig.createSection("lose." + subsection);
+						} else myConfig.set("lose." + subsection, myConfig.get("loose." + subsection));
+					}
+					myConfig.set("loose", null);
+				}
+				if (myConfig.contains("looseSpawn") && myConfig.isConfigurationSection("looseSpawn")) {
+					for (String subsection : myConfig.getConfigurationSection("looseSpawn").getKeys(true)) { //copy sections
+						if (myConfig.isConfigurationSection("looseSpawn." + subsection)) {
+							myConfig.createSection("loseSpawn." + subsection);
+						} else myConfig.set("loseSpawn." + subsection, myConfig.get("looseSpawn." + subsection));
+					}
+					myConfig.set("looseSpawn", null);
+				}
+			}
+			changed = true;
+		}
 		// add new update versions here
 		
 		// increase version number
 		if (changed) {
-			SimpleSpleef.log.info("[SimpleSpleef] Updating configuration from version " + version + " to version 2.");
+			SimpleSpleef.log.info("[SimpleSpleef] Updating configuration from version " + version + " to version 3.");
 			config.set("version", 2);
 			SimpleSpleef.getPlugin().saveConfig();
 		}
