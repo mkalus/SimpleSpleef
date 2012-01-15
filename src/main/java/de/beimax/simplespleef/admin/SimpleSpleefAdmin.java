@@ -82,7 +82,7 @@ public class SimpleSpleefAdmin {
 		
 		// is it a console command and it cannot be executed from the console?
 		if (isConsole(sender) && !isConsoleCommand(adminCommand)) {
-			sender.sendMessage("This command cannot be executed from the consolse");
+			sender.sendMessage("Unknown command or one that cannot be executed from the consolse");
 			return;
 		}
 
