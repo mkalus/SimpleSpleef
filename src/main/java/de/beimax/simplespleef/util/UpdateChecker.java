@@ -124,7 +124,7 @@ public class UpdateChecker {
 		// increase version number
 		if (changed) {
 			SimpleSpleef.log.info("[SimpleSpleef] Updating configuration from version " + version + " to version 3.");
-			config.set("version", 2);
+			config.set("version", 3);
 			SimpleSpleef.getPlugin().saveConfig();
 		}
 	}
