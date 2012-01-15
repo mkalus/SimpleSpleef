@@ -208,6 +208,7 @@ public class GameStandard extends Game {
 		}
 		// max number of players?
 		int maximumPlayers = configuration.getInt("maximumPlayers", 0);
+		if (spleefers == null) spleefers = new SpleeferList(); //restore spleefers list if it was null for some reason - strange that this would happen...
 		if (maximumPlayers > 0 && spleefers.size() >= maximumPlayers) {
 			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinMax", "[ARENA]", getName(), "[NUMBER]", String.valueOf(maximumPlayers)));
 			return false;
