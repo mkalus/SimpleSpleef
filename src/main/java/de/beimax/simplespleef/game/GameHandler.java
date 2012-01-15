@@ -159,7 +159,7 @@ public class GameHandler {
 	}
 
 	/**
-	 * check, if a certain game name exists
+	 * check, if a certain running game name exists
 	 * @param game name of game
 	 * @return
 	 */
@@ -168,7 +168,7 @@ public class GameHandler {
 	}
 
 	/**
-	 * return game by name
+	 * return running game by name
 	 * @param game name of game
 	 * @return
 	 */

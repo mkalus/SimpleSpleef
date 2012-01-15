@@ -37,6 +37,7 @@ import com.sk89q.worldedit.regions.Region;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
+import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.util.ConfigHelper;
 import de.beimax.simplespleef.util.LocationHelper;
 
@@ -302,7 +303,10 @@ public class SimpleSpleefAdmin {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", id));
 			return;
 		}
-		
+
+		//possibly stop a running game first
+		stopRunningGame(sender, id);
+
 		// ok, now delete arena config
 		SimpleSpleef.getPlugin().getConfig().set("arenas." + id, null);
 
@@ -562,5 +566,19 @@ public class SimpleSpleefAdmin {
 			if (c.equals(command)) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * possibly stop a running game before changing config
+	 * @param sender
+	 * @param id
+	 */
+	protected void stopRunningGame(CommandSender sender, String id) {
+		// is there a game running currently?
+		if (SimpleSpleef.getGameHandler().gameExists(id)) {
+			// stop game first
+			Game game = SimpleSpleef.getGameHandler().getGameByName(id);
+			game.delete(sender);
+		}
 	}
 }
