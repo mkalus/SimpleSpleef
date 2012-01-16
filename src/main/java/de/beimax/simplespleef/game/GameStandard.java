@@ -758,7 +758,10 @@ public class GameStandard extends Game {
 
 		// check block degeneration
 		if (playerOnBlockDegenerator != null && isInGame()) {
-			playerOnBlockDegenerator.updatePlayer(player);
+			// get block player is standing on
+			Block block = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
+			if (block != null && checkMayBreakBlockLocation(block)) // only degenerate blocks that are within the arena/floor
+				playerOnBlockDegenerator.updatePlayer(player);
 		}
 	}
 
