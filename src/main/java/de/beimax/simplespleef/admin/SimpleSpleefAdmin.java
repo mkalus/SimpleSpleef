@@ -116,6 +116,7 @@ public class SimpleSpleefAdmin {
 			}
 		} else if (adminCommand.equals("spawn")) {
 			if (checkThirdSpawnName(sender, args, adminCommand)) {
+				if (args[2].equalsIgnoreCase("loose")) args[2] = "lose"; //correct spelling
 				defineSpawnPoint(sender, args[2], adminCommand);
 				checkArena = true;
 			}
