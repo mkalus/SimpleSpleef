@@ -1,6 +1,6 @@
 name: SimpleSpleef
 main: de.beimax.simplespleef.SimpleSpleef
-version: 2.2.1
+version: 2.3.0-dev
 author: maxkalus
 description: >
              Simple Spleef Plugin
@@ -60,3 +60,48 @@ permissions:
   simplespleef.admin:
     description: Admin commands
     default: op
+  simplespleef.sign.help:
+    description: Display help (sign command)
+    default: true
+  simplespleef.sign.announce:
+    description: Announce a new game (in arena) (sign command)
+    default: true
+  simplespleef.sign.join:
+    description: Join a game (in arena) (sign command)
+    default: true
+  simplespleef.sign.arenas:
+    description: List available arenas (sign command)
+    default: true
+  simplespleef.sign.info:
+    description: Show information (on arena) (sign command)
+    default: true
+  simplespleef.sign.list:
+    description: List spleefers (in arena) (sign command)
+    default: true
+  simplespleef.sign.ready:
+    description: Ready for a game (spleefers only) (sign command)
+    default: true
+  simplespleef.sign.start:
+    description: Start game (spleefers only) (sign command)
+    default: true
+  simplespleef.sign.countdown:
+    description: Start count down (of arena) (sign command)
+    default: true
+  simplespleef.sign.leave:
+    description: Leave a game (sign command)
+    default: true
+  simplespleef.sign.stop:
+    description: Stop a game (sign command)
+    default: true
+  simplespleef.sign.delete:
+    description: Delete a game (sign command)
+    default: true
+  simplespleef.sign.reset:
+    description: Reset a game (admin/moderator delete game) (sign command)
+    default: op
+  simplespleef.sign.watch:
+    description: Watch a game (sign command)
+    default: true
+  simplespleef.sign.back:
+    description: Teleport back from arena (sign command)
+    default: true

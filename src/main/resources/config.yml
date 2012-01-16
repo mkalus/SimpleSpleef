@@ -17,6 +17,8 @@ settings:
     defaultArena: default
 # active arena command signs to join/spectate/return/etc.
     enableSigns: true
+# use separate sign permissions (like simplespleef.sign.help, instead of simplespleef.help) for clicking on signs
+    useSignPermissions: true
 # if signs are used, look for this on the first line to make the sign a SimpleSpleef command sign
 # command parameters are then one per line, e.g.:
 # [Spleef]
@@ -77,10 +79,8 @@ arenas:
 # If you use colored wool, please use WOOL:15 (for red wool)
         readyBlockMaterial: '42'
 # Clear inventory at game start and restore after game has ended
-# Not implemented yet
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid
-# Not implemented yet
         addToInventory: false
         addInventoryItems:
             - 1:BOW
@@ -140,6 +140,12 @@ arenas:
         noHunger: true
 # Disallow PVP while spleefing (no effect on no-pvp worlds)
         noPvP: true
+# Block degeneration - if set to a number of 0 or higher, this will be the maximum seconds a player may stand on a single block before it dissolves
+        blockDegeneration: -1
+# List if blocks that will degenerate by standing on them too long (if blockDegeneration >= 0)
+        degeneratingBlocks:
+            - DIRT
+            - GRASS
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
             - DIRT
