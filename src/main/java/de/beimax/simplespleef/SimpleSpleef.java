@@ -27,6 +27,7 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -279,7 +280,7 @@ public class SimpleSpleef extends JavaPlugin {
 	protected void registerEvents() {
 		// add listener for other plugins
 		PluginListener pluginListener = new PluginListener();
-		
+
 		// let my command handler take care of commands
 		this.commandExecutor = new SimpleSpleefCommandExecutor();
 		this.getCommand("spleef").setExecutor(commandExecutor);
@@ -289,16 +290,16 @@ public class SimpleSpleef extends JavaPlugin {
 		this.blockListener = new SimpleSpleefBlockListener();
 		this.entityListener = new SimpleSpleefEntityListener();
 		this.playerListener = new SimpleSpleefPlayerListener();
-		
+
 		// Register our events
 		pm.registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
-		
+
 		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.Low, this);
 		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Low, this);
-		
+
 		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Highest, this);
 		pm.registerEvent(Type.FOOD_LEVEL_CHANGE, entityListener, Priority.Highest, this);
-		
+
 		pm.registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
@@ -400,14 +401,26 @@ public class SimpleSpleef extends JavaPlugin {
 		SimpleSpleef.log.info("[SimpleSpleef] Vault plugin not found - defaulting to Bukkit permission system.");
 		return false;
 	}
-	
-	/** 
+
+	/**
 	 * make sure worldEdit is loaded - inspired by MultiversePortals
 	 */
 	private void checkForWorldEdit() {
-		 if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-			 SimpleSpleef.setWorldEditAPI(new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit")));
-				SimpleSpleef.log.info("[SimpleSpleef] Found WorldEdit. Using it for selections.");
-		 }
+		Plugin plugin = this.getServer().getPluginManager().getPlugin("WorldEdit");
+		if (plugin != null) {
+			// check version
+			try {
+				double version = Double.parseDouble(plugin.getDescription().getVersion());
+				if (version < 5.0) {
+					SimpleSpleef.log
+					.warning("[SimpleSpleef] Found WorldEdit, but must be at least version 5.0 to work! Ignoring it.");
+					return;
+				}
+			} catch (Exception e) {} // no number, should be fine...
+			
+			SimpleSpleef.setWorldEditAPI(new WorldEditAPI((WorldEditPlugin) plugin));
+			SimpleSpleef.log
+					.info("[SimpleSpleef] Found WorldEdit " + plugin.getDescription().getVersion() + ". Using it for selections.");
+		}
 	}
 }
