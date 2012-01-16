@@ -4,30 +4,23 @@
 package de.beimax.simplespleef.util;
 
 
-import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bukkit.entity.Player;
-
-import de.beimax.simplespleef.SimpleSpleef;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author mkalus
  *
  */
 public class InventoryKeeper {
-	private File saveDir;
 	/**
-	 * Constructor - creates data folder subdir, if needed
+	 * keeps the players' inventories
 	 */
-	public InventoryKeeper() {
-		//check, if directory exists
-		saveDir = new File(SimpleSpleef.getPlugin().getDataFolder(), "playerinventories");
-		if (!saveDir.exists()) saveDir.mkdir(); // create, if not exists
-		if (!saveDir.exists() || !saveDir.isDirectory()) {
-			SimpleSpleef.log.severe("[SimpleSpleef] Could not create directory " + saveDir + ". Check file permissions, etc.!");
-			saveDir = null;
-		}
-	}
+	private HashMap<Player, List<InventoryEntry>> playerInventories = new HashMap<Player, List<InventoryEntry>>();
 	
 	/**
 	 * save a player's inventory to a file
@@ -35,27 +28,30 @@ public class InventoryKeeper {
 	 * @return
 	 */
 	public boolean saveInventory(Player player) {
-		/*if (player == null || saveDir == null) return false; // no NPE
+		if (player == null || playerInventories == null) return false; // no NPEs
 		
-		// file name
-		File file = new File(saveDir, player.getName());
+		// create inventory entry
+		LinkedList<InventoryEntry> copiedInventory = new LinkedList<InventoryKeeper.InventoryEntry>();
 		
-		YamlConfiguration playerInv = new YamlConfiguration();
-		
+		// cycle through entries of stack
 		int i = 0;
-		for(ItemStack itemStack : player.getInventory().getContents()) {
-			playerInv.set(String.valueOf(i++), itemStack);
+		for (ItemStack stack : player.getInventory().getContents()) {
+			if (stack != null) //add new clone of stack to inventory
+				copiedInventory.add(new InventoryEntry(i, stack.clone()));
+			i++;
 		}
 		
-		try {
-			playerInv.save(file);
-		} catch (Exception e) {
-			SimpleSpleef.log.severe("[SimpleSpleef] Could not create save player's inventory " + file + "! Skipping save...");
-			return false;
-		}
-		return true;*/
-		SimpleSpleef.log.warning("[SimpleSpleef] ItemStack serialization is broken right now - skipping inventory saving.");
-		return false;
+		// remove old entry, if needed
+		if (playerInventories.containsKey(player))
+			playerInventories.remove(player);
+		
+		// add new entry to list
+		playerInventories.put(player, copiedInventory);
+
+		// finally, clear player's inventory
+		player.getInventory().clear();
+
+		return true;
 	}
 	
 	/**
@@ -64,19 +60,43 @@ public class InventoryKeeper {
 	 * @return
 	 */
 	public boolean restoreInventory(Player player) {
-		/*if (player == null || saveDir == null) return false; // no NPE
+		if (player == null || playerInventories == null) return false; // no NPEs
+
+		// entry not found -> return
+		if (!playerInventories.containsKey(player)) return false;
+			
+		// clear player's inventory first
+		Inventory inventory = player.getInventory();
+		inventory.clear();
 		
-		// file name
-		File file = new File(saveDir, player.getName());
-		YamlConfiguration playerInv = new YamlConfiguration();
-		try {
-			playerInv.load(file);
-		} catch (Exception e) {
-			SimpleSpleef.log.severe("[SimpleSpleef] Could not create restore player's inventory " + file + "! Skipping save...");
-			e.printStackTrace();
-			return false;
-		}*/
-		SimpleSpleef.log.warning("[SimpleSpleef] ItemStack deserialization is broken right now - skipping inventory restoration.");
+		// get contents from list and put them into player inventory
+		for (InventoryEntry inventoryEntry : playerInventories.get(player)) {
+			inventory.setItem(inventoryEntry.index, inventoryEntry.item.clone());
+		}
+		
+		// finally, remove old entry
+		playerInventories.remove(player);
+
 		return false;
+	}
+	
+	/**
+	 * private class to keep track of item stack entries
+	 * @author mkalus
+	 *
+	 */
+	private class InventoryEntry {
+		private int index;
+		private ItemStack item;
+		
+		/**
+		 * Constructor
+		 * @param index
+		 * @param item
+		 */
+		public InventoryEntry(int index, ItemStack item) {
+			this.index = index;
+			this.item = item;
+		}
 	}
 }

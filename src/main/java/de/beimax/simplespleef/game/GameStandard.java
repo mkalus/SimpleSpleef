@@ -104,6 +104,11 @@ public class GameStandard extends Game {
 	private boolean allowDigBlocks = true;
 	
 	/**
+	 * inventory keeper for this game
+	 */
+	protected InventoryKeeper inventoryKeeper;
+	
+	/**
 	 * block degenerator that keeps track of players standing on something, if needed
 	 */
 	protected PlayerOnBlockDegenerator playerOnBlockDegenerator;
@@ -201,6 +206,11 @@ public class GameStandard extends Game {
 		else if (arena == null) diggingIfFloorUndefined = GameStandard.DIGGING_EVERYWHERE;
 		else if (dig.equals("outsidearena")) diggingIfFloorUndefined = GameStandard.DIGGING_OUTSIDE_ARENA;
 		else diggingIfFloorUndefined = GameStandard.DIGGING_IN_ARENA;
+		
+		// initialize inventory keeper if needed
+		if (configuration.getBoolean("clearInventory", false))
+			this.inventoryKeeper = new InventoryKeeper();
+		else this.inventoryKeeper = null;
 		
 		// block degeneration
 		renewPlayerOnBlockGenerator();
@@ -1074,16 +1084,13 @@ public class GameStandard extends Game {
 	protected boolean clearInventories() {
 		// check setting in configuration
 		if (!configuration.getBoolean("clearInventory", false)) return false;
-		if (spleefers == null) return false; // no NPE
+		if (spleefers == null || inventoryKeeper == null) return false; // no NPE
 
-		InventoryKeeper inventoryKeeper = new InventoryKeeper();
 		for (Spleefer spleefer : spleefers.get()) {
 			Player player = spleefer.getPlayer();
-			if (inventoryKeeper.saveInventory(player)) {
-				player.getInventory().clear(); // clear player's inventory, if saved
-			} else {
+			if (!inventoryKeeper.saveInventory(player)) {
 				// log error
-				SimpleSpleef.log.severe("[SimpleSpleef] Could not save inventory of " + player.getName() + ". Keeping it.");
+				SimpleSpleef.log.severe("[SimpleSpleef] Could not clear inventory of " + player.getName() + ". Keeping it.");
 			}
 		}
 		return true;
@@ -1111,9 +1118,9 @@ public class GameStandard extends Game {
 	protected boolean restoreInventory(Player player) {
 		// check setting in configuration
 		if (!configuration.getBoolean("clearInventory", false)) return false;
-		if (player == null) return false; // no NPE
+		if (player == null || inventoryKeeper == null) return false; // no NPE
 
-		return new InventoryKeeper().restoreInventory(player);
+		return inventoryKeeper.restoreInventory(player);
 	}
 	
 	/**
