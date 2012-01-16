@@ -19,6 +19,7 @@ command:
 errors:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
     permissionMissing: 'Dir fehlt die Berechtigung für das Kommando [COMMAND]. Du brauchst die Berechtigung simplespleef.[COMMAND].'
+    signPermissionMissing: 'Dir fehlt die Berechtigung zum Auslösen dieses Schildes. Du brauchst die Berechtigung simplespleef.sign.[COMMAND].'
     unknownCommand: 'Unbekannter Befehl "[COMMAND]"'
     unknownArena: 'Unbekannte Arena "[ARENA]"'
     noDig: 'Du darfst hier nicht graben!'

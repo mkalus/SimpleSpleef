@@ -19,6 +19,7 @@
 package de.beimax.simplespleef.command;
 
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -38,7 +39,18 @@ public class SimpleSpleefSignCommandExecutor {
 		if (!isSimpleSpleefSign(sign)) return;
 		
 		// ok, construct command from the next few lines
-		StringBuilder sb = new StringBuilder().append("spleef");
+		StringBuilder sb = new StringBuilder();
+		
+		// What command do we handle here?
+		CommandSender sender;
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.useSignPermissions")) { // separate sign permissions
+			sb.append("spleefsigncmd "); //special sign command
+			sb.append(player.getName()); //include player name in command name
+			sender = SimpleSpleef.getPlugin().getServer().getConsoleSender();
+		} else { // simulate "normal" player command
+			sb.append("spleef");
+			sender = player;
+		}
 		
 		boolean first = true;
 		for (String line : sign.getLines()) {
@@ -50,7 +62,7 @@ public class SimpleSpleefSignCommandExecutor {
 		}
 		
 		// dispatch the command
-		SimpleSpleef.getPlugin().getServer().dispatchCommand(player, sb.toString());
+		SimpleSpleef.getPlugin().getServer().dispatchCommand(sender, sb.toString());
 	}
 
 	/**

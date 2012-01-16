@@ -65,6 +65,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
+		boolean signCommand = false;
 		// spleef admin short command?
 		if (label.equalsIgnoreCase("spla")) {
 			// expand arguments by prepending admin
@@ -73,10 +74,31 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			for (int i = 0; i < args.length; i++)
 				expandargs[i+1] = args[i];
 			args = expandargs;
+		} // spleef sign command?
+		else if (label.equalsIgnoreCase("spleefsigncmd")) {
+			if (!isConsole(sender) || args == null || args.length == 0) return false; //ignore sign commands not dispatched from the console sender or malformed - prevents players to exploit this pseudo command
+			// real sender is first argument
+			Player player = SimpleSpleef.getPlugin().getServer().getPlayer(args[0]);
+			if (player == null) return false; // no such player
+			sender = player; // new sender for this command
+			// shorten args by copying and shortening
+			String[] newArgs;
+			if (args.length == 0) newArgs = new String[]{}; // empty array
+			else {
+				newArgs = new String[args.length-1];
+				for (int i = 1; i < args.length; i++)
+					newArgs[i-1] = args[i];
+			}
+			args = newArgs;
+			// yes, we have a sign command!
+			signCommand = true;
 		}
-		
+			
 		// how many arguments?
-		if (args.length == 0 || args[0].equalsIgnoreCase("help")) return helpCommand(sender);
+		if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
+			if (signCommand) return false; //empty sign - ignore command!
+			else return helpCommand(sender);
+		}
 		
 		// first argument is subcommand
 		String subcommand = args[0].toLowerCase();
@@ -94,13 +116,16 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		
 		// is it a console command and it cannot be executed from the console?
 		if (isConsole(sender) && !isConsoleCommand(subcommand)) {
-			sender.sendMessage("This command cannot be executed from the consolse");
+			sender.sendMessage("This command cannot be executed from the console.");
 			return true;
 		}
 
 		// check permissions
-		if (!SimpleSpleef.checkPermission(sender, "simplespleef." + subcommand))
-			return permissionMissing(sender, subcommand);
+		if (signCommand) { // check sign permission for sign commands
+			if (!SimpleSpleef.checkPermission(sender, "simplespleef.sign." + subcommand))
+				return permissionMissing(sender, subcommand, signCommand);
+		} else if (!SimpleSpleef.checkPermission(sender, "simplespleef." + subcommand)) // check normal permissions for normal commands
+			return permissionMissing(sender, subcommand, signCommand);
 
 		// Ok, we are clear...
 		try {
@@ -451,8 +476,16 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		return true;
 	}
 	
-	protected boolean permissionMissing(CommandSender sender, String command) {
-		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.permissionMissing", "[COMMAND]", command));
+	/**
+	 * tells the sender that a particular permission is missing
+	 * @param sender
+	 * @param command
+	 * @param signcommand is this a sign command?
+	 * @return
+	 */
+	protected boolean permissionMissing(CommandSender sender, String command, boolean signcommand) {
+		String msg = signcommand?"errors.signPermissionMissing":"errors.permissionMissing";
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll(msg, "[COMMAND]", command));
 		return true;
 	}
 

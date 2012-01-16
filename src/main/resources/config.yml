@@ -17,6 +17,9 @@ settings:
     defaultArena: default
 # active arena command signs to join/spectate/return/etc.
     enableSigns: true
+# Use separate sign permissions (like simplespleef.sign.help, instead of simplespleef.help) for clicking on signs.
+# With this, you can disallow commands, but allow clicking on signs by defining separate permissions for commands and signs.
+    useSignPermissions: true
 # if signs are used, look for this on the first line to make the sign a SimpleSpleef command sign
 # command parameters are then one per line, e.g.:
 # [Spleef]
