@@ -3,6 +3,8 @@
  */
 package de.beimax.simplespleef.game.floortracking;
 
+import org.bukkit.block.Block;
+
 /**
  * @author mkalus
  *
@@ -29,6 +31,11 @@ public abstract class FloorBaseThread implements FloorThread {
 	private long nextTick = 0;
 	
 	/**
+	 * reference to tracker
+	 */
+	private FloorTracker tracker;
+	
+	/**
 	 * flag to stop thread
 	 */
 	private boolean stop = false;
@@ -38,9 +45,10 @@ public abstract class FloorBaseThread implements FloorThread {
 	 * @param startAfter
 	 * @param tickTime
 	 */
-	public FloorBaseThread(int startAfter, int tickTime) {
+	public FloorBaseThread(int startAfter, int tickTime, FloorTracker tracker) {
 		this.startAfter = startAfter;
 		this.tickTime = tickTime;
+		this.tracker = tracker;
 	}
 
 	/* (non-Javadoc)
@@ -80,5 +88,14 @@ public abstract class FloorBaseThread implements FloorThread {
 	@Override
 	public void stopTracking() {
 		stop =  true;
+	}
+	
+	/**
+	 * Notify the tracker about a block change - called by tick() when a block changes,
+	 * so other trackers can update this block
+	 * @param block changed block
+	 */
+	protected void notifyTracker(Block block) {
+		tracker.notifyChangedBlock(block, this);
 	}
 }

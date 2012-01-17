@@ -106,12 +106,12 @@ public class FloorTracker {
 	public void startTracking(Game game, Cuboid floor) {
 		//initialize floor dissolve thread
 		if (arenaFloorDissolvesAfter >= 0) {
-			floorThreads.add(new FloorDissolveThread(arenaFloorDissolvesAfter, arenaFloorDissolveTick));
+			floorThreads.add(new FloorDissolveThread(arenaFloorDissolvesAfter, arenaFloorDissolveTick, this));
 		}
 
 		//initialize floor repair thread
 		if (arenaFloorRepairsAfter >= 0) {
-			floorThreads.add(new FloorRepairThread(arenaFloorRepairsAfter, arenaFloorRepairTick));
+			floorThreads.add(new FloorRepairThread(arenaFloorRepairsAfter, arenaFloorRepairTick, this));
 		}
 
 		// get diggable floor
@@ -140,6 +140,19 @@ public class FloorTracker {
 	public void updateBlock(Block block) {
 		for (FloorThread floorThread : floorThreads) {
 			floorThread.updateBlock(block);
+		}
+	}
+	
+	/**
+	 * Called by tick()-methods of FloorThreads when they change a block,
+	 * so other trackers can update their block database. 
+	 * @param block
+	 * @param caller
+	 */
+	public void notifyChangedBlock(Block block, FloorThread caller) {
+		for (FloorThread floorThread : floorThreads) {
+			if (floorThread != caller) // caller is not updated - has to do this itself
+				floorThread.updateBlock(block);
 		}
 	}
 }

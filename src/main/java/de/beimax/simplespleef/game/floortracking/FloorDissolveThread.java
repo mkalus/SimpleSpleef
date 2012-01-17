@@ -28,15 +28,15 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 * @param startAfter
 	 * @param tickTime
 	 */
-	public FloorDissolveThread(int startAfter, int tickTime) {
-		super(startAfter, tickTime);
+	public FloorDissolveThread(int startAfter, int tickTime, FloorTracker tracker) {
+		super(startAfter, tickTime, tracker);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#initializeThread(de.beimax.simplespleef.game.Game, java.util.List)
 	 */
 	@Override
-	public void initializeThread(Game game, List<Block> floor) {
+	public synchronized void initializeThread(Game game, List<Block> floor) {
 		for (Block block : floor) {
 			if (block == null) continue; // no NPEs
 			if (block.getType() != Material.AIR) // add location to nonAir locations
@@ -48,7 +48,8 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
-	public void updateBlock(Block block) {
+	public synchronized void updateBlock(Block block) {
+		if (block == null) return; // no NPEs
 		Location loc = block.getLocation();
 		if (nonAir.contains(loc)) {
 			if (block.getType() == Material.AIR) // dissolve to air
@@ -61,7 +62,7 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseThread#tick()
 	 */
 	@Override
-	public void tick() {
+	public synchronized void tick() {
 		// get a random entry
 		Location location = getRandomEntry();
 		if (location != null) {
@@ -70,11 +71,13 @@ public class FloorDissolveThread extends FloorBaseThread {
 			block.setType(Material.AIR);
 			block.setData((byte) 0);
 			nonAir.remove(location);
+			// notify others
+			notifyTracker(block);
 		}
 	}
 	
 	/**
-	 * picks a random entry from a set
+	 * picks a random entry from non-air set
 	 */
 	private Location getRandomEntry() {
 		int size = nonAir.size();
