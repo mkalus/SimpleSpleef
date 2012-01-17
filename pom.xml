@@ -20,12 +20,12 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.3 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.4 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
 			<groupId>net.milkbowl</groupId>
 			<version>[1.1.9,)</version>
 			<artifactId>vault</artifactId>
 		</dependency>
-        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.0 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
+        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.1 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
             <version>[5.0,)</version>
