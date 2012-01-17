@@ -211,8 +211,8 @@ public class SimpleSpleef extends JavaPlugin {
 		this.commandExecutor = null;
 		//TODO add if more stuff comes along
 
-		//save config to disk - nope, done in most cases anyway...
-		//this.saveConfig(); //TODO: check, if this breaks something
+		//save config to disk
+		this.saveConfig();
 		
 		// derefer self reference
 		SimpleSpleef.simpleSpleef = null;

@@ -3,12 +3,17 @@
  */
 package de.beimax.simplespleef.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import de.beimax.simplespleef.game.Game;
 
 /**
  * @author mkalus
@@ -65,9 +70,11 @@ public class CuboidWorldGuard implements Cuboid {
 		for (int x = coords[0]; x <= coords[3]; x++)
 			for (int y = coords[1]; y <= coords[4]; y++)
 				for (int z = coords[2]; z <= coords[5]; z++) {
-					Block block = this.world.getBlockAt(x, y, z);
-					blockData[Math.abs(coords[0]-x)][Math.abs(coords[1]-y)][Math.abs(coords[2]-z)] =
-						new SerializableBlockData(block.getTypeId(), block.getData());
+					//if (region.contains(x, y, z)) {
+						Block block = this.world.getBlockAt(x, y, z);
+						blockData[Math.abs(coords[0]-x)][Math.abs(coords[1]-y)][Math.abs(coords[2]-z)] =
+							new SerializableBlockData(block.getTypeId(), block.getData());
+					//} else blockData[Math.abs(coords[0]-x)][Math.abs(coords[1]-y)][Math.abs(coords[2]-z)] = null; //null block outside of arena (for none cube arenas)
 				}
 		return blockData;
 	}
@@ -87,9 +94,40 @@ public class CuboidWorldGuard implements Cuboid {
 		for (int x = 0; x < blockData.length; x++)
 			for (int y = 0; y < blockData[0].length; y++)
 				for (int z = 0; z < blockData[0][0].length; z++) {
-					Block block = this.world.getBlockAt(coords[0] + x, coords[1] + y, coords[2] + z);
-					block.setTypeId(blockData[x][y][z].getTypeId());
-					block.setData(blockData[x][y][z].getData());
+					if (this.region.contains(coords[0] + x, coords[1] + y, coords[2] + z)) { // only restore, if within the region
+						Block block = this.world.getBlockAt(coords[0] + x, coords[1] + y, coords[2] + z);
+						block.setTypeId(blockData[x][y][z].getTypeId());
+						block.setData(blockData[x][y][z].getData());
+					}
 				}
+	}
+
+
+	@Override
+	public List<Block> getDiggableBlocks(Game game) {
+		BlockVector max = region.getMaximumPoint();
+		BlockVector min = region.getMinimumPoint();
+		
+		LinkedList<Block> diggableBlocks = new LinkedList<Block>();
+		
+		// get blocks
+		final int[] coords = {(min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
+			(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
+			(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
+			(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
+			(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
+			(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ())};
+
+		// copy data from blocks
+		for (int x = coords[0]; x <= coords[3]; x++)
+			for (int y = coords[1]; y <= coords[4]; y++)
+				for (int z = coords[2]; z <= coords[5]; z++) {
+					Block block = this.world.getBlockAt(x, y, z);
+					if (block != null && this.region.contains(x, y, z) && game.checkMayBreakBlock(block)) { // can this block be broken and within the region
+						diggableBlocks.add(block);
+					}
+				}
+
+		return diggableBlocks;
 	}
 }

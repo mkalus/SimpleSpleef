@@ -178,7 +178,15 @@ arenas:
         restoreArenaAfterGame: true
 # Players can teleport back to original position after game with /spl back?
         enableBackCommand: true
-# Arena cube that will be protected (saved in memory for restoration)
+# Time in seconds, after which the arena floor starts to dissolve slowly (-1 disables this)
+        arenaFloorDissolvesAfter: -1
+# Time in seconds for new blocks to dissolve into thin air
+        arenaFloorDissolveTick: 5
+# Time in seconds, after which the arena floor starts to repair slowly (-1 disables this)
+        arenaFloorRepairsAfter: -1
+# Time in seconds for new blocks to get repaired
+        arenaFloorRepairTick: 10
+# Arena cube that will be protected (saved on disk for restoration)
         arena:
             enabled: false
 #Instead of a and b, you can also set up a world guard region () bot here (you have to have world guard installed, of course...):

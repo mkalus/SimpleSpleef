@@ -18,7 +18,12 @@
  **/
 package de.beimax.simplespleef.util;
 
+import java.util.List;
+
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+
+import de.beimax.simplespleef.game.Game;
 
 /**
  * @author mkalus Represents cube in the world - inspired by Cuboid plugin
@@ -44,4 +49,11 @@ public interface Cuboid {
 	 * @param blockData
 	 */
 	public void setSerializedBlocks(SerializableBlockData[][][] blockData);
+	
+	/**
+	 * retrieve a list of blocks from the cuboid that can be dug by a particular game
+	 * @param game
+	 * @return
+	 */
+	public List<Block> getDiggableBlocks(Game game);
 }

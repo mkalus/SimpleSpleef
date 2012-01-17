@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import de.beimax.simplespleef.game.floortracking.FloorTracker;
 import de.beimax.simplespleef.util.MaterialHelper;
 
 /**
@@ -35,12 +36,17 @@ public class PlayerOnBlockDegenerator {
 	 * list of DegenerationKeeper to players
 	 */
 	private Map<Player, DegenerationKeeper> degenerationList;
+	
+	/**
+	 * reference to floor tracker
+	 */
+	private FloorTracker floorTracker;
 
 	/**
 	 * Constructor
 	 * @param numberOfSecondsToDegenerate
 	 */
-	public PlayerOnBlockDegenerator(int numberOfSecondsToDegenerate, List<String> degeneratingBlocks) {
+	public PlayerOnBlockDegenerator(int numberOfSecondsToDegenerate, List<String> degeneratingBlocks, FloorTracker floorTracker) {
 		seconds = numberOfSecondsToDegenerate;
 		
 		// fill with degenerating blocks
@@ -51,6 +57,8 @@ public class PlayerOnBlockDegenerator {
 		}
 		
 		degenerationList = new HashMap<Player, PlayerOnBlockDegenerator.DegenerationKeeper>();
+		
+		this.floorTracker = floorTracker;
 	}
 
 	/**
@@ -131,6 +139,9 @@ public class PlayerOnBlockDegenerator {
 					checkedBlock.setType(Material.AIR); // block dissolves into thin air
 					checkedBlock.setData((byte) 0);
 					timestamp = Long.MAX_VALUE; // to not have this happen again
+					// notify floor tracker
+					if (floorTracker != null)
+						floorTracker.updateBlock(checkedBlock);
 				}
 			}
 			

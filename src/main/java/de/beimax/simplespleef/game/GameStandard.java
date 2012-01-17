@@ -41,6 +41,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.floortracking.FloorTracker;
 import de.beimax.simplespleef.util.*;
 
 /**
@@ -112,6 +113,11 @@ public class GameStandard extends Game {
 	 * block degenerator that keeps track of players standing on something, if needed
 	 */
 	protected PlayerOnBlockDegenerator playerOnBlockDegenerator;
+	
+	/**
+	 * floor tracker - takes care of floor changes
+	 */
+	protected FloorTracker floorTracker;
 	
 	/**
 	 * shortcuts for digging settings
@@ -212,6 +218,9 @@ public class GameStandard extends Game {
 			this.inventoryKeeper = new InventoryKeeper();
 		else this.inventoryKeeper = null;
 		
+		// floor changes might be registered by the floor tracker
+		renewFloorTracker();
+		
 		// block degeneration
 		renewPlayerOnBlockGenerator();
 
@@ -219,14 +228,32 @@ public class GameStandard extends Game {
 	}
 	
 	/**
+	 * renew the floor tracker
+	 */
+	protected void renewFloorTracker() {
+		if (floor != null) {
+			int arenaFloorDissolvesAfter = configuration.getInt("arenaFloorDissolvesAfter", -1);
+			int arenaFloorRepairsAfter = configuration.getInt("arenaFloorRepairsAfter", -1);
+			if (arenaFloorDissolvesAfter > -1 || arenaFloorRepairsAfter > -1) {
+				floorTracker = new FloorTracker();
+				floorTracker.setArenaFloorDissolvesAfter(arenaFloorDissolvesAfter);
+				floorTracker.setArenaFloorRepairsAfter(arenaFloorRepairsAfter);
+				floorTracker.setArenaFloorDissolveTick(configuration.getInt("arenaFloorDissolveTick", 5));
+				floorTracker.setArenaFloorRepairTick(configuration.getInt("arenaFloorRepairTick", 10));
+			} else
+				floorTracker = null; // none is needed to track floor
+		} else floorTracker = null; // no floor, no floor tracker!		
+	}
+
+	/**
 	 * renew the block degenerator for players
 	 */
 	protected void renewPlayerOnBlockGenerator() {
 		int blockDegeneration = configuration.getInt("blockDegeneration", -1);
-		if (blockDegeneration >= 0) playerOnBlockDegenerator = new PlayerOnBlockDegenerator(blockDegeneration, configuration.getStringList("degeneratingBlocks"));
+		if (blockDegeneration >= 0) playerOnBlockDegenerator = new PlayerOnBlockDegenerator(blockDegeneration, configuration.getStringList("degeneratingBlocks"), floorTracker);
 		else playerOnBlockDegenerator = null;		
 	}
-
+	
 	@Override
 	public boolean join(Player player) {
 		//check joinable status
@@ -433,10 +460,13 @@ public class GameStandard extends Game {
 	public boolean start() {
 		// delete countdown
 		deleteCountdown();
-		// save arena information
-		saveArena();
 		// change game status
 		status = STATUS_STARTED;
+		// save arena information
+		saveArena();
+		// start floor tracker, if needed
+		if (floorTracker != null)
+			floorTracker.startTracking(this, floor);
 		// possibly clear inventory
 		clearInventories();
 		// optionally add to inventory
@@ -484,16 +514,24 @@ public class GameStandard extends Game {
 		//isJoinable()
 		//isReady()
 		// + other cases?
+
 		// still in countdown? if yes, kill it!
 		if (countdown != null)
 			countdown.interrupted = true;
+
+		// if floor tracker is on, delete it and renew it
+		if (floorTracker != null)
+			floorTracker.stopTracking();
+		renewFloorTracker(); // renew the tracker
+
 		// if degeneration keeper is on, delete and renew it
-		if (playerOnBlockDegenerator != null) {
+		if (playerOnBlockDegenerator != null)
 			playerOnBlockDegenerator.stopBlockDegenerator();
-			renewPlayerOnBlockGenerator(); // renew the degenerator
-		}
+		renewPlayerOnBlockGenerator(); // renew the degenerator
+
 		// change game status
 		status = STATUS_FINISHED;
+
 		// only do this when game was in progress
 		if (wasInProgress) {
 			// possibly take away shovel items
@@ -508,6 +546,7 @@ public class GameStandard extends Game {
 			// restore arena
 			restoreArena();
 		}
+
 		// change game status
 		status = STATUS_NEW;
 		return true;
@@ -801,6 +840,9 @@ public class GameStandard extends Game {
 			// set block to air
 			event.getClickedBlock().setType(Material.AIR);
 			event.getClickedBlock().setData((byte) 0);
+			// notify floor tracker
+			if (floorTracker != null)
+				floorTracker.updateBlock(event.getClickedBlock());
 		} else
 		//check if player clicked on a "ready" block (e.g. iron block) and the game is readyable
 			if (supportsReady() && isJoinable()) {
@@ -899,6 +941,10 @@ public class GameStandard extends Game {
 			block.setType(Material.AIR);
 			block.setData((byte) 0);
 		}
+
+		// if there is a floor tracker running, tell it about the change
+		if (floorTracker != null && !event.isCancelled())
+			floorTracker.updateBlock(block);
 	}
 	
 	@Override
@@ -910,6 +956,10 @@ public class GameStandard extends Game {
 			event.setCancelled(true);
 			event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noPlacement"));
 		}
+
+		// if there is a floor tracker running, tell it about the change
+		if (floorTracker != null && !event.isCancelled())
+			floorTracker.updateBlock(event.getBlock());
 	}
 
 	/**
@@ -1278,7 +1328,8 @@ public class GameStandard extends Game {
 	 * @param block broken/interacted (on instant-break) by spleefer
 	 * @return true, if block may be destroyed
 	 */
-	protected boolean checkMayBreakBlock(Block block) {
+	@Override
+	public boolean checkMayBreakBlock(Block block) {
 		// sanity check
 		if (block == null) return true;
 		// joined players may not break blocks as long as game has not started
@@ -1400,6 +1451,13 @@ public class GameStandard extends Game {
 		this.arena = null;
 		this.floor = null;
 		this.lose = null;
+		this.inventoryKeeper = null;
+		if (this.playerOnBlockDegenerator != null)
+			this.playerOnBlockDegenerator.stopBlockDegenerator(); // to play it safe
+		this.playerOnBlockDegenerator = null;
+		if (this.floorTracker != null)
+			this.floorTracker.stopTracking(); // to play it safe, too
+		this.floorTracker = null;
 		//TODO add more
 	}
 	

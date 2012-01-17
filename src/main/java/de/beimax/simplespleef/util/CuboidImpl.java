@@ -3,9 +3,14 @@
  */
 package de.beimax.simplespleef.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+
+import de.beimax.simplespleef.game.Game;
 
 /**
  * @author mkalus
@@ -135,5 +140,22 @@ public class CuboidImpl implements Cuboid {
 					block.setTypeId(blockData[x][y][z].getTypeId());
 					block.setData(blockData[x][y][z].getData());
 				}
+	}
+
+	@Override
+	public List<Block> getDiggableBlocks(Game game) {
+		LinkedList<Block> diggableBlocks = new LinkedList<Block>();
+
+		// copy data from blocks
+		for (int x = this.coords[0]; x <= this.coords[3]; x++)
+			for (int y = this.coords[1]; y <= this.coords[4]; y++)
+				for (int z = this.coords[2]; z <= this.coords[5]; z++) {
+					Block block = this.world.getBlockAt(x, y, z);
+					if (block != null && game.checkMayBreakBlock(block)) { // can this block be broken
+						diggableBlocks.add(block);
+					}					
+				}
+
+		return diggableBlocks;
 	}
 }

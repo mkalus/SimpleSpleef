@@ -18,6 +18,7 @@
  **/
 package de.beimax.simplespleef.game;
 
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -308,4 +309,13 @@ public abstract class Game {
 	 * cleaning routine called at end of game
 	 */
 	public abstract void clean();
+	
+	/**
+	 * check whether a certain block may be broken
+	 * => player has been checked before this, so this does only concern block breaks
+	 * and interactions by spleefers
+	 * @param block broken/interacted (on instant-break) by spleefer
+	 * @return true, if block may be destroyed
+	 */
+	public abstract boolean checkMayBreakBlock(Block block);
 }
