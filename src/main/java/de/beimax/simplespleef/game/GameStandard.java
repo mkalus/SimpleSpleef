@@ -1010,6 +1010,8 @@ public class GameStandard extends Game {
 				payPrizeMoney(player);
 				payPrizeExperience(player);
 				payPrizeItems(player);
+				// teleport winners back to lounge
+				teleportPlayer(player, "lounge");
 			}
 			// update original positions
 			if (configuration.getBoolean("enableBackCommand", true))
