@@ -71,7 +71,7 @@ public class SimpleSpleef extends JavaPlugin {
 		if (SimpleSpleef.permission != null) { // use Vault to check permissions - actually does nothing different than sender.hasPermission at the moment, but might change
 			try {
 				return SimpleSpleef.permission.has(sender, permission);
-			} catch (Exception e) {
+			} catch (NoSuchMethodError e) {
 				// if for some reason there is a problem with Vault, fall back to default permissions
 				SimpleSpleef.log.warning("[SimpleSpleef] Checking Vault permission threw an exception. Are you using the most recent version? Falling back to to default permission checking.");
 			}
