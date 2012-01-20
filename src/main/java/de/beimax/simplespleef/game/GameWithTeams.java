@@ -159,9 +159,11 @@ public class GameWithTeams extends GameStandard {
 		if (redTeam.size() > 1) { // don't change 1 player team games
 			Random generator = new Random();
 			while (blueTeam.size() <= redTeam.size()) { // take one of the red team members from team red to blue until they even out
-				int index = generator.nextInt(redTeam.size() -1);
-				blueTeam.add(redTeam.get(index));
-				redTeam.remove(index);
+				if (redTeam.size() > 1) { // checking again because team size might have changed meanwhile //TODO - work on this again...
+					int index = generator.nextInt(redTeam.size() -1);
+					blueTeam.add(redTeam.get(index));
+					redTeam.remove(index);
+				}
 			}
 		}
 		
