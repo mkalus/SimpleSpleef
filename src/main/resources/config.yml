@@ -207,7 +207,7 @@ arenas:
 # Time in seconds for new blocks to dissolve into thin air
         arenaFloorDissolveTick: 5
 # Time in seconds, after which the arena floor starts to repair (-1 disables this)
-        arenaFloorRepairsAfter: 1
+        arenaFloorRepairsAfter: -1
 # Time in seconds for new blocks to get repaired
         arenaFloorRepairTick: 10
 # Arena cube that will be protected (saved on disk for restoration)

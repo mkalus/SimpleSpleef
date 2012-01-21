@@ -230,7 +230,7 @@ public class GameWithTeams extends GameStandard {
 			if ((team == Spleefer.TEAM_BLUE && blue == null)
 					|| (team == Spleefer.TEAM_RED && red == null))
 				teleportPlayer(spleefer.getPlayer(), "game");
-			else teleportPlayer(spleefer.getPlayer(), Spleefer.getTeamId(team) + "Spawn");
+			else teleportPlayer(spleefer.getPlayer(), Spleefer.getTeamId(team));
 		}
 	}
 
