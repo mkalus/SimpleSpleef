@@ -147,10 +147,18 @@ arenas:
         degeneratingBlocks:
             - DIRT
             - GRASS
+            - WOOL
+            - SNOW_BLOCK
+            - ICE
+            - GLASS
 # Allow Digging away of blocks (name/id) of...
         allowDigBlocks:
             - DIRT
             - GRASS
+            - WOOL
+            - SNOW_BLOCK
+            - ICE
+            - GLASS
 # Alternatively: disallow digging away of certain blocks (name/id)
         disallowDigBlocks:
             - STONE
@@ -188,8 +196,8 @@ arenas:
         arenaFloorDissolvesAfter: -1
 # Time in seconds for new blocks to dissolve into thin air
         arenaFloorDissolveTick: 5
-# Time in seconds, after which the arena floor starts to repair slowly (-1 disables this)
-        arenaFloorRepairsAfter: -1
+# Time in seconds, after which the arena floor starts to repair (-1 disables this)
+        arenaFloorRepairsAfter: 1
 # Time in seconds for new blocks to get repaired
         arenaFloorRepairTick: 10
 # Arena cube that will be protected (saved on disk for restoration)
