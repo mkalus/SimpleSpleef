@@ -18,11 +18,6 @@
  **/
 package de.beimax.simplespleef.game;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
 
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -41,6 +36,10 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.arenarestoring.ArenaRestorer;
+import de.beimax.simplespleef.game.arenarestoring.HardArenaRestorer;
+import de.beimax.simplespleef.game.arenarestoring.SoftRestorer;
+import de.beimax.simplespleef.game.floortracking.FloorThread;
 import de.beimax.simplespleef.game.floortracking.FloorTracker;
 import de.beimax.simplespleef.util.*;
 
@@ -118,6 +117,11 @@ public class GameStandard extends Game {
 	 * floor tracker - takes care of floor changes
 	 */
 	protected FloorTracker floorTracker;
+	
+	/**
+	 * arena restorer for this game
+	 */
+	protected ArenaRestorer arenaRestorer;
 	
 	/**
 	 * shortcuts for digging settings
@@ -499,8 +503,8 @@ public class GameStandard extends Game {
 		// send message
 		sendMessage(SimpleSpleef.getPlugin().ll("feedback.delete", "[ARENA]", getName(), "[PLAYER]", sender.getName()),
 				SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceStop", true));
-		// call the game handler to tell it that the game is over
-		SimpleSpleef.getGameHandler().gameOver(this);
+		// call the game handler to tell it that the game is over - only if game status has been reset
+		if (status == STATUS_NEW) SimpleSpleef.getGameHandler().gameOver(this);
 		return true;
 	}
 
@@ -544,11 +548,10 @@ public class GameStandard extends Game {
 					teleportPlayer(spleefer.getPlayer(), "lounge");
 			}
 			// restore arena
-			restoreArena();
-		}
-
-		// change game status
-		status = STATUS_NEW;
+			restoreArena(); // this will also eventually reset the game status and call the game handler
+		} else 	
+			// change game status
+			status = STATUS_NEW;
 		return true;
 	}
 
@@ -1021,8 +1024,8 @@ public class GameStandard extends Game {
 		
 		// clean up game and end it
 		endGame();
-		// call the game handler to tell it that the game is over
-		SimpleSpleef.getGameHandler().gameOver(this);
+		// call the game handler to tell it that the game is over - only if game status has been reset
+		if (status == STATUS_NEW) SimpleSpleef.getGameHandler().gameOver(this);
 	}
 	
 	/**
@@ -1390,25 +1393,33 @@ public class GameStandard extends Game {
 	 * save arena information, if setting restoreArenaAfterGame has been set
 	 */
 	protected void saveArena() {
-		if (arena == null || !configuration.getBoolean("restoreArenaAfterGame", true)) return; // ignore, if arena not defined or setting false
-		SerializableBlockData[][][] blockData = arena.getSerializedBlocks();
-		
-		// output file
-		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + ".save");
-		// delete old file
-		if (file.exists() && !file.delete()) {
-			SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
-			return;
+		// explicitly set to false
+		if (configuration.isBoolean("restoreArenaAfterGame") && !configuration.getBoolean("restoreArenaAfterGame")) {
+			arenaRestorer = null;
+			return; // ignore, if arena not defined or setting false
 		}
-		try {
-			// serialize objects
-			FileOutputStream fileStream = new FileOutputStream(file);
-			ObjectOutputStream os = new ObjectOutputStream(fileStream);
-			// write array itself
-			os.writeObject(blockData);
-			os.close();
-		} catch (Exception e) {
-			 SimpleSpleef.log.warning("[SimpleSpleef] Could not save arena file " + file.getName() + ". Reason: " + e.getMessage());
+		
+		// determine type of arena
+		String type;
+		if (configuration.isBoolean("restoreArenaAfterGame")) type = "soft";
+		else if (configuration.isString("restoreArenaAfterGame")) type = configuration.getString("restoreArenaAfterGame");
+		else type = "soft"; // fall back
+		
+		if (type.equals("arenahard")) { // hard arena restorer
+			arenaRestorer = new HardArenaRestorer();
+			arenaRestorer.saveArena(this, arena);
+		} else if (type.equals("floorhard")) { // hard floor restorer
+			arenaRestorer = new HardArenaRestorer();
+			arenaRestorer.saveArena(this, floor);
+		} else { // soft restorer
+			// create soft restorer
+			arenaRestorer = new SoftRestorer();
+			arenaRestorer.saveArena(this, floor);
+
+			if (floorTracker == null) // create floor tracker, if needed
+				floorTracker = new FloorTracker();
+			// create a new tracker/restorer
+			floorTracker.addFloorThread((FloorThread) arenaRestorer);
 		}
 	}
 
@@ -1416,29 +1427,7 @@ public class GameStandard extends Game {
 	 * restore arena information, if setting restoreArenaAfterGame has been set
 	 */
 	protected void restoreArena() {
-		if (arena == null || !configuration.getBoolean("restoreArenaAfterGame", true)) return; // ignore, if arena not defined or setting false
-		
-		// input file
-		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + ".save");
-		if (!file.exists()) {
-			SimpleSpleef.log.warning("[SimpleSpleef] Could find arena file " + file.getName());
-			return;
-		}
-		SerializableBlockData[][][] blockData;
-		try {
-			// deserialize objects
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
-			blockData = (SerializableBlockData[][][]) oInputStream.readObject();
-			oInputStream.close();
-		} catch (Exception e) {
-			 SimpleSpleef.log.warning("[SimpleSpleef] Could not restore arena file " + file.getName() + ". Reason: " + e.getMessage());
-			 return;
-		}
-		// restore arena
-		arena.setSerializedBlocks(blockData);
-		// delete file at the end - cleanup work...
-		if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
+		if (arenaRestorer != null) arenaRestorer.restoreArena();
 	}
 
 	@Override

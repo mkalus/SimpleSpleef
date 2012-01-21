@@ -155,4 +155,12 @@ public class FloorTracker {
 				floorThread.updateBlock(block);
 		}
 	}
+	
+	/**
+	 * Add a new floor thread to tracker
+	 * @param thread
+	 */
+	public void addFloorThread(FloorThread thread) {
+		floorThreads.add(thread);
+	}
 }
