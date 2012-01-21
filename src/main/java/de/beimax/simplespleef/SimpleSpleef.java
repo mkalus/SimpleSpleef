@@ -242,6 +242,8 @@ public class SimpleSpleef extends JavaPlugin {
 	public void reloadSimpleSpleefConfiguration() {
 		// reload the config file
 		this.reloadConfig();
+		// have the game loader reload, too
+		SimpleSpleef.gameHandler.reloadConfig();
 
 		// re-initialize the translator
 		lang = new Translator(this, this.getConfig().getString("language", "en"));
