@@ -1427,7 +1427,25 @@ public class GameStandard extends Game {
 	 * restore arena information, if setting restoreArenaAfterGame has been set
 	 */
 	protected void restoreArena() {
-		if (arenaRestorer != null) arenaRestorer.restoreArena();
+		if (arenaRestorer == null) return;
+
+		final int wait = configuration.getInt("restoreArenaAfterGameTimer", 0);
+		if (wait > 0) { // start in timer thread
+			new Thread() {
+				@Override
+				public void run() {
+					// end time to wait for
+					long endTime = System.currentTimeMillis() + ((long) wait * 1000);
+					do {
+						try {
+							Thread.sleep(200); // do nothing for some time
+						} catch (InterruptedException e) {}
+					} while (System.currentTimeMillis() < endTime);
+					// time has come to restore
+					arenaRestorer.restoreArena();
+				}
+			}.start();
+		} else arenaRestorer.restoreArena(); // restore right away
 	}
 
 	@Override
@@ -1449,6 +1467,7 @@ public class GameStandard extends Game {
 		if (this.floorTracker != null)
 			this.floorTracker.stopTracking(); // to play it safe, too
 		this.floorTracker = null;
+		this.arenaRestorer = null;
 		//TODO add more
 	}
 	

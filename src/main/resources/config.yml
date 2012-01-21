@@ -180,6 +180,8 @@ arenas:
 # - floorhard: resets the floor the hard way (does not touch placed blocks outside arena floor)
 # - arenahard: resets the whole arena the hard way (may lag on large arenas)
         restoreArenaAfterGame: true
+# Wait for a number of seconds before restoring arena - 0 to disable this timer
+        restoreArenaAfterGameTimer: 0
 # Players can teleport back to original position after game with /spl back?
         enableBackCommand: true
 # Time in seconds, after which the arena floor starts to dissolve slowly (-1 disables this)
