@@ -193,13 +193,13 @@ public class GameStandard extends Game {
 			allowDigBlocks = true;
 			digBlocks = new LinkedList<ItemStack>();
 			for (String line : conf.getStringList("allowDigBlocks")) {
-				digBlocks.add(MaterialHelper.getItemStackFromString(line));
+				digBlocks.add(MaterialHelper.getItemStackFromString(line, true));
 			}
 		} else if (conf.isList("disallowDigBlocks")) {
 			allowDigBlocks = false;
 			digBlocks = new LinkedList<ItemStack>();
 			for (String line : conf.getStringList("disallowDigBlocks")) {
-				digBlocks.add(MaterialHelper.getItemStackFromString(line));
+				digBlocks.add(MaterialHelper.getItemStackFromString(line, true));
 			}
 		} else digBlocks = null; // delete previous settings
 
@@ -854,22 +854,14 @@ public class GameStandard extends Game {
 			if (supportsReady() && isJoinable()) {
 				ItemStack readyBlockMaterial;
 				try {
-					readyBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("readyBlockMaterial", null));
+					readyBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("readyBlockMaterial", null), true);
 				} catch (Exception e) {
 					return; // ignore exceptions
 				}
 				if (readyBlockMaterial == null) return; // ignore null materials
 				// material has been checked, now test, if clicked block is of the same material
-				if (readyBlockMaterial.getTypeId() == block.getTypeId()) {
-					try {
-						// either type is -1 or data value matches
-						if (readyBlockMaterial.getData() == null || block.getData() == readyBlockMaterial.getData().getData()) {
-							// found matching block! => Ready the player!
-							ready(event.getPlayer());
-						}
-					} catch (NullPointerException e) { // possibly thrown by compareBlock.getData() if data was -1
-						return;
-					}
+				if (readyBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, readyBlockMaterial)) {
+					ready(event.getPlayer());
 				}
 			}
 	}
@@ -1129,7 +1121,7 @@ public class GameStandard extends Game {
 			prize = prizes.get(0);
 		} else prize = prizes.get(generator.nextInt(prizes.size() - 1));
 		// interpret line to Item Stack
-		ItemStack itemStack = MaterialHelper.getItemStackFromString(prize);
+		ItemStack itemStack = MaterialHelper.getItemStackFromString(prize, false);
 		// give prizes to player
 		player.getInventory().addItem(itemStack);
 		// player gets message
@@ -1201,7 +1193,7 @@ public class GameStandard extends Game {
 		List<String> addInventoryItems = configuration.getStringList("addInventoryItems");
 		LinkedList<ItemStack> itemStack = new LinkedList<ItemStack>();
 		for (String item : addInventoryItems) {
-			ItemStack stack = MaterialHelper.getItemStackFromString(item);
+			ItemStack stack = MaterialHelper.getItemStackFromString(item, false);
 			if (stack == null)
 				SimpleSpleef.log.warning("[SimpleSpleef] Could not parse addInventoryItems to item stack in arena " + getId() + ", line: " + item);
 			else itemStack.add(stack);
@@ -1245,7 +1237,7 @@ public class GameStandard extends Game {
 		// should setting be checked first?
 		if (checkSetting && !configuration.getBoolean("playersReceiveShovelAtGameStart", true)) return false; // no shovel added
 		// get material
-		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"), false);
 		if (shovelItem == null) {
 			SimpleSpleef.log.warning("[SimpleSpleef] shovelItem of arena " + getId() + " is not a correct item id/name!");
 			return false;
@@ -1281,7 +1273,7 @@ public class GameStandard extends Game {
 		// should setting be checked first?
 		if (checkSetting && !configuration.getBoolean("playersLoseShovelAtGameEnd", true)) return false; // no shovel lost
 		// get material
-		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"));
+		ItemStack shovelItem = MaterialHelper.getItemStackFromString(configuration.getString("shovelItem", "DIAMOND_SPADE"), false);
 		if (shovelItem == null) {
 			SimpleSpleef.log.warning("[SimpleSpleef] shovelItem of arena " + getId() + " is not a correct item id/name!");
 			return false;

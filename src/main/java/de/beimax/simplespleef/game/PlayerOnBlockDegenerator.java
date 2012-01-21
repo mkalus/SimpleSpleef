@@ -52,7 +52,7 @@ public class PlayerOnBlockDegenerator {
 		// fill with degenerating blocks
 		this.degeneratingBlocks = new LinkedList<ItemStack>();
 		for (String string : degeneratingBlocks) {
-			ItemStack stack = MaterialHelper.getItemStackFromString(string);
+			ItemStack stack = MaterialHelper.getItemStackFromString(string, true);
 			if (stack != null) this.degeneratingBlocks.add(stack);
 		}
 		

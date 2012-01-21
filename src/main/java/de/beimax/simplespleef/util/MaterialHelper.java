@@ -49,17 +49,18 @@ public abstract class MaterialHelper {
 	}
 	
 	/**
-	 * 
+	 * Get a stack from a config line
 	 * @param line
+	 * @param considerAny true if you want simple lines (not containing damage number) to be of type "any"
 	 * @return
 	 */
-	public static ItemStack getItemStackFromString(String line) {
+	public static ItemStack getItemStackFromString(String line, boolean considerAny) {
 		if (line == null) return null; // ignore null strings
 		// split string to stack
 		String[] parts = line.split(":");
 		int number;
 		String item;
-		short dmg = -1;
+		short dmg = 0;
 		if (parts.length > 3) return null; //syntax error
 		else if (parts.length == 3) { // with damage number!
 			try {
@@ -91,15 +92,16 @@ public abstract class MaterialHelper {
 		} else {
 			number = 1;
 			item = line;
+			if (considerAny) dmg = -1; // consider this to be "any" type
 		}
 		// get material
 		Material material = getMaterialFromString(item);
 		if (material == null) return null; //syntax error
 		// create stack
 		ItemStack stack;
-		if (dmg > 0) stack = new ItemStack(material, number, dmg);
+		stack = new ItemStack(material, number, dmg);
 		//else stack = new ItemStack(material, number, (short) -1); //-1 to define a generic material (like all wool, not wool:0 = white wool)
-		else stack = new ItemStack(material, number); //-1 to define a generic material (like all wool, not wool:0 = white wool)
+		//else stack = new ItemStack(material, number); //-1 to define a generic material (like all wool, not wool:0 = white wool)
 
 		return stack;
 	}
@@ -115,7 +117,7 @@ public abstract class MaterialHelper {
 		
 		try {
 			// either type is -1 or data value matches
-			if (compareBlock.getData() == null || block.getData() == compareBlock.getData().getData())
+			if (compareBlock.getData().getData() == -1 || block.getData() == compareBlock.getData().getData())
 				return true; // found -> return state						
 		} catch (NullPointerException e) { // possibly thrown by compareBlock.getData() if data was -1
 			return true;
