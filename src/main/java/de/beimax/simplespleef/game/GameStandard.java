@@ -1003,6 +1003,9 @@ public class GameStandard extends Game {
 	 * called when game is over - get winners, etc.
 	 */
 	protected void gameOver() {
+		// possibly restore inventories
+		restoreAllInventories(); // done before paying prizes...
+
 		// determine winners
 		LinkedList<Spleefer> winners = new LinkedList<Spleefer>();
 		for (Spleefer spleefer : spleefers.get()) {
