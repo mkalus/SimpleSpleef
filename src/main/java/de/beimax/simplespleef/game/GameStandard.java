@@ -981,6 +981,8 @@ public class GameStandard extends Game {
 		// broadcast message has to be sent by calling method
 		// shovel lost, too
 		removeShovelItem(player, true);
+		// restore inventory
+		restoreInventory(player);
 		// teleport player to lose spawn
 		if (teleport) teleportPlayer(player, "lose");
 		// determine if game is over...
