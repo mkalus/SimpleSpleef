@@ -126,19 +126,25 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 		@Override
 		public void run() {
 			int count = 0;
+			// sleep a little to let other threads finish
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {}
 			
-			// cycle through changes and restore
-			for (BlockChange changedBlock : changedBlocks) {
-				Block block = changedBlock.location.getBlock();
-				block.setTypeId(changedBlock.blockData.getTypeId());
-				block.setData(changedBlock.blockData.getData());
-				
-				// every 10 cycles, wait a little
-				if ((count++ % 10) == 0) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {}
-				}
+			synchronized (changedBlocks) {
+				// cycle through changes and restore
+				for (BlockChange changedBlock : changedBlocks) {
+					Block block = changedBlock.location.getBlock();
+					block.setTypeId(changedBlock.blockData.getTypeId());
+					block.setData(changedBlock.blockData.getData());
+					
+					// every 10 cycles, wait a little
+					if ((count++ % 10) == 0) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {}
+					}
+				}				
 			}
 
 			//System.out.println("Finished");

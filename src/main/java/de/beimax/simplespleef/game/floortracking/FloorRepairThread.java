@@ -56,13 +56,15 @@ public class FloorRepairThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
-	public synchronized void updateBlock(Block block, int oldType, byte oldData) {
+	public void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
-		Location loc = block.getLocation();
-		if (originalBlocks.containsKey(loc)) { // only locations that are contained in the original block database
-			if (block.getType() == Material.AIR) // dissolved to air?
-				air.add(loc); //add location to repair it later on
-			else air.remove(loc); // if not dissolved, remove from repair list to prevent repairs
+		synchronized (block) {
+			Location loc = block.getLocation();
+			if (originalBlocks.containsKey(loc)) { // only locations that are contained in the original block database
+				if (block.getType() == Material.AIR) // dissolved to air?
+					air.add(loc); //add location to repair it later on
+				else air.remove(loc); // if not dissolved, remove from repair list to prevent repairs
+			}			
 		}
 	}
 
@@ -70,7 +72,7 @@ public class FloorRepairThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseThread#tick()
 	 */
 	@Override
-	public synchronized void tick() {
+	public void tick() {
 		// get a random entry
 		Location location = getRandomEntry();
 		if (location != null) {
@@ -81,9 +83,11 @@ public class FloorRepairThread extends FloorBaseThread {
 			// get old data
 			int oldType = block.getTypeId();
 			byte oldData = block.getData();
-			block.setTypeId(blockData.getTypeId());
-			block.setData(blockData.getData());
-			air.remove(location);
+			synchronized (block) {
+				block.setTypeId(blockData.getTypeId());
+				block.setData(blockData.getData());
+				air.remove(location);				
+			}
 			// notify others
 			notifyTracker(block, oldType, oldData);
 		}
