@@ -136,12 +136,15 @@ public class PlayerOnBlockDegenerator {
 
 				// has timestamp been exceeded?
 				if (System.currentTimeMillis() >= timestamp && checkedBlock != null) {
+					// get original data
+					int oldType = checkedBlock.getTypeId();
+					byte oldData = checkedBlock.getData();
 					checkedBlock.setType(Material.AIR); // block dissolves into thin air
 					checkedBlock.setData((byte) 0);
 					timestamp = Long.MAX_VALUE; // to not have this happen again
 					// notify floor tracker
 					if (floorTracker != null)
-						floorTracker.updateBlock(checkedBlock);
+						floorTracker.updateBlock(checkedBlock, oldType, oldData);
 				}
 			}
 			

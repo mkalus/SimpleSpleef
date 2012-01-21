@@ -95,7 +95,7 @@ public abstract class FloorBaseThread implements FloorThread {
 	 * so other trackers can update this block
 	 * @param block changed block
 	 */
-	protected void notifyTracker(Block block) {
-		tracker.notifyChangedBlock(block, this);
+	protected void notifyTracker(Block block, int oldType, byte oldData) {
+		tracker.notifyChangedBlock(block, oldType, oldData, this);
 	}
 }

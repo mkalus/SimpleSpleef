@@ -3,12 +3,10 @@
  */
 package de.beimax.simplespleef.game.arenarestoring;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -41,11 +39,6 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 	 * keeps the data of the changed blocks
 	 */
 	private LinkedList<BlockChange> changedBlocks;
-	
-	/**
-	 * keeps the data of the original blocks
-	 */
-	private HashMap<Location, SerializableBlockData> originalBlocks = new HashMap<Location, SerializableBlockData>();
 
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
@@ -66,10 +59,7 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 	 */
 	@Override
 	public void initializeThread(Game game, List<Block> floor) {
-		for (Block block : floor) {
-			if (block == null) continue; // no NPEs
-			originalBlocks.put(block.getLocation(), new SerializableBlockData(block.getTypeId(), block.getData()));
-		}
+		//Do nothing
 	}
 
 	/* (non-Javadoc)
@@ -84,24 +74,15 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
-	public void updateBlock(Block block) {
+	public void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
-		Location loc = block.getLocation();
-		// in list of original blocks?
-		SerializableBlockData originalBlock = originalBlocks.get(loc);
-		if (originalBlock != null) { // add changed block data
-			BlockChange change = new BlockChange();
-			change.location = loc;
-			change.blockData = new SerializableBlockData(originalBlock.getTypeId(), originalBlock.getData());
-			changedBlocks.add(change);
-		} else  { // outside original blocks? Add to list as air (placed blocks)
-			if (block.getType() != Material.AIR) {
-				BlockChange change = new BlockChange();
-				change.location = loc;
-				change.blockData = new SerializableBlockData(Material.AIR.getId(), (byte) 0);
-				changedBlocks.add(change);
-			}
-		}
+		// just add original block type to list
+		BlockChange change = new BlockChange();
+		change.location = block.getLocation();
+		change.blockData = new SerializableBlockData(oldType, oldData);
+		// add at first position, so the restoration is done from the last block changed
+		changedBlocks.addFirst(change);
+		//System.out.println("Added!");
 	}
 
 	/* (non-Javadoc)
@@ -160,6 +141,7 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 				}
 			}
 
+			//System.out.println("Finished");
 			// call game handler to finish the game off
 			SimpleSpleef.getGameHandler().gameOver(game);
 		}

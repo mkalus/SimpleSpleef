@@ -840,12 +840,15 @@ public class GameStandard extends Game {
 		if (event.getAction() == Action.LEFT_CLICK_BLOCK && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block)) {
 			// cancel event
 			event.setCancelled(true);
+			// get block data
+			Block clickedBlock = event.getClickedBlock();
+			int oldType = clickedBlock.getTypeId();
+			byte oldData = clickedBlock.getData();
 			// set block to air
-			event.getClickedBlock().setType(Material.AIR);
-			event.getClickedBlock().setData((byte) 0);
+			clickedBlock.setType(Material.AIR);
+			clickedBlock.setData((byte) 0);
 			// notify floor tracker
-			if (floorTracker != null)
-				floorTracker.updateBlock(event.getClickedBlock());
+			updateTrackers(clickedBlock, oldType, oldData);
 		} else
 		//check if player clicked on a "ready" block (e.g. iron block) and the game is readyable
 			if (supportsReady() && isJoinable()) {
@@ -931,6 +934,9 @@ public class GameStandard extends Game {
 	public void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		if (block == null) return; // sanity check
+		// get block data
+		int oldType = block.getTypeId();
+		byte oldData = block.getData();
 		// may the block be broken?
 		if (!checkMayBreakBlock(block)) {
 			// cancel event
@@ -947,7 +953,7 @@ public class GameStandard extends Game {
 
 		// if there is a floor tracker running, tell it about the change
 		if (floorTracker != null && !event.isCancelled())
-			floorTracker.updateBlock(block);
+			updateTrackers(block, oldType, oldData);
 	}
 	
 	@Override
@@ -962,7 +968,7 @@ public class GameStandard extends Game {
 
 		// if there is a floor tracker running, tell it about the change
 		if (floorTracker != null && !event.isCancelled())
-			floorTracker.updateBlock(event.getBlock());
+			updateTrackers(event.getBlock(), Material.AIR.getId(), (byte) 0);
 	}
 
 	/**
@@ -1352,7 +1358,7 @@ public class GameStandard extends Game {
 	 * @param block
 	 * @return
 	 */
-	private boolean checkMayBreakBlockMaterial(Block block) {
+	protected boolean checkMayBreakBlockMaterial(Block block) {
 		// allowed blocks? => allowDigBlocks
 		// alternatively: disallowDigBlocks
 		if (digBlocks != null) {
@@ -1368,7 +1374,7 @@ public class GameStandard extends Game {
 	 * @param block
 	 * @return
 	 */
-	private boolean checkMayBreakBlockLocation(Block block) {
+	protected boolean checkMayBreakBlockLocation(Block block) {
 		Location blockLocation = block.getLocation();
 		// is arena undefined?
 		if (arena == null) {
@@ -1392,6 +1398,17 @@ public class GameStandard extends Game {
 				return this.floor.contains(blockLocation); // only arena floor can be broken during game
 			}
 		}
+	}
+	
+	/**
+	 * update the trackers when blocks are changed
+	 * @param newBlock - new block (after change)
+	 * @param oldType - old type of block
+	 * @param oldData - old data of block
+	 */
+	protected void updateTrackers(Block newBlock, int oldType, byte oldData) {
+		if (floorTracker != null)
+			floorTracker.updateBlock(newBlock, oldType, oldData);
 	}
 	
 	/**

@@ -48,13 +48,13 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
-	public synchronized void updateBlock(Block block) {
+	public synchronized void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
 		Location loc = block.getLocation();
 		if (nonAir.contains(loc)) {
 			if (block.getType() == Material.AIR) // dissolve to air
 				nonAir.remove(loc); // remove because it is air anyway
-		} else if (block.getType() != Material.AIR) // non air added - add to dissolvable parts of arena
+		} else if (block.getType() != Material.AIR) // non air added - add to dissolveable parts of arena
 			nonAir.add(loc);
 	}
 
@@ -66,13 +66,16 @@ public class FloorDissolveThread extends FloorBaseThread {
 		// get a random entry
 		Location location = getRandomEntry();
 		if (location != null) {
-			// dissolve to air
 			Block block = location.getBlock();
+			// get old data
+			int oldType = block.getTypeId();
+			byte oldData = block.getData();
+			// dissolve to air
 			block.setType(Material.AIR);
 			block.setData((byte) 0);
 			nonAir.remove(location);
 			// notify others
-			notifyTracker(block);
+			notifyTracker(block, oldType, oldData);
 		}
 	}
 	

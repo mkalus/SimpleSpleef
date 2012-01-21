@@ -136,10 +136,12 @@ public class FloorTracker {
 	/**
 	 * update a certain block location
 	 * @param block
+	 * @param oldType - old type of block
+	 * @param oldData - old data of block
 	 */
-	public void updateBlock(Block block) {
+	public void updateBlock(Block block, int oldType, byte oldData) {
 		for (FloorThread floorThread : floorThreads) {
-			floorThread.updateBlock(block);
+			floorThread.updateBlock(block, oldType, oldData);
 		}
 	}
 	
@@ -147,12 +149,14 @@ public class FloorTracker {
 	 * Called by tick()-methods of FloorThreads when they change a block,
 	 * so other trackers can update their block database. 
 	 * @param block
+	 * @param oldType - old type of block
+	 * @param oldData - old data of block
 	 * @param caller
 	 */
-	public void notifyChangedBlock(Block block, FloorThread caller) {
+	public void notifyChangedBlock(Block block, int oldType, byte oldData, FloorThread caller) {
 		for (FloorThread floorThread : floorThreads) {
 			if (floorThread != caller) // caller is not updated - has to do this itself
-				floorThread.updateBlock(block);
+				floorThread.updateBlock(block, oldType, oldData);
 		}
 	}
 	

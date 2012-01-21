@@ -28,6 +28,9 @@ public interface FloorThread extends Runnable {
 	
 	/**
 	 * update a certain block location
+	 * @param block - new block data
+	 * @param oldType - old type of block
+	 * @param oldData - old data of block
 	 */
-	public void updateBlock(Block block);
+	public void updateBlock(Block block, int oldType, byte oldData);
 }

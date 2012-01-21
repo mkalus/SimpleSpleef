@@ -44,6 +44,7 @@ public class FloorRepairThread extends FloorBaseThread {
 	 */
 	@Override
 	public synchronized void initializeThread(Game game, List<Block> floor) {
+		//TODO: do we really need an original block memory or can we do something like in the SoftRestorer?
 		for (Block block : floor) {
 			if (block == null) continue; // no NPEs
 			if (block.getType() != Material.AIR) // add location to original locations
@@ -55,7 +56,7 @@ public class FloorRepairThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
-	public synchronized void updateBlock(Block block) {
+	public synchronized void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
 		Location loc = block.getLocation();
 		if (originalBlocks.containsKey(loc)) { // only locations that are contained in the original block database
@@ -77,11 +78,14 @@ public class FloorRepairThread extends FloorBaseThread {
 			if (blockData == null) return; // no NPEs, should not happen here, but just to make sure...
 			// repair it
 			Block block = location.getBlock();
+			// get old data
+			int oldType = block.getTypeId();
+			byte oldData = block.getData();
 			block.setTypeId(blockData.getTypeId());
 			block.setData(blockData.getData());
 			air.remove(location);
 			// notify others
-			notifyTracker(block);
+			notifyTracker(block, oldType, oldData);
 		}
 	}
 
