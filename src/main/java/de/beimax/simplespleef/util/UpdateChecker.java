@@ -48,8 +48,7 @@ public class UpdateChecker {
 		String inputLine = in.readLine();
 		in.close();
 
-		//TODO revert later on
-		if (inputLine != null && (inputLine.equals(version) || inputLine.equals("2.2.1"))) return null; // no new update
+		if (inputLine != null && (inputLine.equals(version))) return null; // no new update
 		//if (inputLine != null && inputLine.equals(version)) return null; // no new update
 
 		return inputLine; // new version
