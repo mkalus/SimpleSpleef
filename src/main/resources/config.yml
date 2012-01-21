@@ -74,7 +74,7 @@ arenas:
         announceOnJoin: true
 # Start the countdown by typing "/spleef start" - otherwise someone has to "/spleef countdown" the arena)
         spleeferStart: true
-# Only applicable for team arenas:  Allow players to choose teams using the team command.
+# Only applicable for team arenas:  Allow players to choose teams using the team command and/or teamBlocks (see below).
         teamCommand: true
 # Only applicable for team arenas:  Team block for joining the blue team.
         teamBlockMaterialBlue: WOOL:11

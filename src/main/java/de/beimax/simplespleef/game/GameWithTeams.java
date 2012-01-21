@@ -8,10 +8,14 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.util.LocationHelper;
+import de.beimax.simplespleef.util.MaterialHelper;
 
 /**
  * @author mkalus
@@ -143,6 +147,39 @@ public class GameWithTeams extends GameStandard {
 			checkReadyAndStartGame(); // check status and possibly start the game
 		}
 		return true;
+	}
+	
+	@Override
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		Block block = event.getClickedBlock();
+		if (block == null || event.getPlayer() == null) return; // ignore null blocks and null players
+
+		if (isJoinable() && configuration.getBoolean("teamCommand", true)) {
+			// get blocks
+			ItemStack redBlockMaterial;
+			try {
+				redBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("teamBlockMaterialRed", null), true);
+			} catch (Exception e) {
+				SimpleSpleef.log.warning("[SimpleSpleef] Could not parse teamBlockMaterialRed in arena " + getId());
+				return; // ignore exceptions
+			}
+			ItemStack blueBlockMaterial;
+			try {
+				blueBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("teamBlockMaterialBlue", null), true);
+			} catch (Exception e) {
+				SimpleSpleef.log.warning("[SimpleSpleef] Could not parse teamBlockMaterialBlue in arena " + getId());
+				return; // ignore exceptions
+			}
+
+			// blocks are ok, now check touched material and join team
+			if (redBlockMaterial != null && redBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, redBlockMaterial)) {
+				if (team(event.getPlayer(), "red")) return;
+			}
+			if (blueBlockMaterial != null && blueBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, blueBlockMaterial)) {
+				if (team(event.getPlayer(), "blue")) return;
+			}
+		}
+		super.onPlayerInteract(event); // call parent
 	}
 	
 	@Override
