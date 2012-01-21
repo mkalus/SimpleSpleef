@@ -361,7 +361,14 @@ public class GameStandard extends Game {
 		}
 		return true;
 	}
-	
+
+	@Override
+	public boolean team(Player player, String team) {
+		// no team games possible in this arena
+		player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNotPossible", "[ARENA]", getName()));
+		return false;
+	}
+
 	@Override
 	public boolean ready(Player player) {
 		// game started already?
@@ -388,7 +395,7 @@ public class GameStandard extends Game {
 		// ok, ready player now
 		spleefer.setReady(true);
 		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.ready", "[ARENA]", getName()));
-		// broadcast message of somebody loosing
+		// broadcast message of somebody readying
 		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.ready", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName());
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceReady", false)) {
 			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
@@ -397,6 +404,14 @@ public class GameStandard extends Game {
 			sendMessage(broadcastMessage, player);
 		}
 		// is the game ready?
+		checkReadyAndStartGame();
+		return true;
+	}
+
+	/**
+	 * check the readiness status of a game and possibly start it
+	 */
+	protected void checkReadyAndStartGame() {
 		if (spleefers.countUnreadyPlayers() == 0) {
 			// autostart game once all are ready
 			if (configuration.getBoolean("readyAutoStart", false)) {
@@ -412,7 +427,6 @@ public class GameStandard extends Game {
 			// otherwise, just set game as ready
 			else this.status = Game.STATUS_READY;
 		}
-		return true;
 	}
 
 	@Override

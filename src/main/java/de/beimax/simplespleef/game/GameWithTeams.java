@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.util.LocationHelper;
@@ -34,6 +35,9 @@ public class GameWithTeams extends GameStandard {
 	public boolean start() {
 		//create teams at game start
 		createTeams();
+		// broadcast message of player teams, so everyone knows this...
+		String broadcastMessage = ChatColor.BLUE + SimpleSpleef.getPlugin().ll("broadcasts.teams", "[TEAMS]", getListOfSpleefers());
+		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceTeam", false));
 		return super.start();
 	}
 	
@@ -87,6 +91,58 @@ public class GameWithTeams extends GameStandard {
 			}
 			return builder.toString();
 		} else return super.getListOfSpleefers();		
+	}
+	
+	@Override
+	public boolean team(Player player, String team) {
+		if (player == null || team == null) return false; // prevent NPEs
+		// is spleefer?
+		Spleefer spleefer = spleefers.getSpleefer(player);
+		if (spleefer == null) return false; // should not happen, because the game handler should have checked that..
+
+		// no teams during gaming
+		if (!isJoinable()) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamAlreadyStarted", "[ARENA]", getName()));
+			return false;
+		}
+		// is team command disallowed in the arena?
+		if (!configuration.getBoolean("teamCommand", true)) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNoTeamCommand", "[ARENA]", getName()));
+			return false;
+		}
+		// parse team string
+		int teamId;
+		if (team.equalsIgnoreCase("red")) teamId = Spleefer.TEAM_RED;
+		else if (team.equalsIgnoreCase("blue")) teamId = Spleefer.TEAM_BLUE;
+		else { // no valid team name
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNoValidTeam", "[NAME]", team));
+			return false;			
+		}
+		// is the player already part of this team?
+		if (spleefer.getTeam() == teamId) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamAlreadyInTeam", "[TEAM]", Spleefer.getTeamId(teamId)));
+			return false;
+		}
+
+		// clear: join the team
+		spleefer.setTeam(teamId);
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.team", "[TEAM]", Spleefer.getTeamId(teamId)));
+
+		// broadcast message of somebody joining a team
+		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.team", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName(), "[TEAM]", Spleefer.getTeamId(teamId));
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceTeam", false)) {
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+		} else {
+			// send message to all receivers
+			sendMessage(broadcastMessage, player);
+		}
+
+		// if teamJoiningAlsoReadies is true, also ready player
+		if (configuration.getBoolean("teamJoiningAlsoReadies", true)) {
+			spleefer.setReady(true);
+			checkReadyAndStartGame(); // check status and possibly start the game
+		}
+		return true;
 	}
 	
 	@Override
@@ -152,23 +208,30 @@ public class GameWithTeams extends GameStandard {
 		LinkedList<Spleefer> blueTeam = new LinkedList<Spleefer>();
 		LinkedList<Spleefer> redTeam = new LinkedList<Spleefer>();
 		
-		// fill red team with all spleefers
-		for (Spleefer spleefer : spleefers.get()) redTeam.add(spleefer);
-		
-		// random generator
-		if (redTeam.size() > 1) { // don't change 1 player team games
-			Random generator = new Random();
-			while (blueTeam.size() <= redTeam.size()) { // take one of the red team members from team red to blue until they even out
-				if (redTeam.size() > 1) { // checking again because team size might have changed meanwhile //TODO - work on this again...
-					int index = generator.nextInt(redTeam.size() -1);
-					blueTeam.add(redTeam.get(index));
-					redTeam.remove(index);
-				}
-			}
+		// fill teams with spleefers
+		for (Spleefer spleefer : spleefers.get()) {
+			if (spleefer.getTeam() == Spleefer.TEAM_BLUE) redTeam.add(spleefer);
+			else redTeam.add(spleefer); // move all others to the red team
 		}
+		
+		// are the teams unevenly mixed? If yes, even them out on a random basis.
+		if (redTeam.size() > blueTeam.size()) evenOutTeamLists(blueTeam, redTeam);
+		else if (blueTeam.size() > redTeam.size()) evenOutTeamLists(redTeam, blueTeam);
 		
 		// we have the teams, now set teams
 		for (Spleefer spleefer : blueTeam) spleefer.setTeam(Spleefer.TEAM_BLUE);
 		for (Spleefer spleefer : redTeam) spleefer.setTeam(Spleefer.TEAM_RED);
+	}
+	
+	protected void evenOutTeamLists(LinkedList<Spleefer> smaller, LinkedList<Spleefer> larger) {
+		// if the size difference is 1, ignore evening out - also ignore 1 member teams
+		if (larger.size()-1 == smaller.size() || larger.size() <= 1) return;
+		
+		Random generator = new Random();
+		while (smaller.size() < larger.size()) { // take one of the red team members from team red to blue until they even out
+			int index = generator.nextInt(larger.size() -1);
+			smaller.add(larger.get(index));
+			larger.remove(index);
+		}
 	}
 }

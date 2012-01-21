@@ -41,7 +41,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * list of all commands
 	 */
-	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "ready", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin" };
+	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "ready", "team", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin" };
 	/**
 	 * commands possible from the console
 	 */
@@ -325,6 +325,18 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		Game game = SimpleSpleef.getGameHandler().getGameByName(arena);
 		// list of spleefers and spectators
 		printGamePlayersAndSpectators(sender, game);
+	}
+	
+	/**
+	 * Join a team (joined spleefers only)
+	 * @param sender
+	 * @param args
+	 */
+	protected void teamCommand(CommandSender sender, String[] args) {
+		// too many or to few arguments?
+		if (tooFewArguments(sender, args, 1)) return;
+		if (tooManyArguments(sender, args, 1)) return;
+		SimpleSpleef.getGameHandler().team(sender, args[1]);
 	}
 	
 	/**

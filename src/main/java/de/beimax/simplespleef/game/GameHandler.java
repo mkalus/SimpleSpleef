@@ -357,6 +357,21 @@ public class GameHandler {
 	}
 
 	/**
+	 * Attempt to join a team (spleefers only)
+	 * @param sender
+	 * @param team team name
+	 */
+	public void team(CommandSender sender, String team) {
+		// only senders in a game may start a game
+		Player player = (Player) sender; // cast to player
+		// find player in arena
+		Game checkGame = checkPlayerInGame(player);
+		if (checkGame != null) checkGame.team(player, team);
+		// sender not part of any game
+		else sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNoGame"));		
+	}
+	
+	/**
 	 * Attempt to set ready for a gamer (spleefers only)
 	 * @param sender
 	 */

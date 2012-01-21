@@ -33,6 +33,8 @@ settings:
     announceGame: true
 # globally announce when players join games
     announceJoin: true
+# globally announce when player joins a team
+    announceTeam: false
 # globally announce when player ready for the game    
     announceReady: false
 # globally announce when game starts
@@ -72,12 +74,20 @@ arenas:
         announceOnJoin: true
 # Start the countdown by typing "/spleef start" - otherwise someone has to "/spleef countdown" the arena)
         spleeferStart: true
+# Only applicable for team arenas:  Allow players to choose teams using the team command.
+        teamCommand: true
+# Only applicable for team arenas:  Team block for joining the blue team.
+        teamBlockMaterialBlue: WOOL:11
+# Only applicable for team arenas:  Team block for joining the red team.
+        teamBlockMaterialRed: WOOL:14
+# Only applicable for team arenas:  If readying is used (see below), then joing a team block will also ready the player.
+        teamJoiningAlsoReadies: true
 # game has to be "ready" to start playing - takes false, command, block, and commandAndBlock as arguments - if false, game has not to be ready to start
         useReady: false
 # Should the game start automatically, once all players are ready?
         readyAutoStart: true
 # If useReady has the value block or commandAndBlock, use the following material block that can be touched to ready the game (default iron block = 42)
-# If you use colored wool, please use WOOL:15 (for red wool)
+# If you use colored wool, please use WOOL:4 (for yellow wool) - in team games, this will ready the gamer for any team.
         readyBlockMaterial: '42'
 # Clear inventory at game start and restore after game has ended
         clearInventory: false

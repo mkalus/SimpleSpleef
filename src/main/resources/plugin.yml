@@ -30,6 +30,9 @@ permissions:
   simplespleef.list:
     description: List spleefers (in arena)
     default: true
+  simplespleef.team:
+    description: Join team (joined spleefers only)
+    default: true
   simplespleef.ready:
     description: Ready for a game (spleefers only)
     default: true
@@ -78,6 +81,8 @@ permissions:
   simplespleef.sign.list:
     description: List spleefers (in arena) (sign command)
     default: true
+  simplespleef.sign.team:
+    description: Join team (joined spleefers only) (sign command)
   simplespleef.sign.ready:
     description: Ready for a game (spleefers only) (sign command)
     default: true

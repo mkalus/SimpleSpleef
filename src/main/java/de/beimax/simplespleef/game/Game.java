@@ -110,6 +110,12 @@ public abstract class Game {
 	public abstract boolean leave(Player player);
 
 	/**
+	 * Attempt to join a team
+	 * @return boolean successful?
+	 */
+	public abstract boolean team(Player player, String team);
+
+	/**
 	 * Mark player as ready
 	 * @return boolean successful?
 	 */
