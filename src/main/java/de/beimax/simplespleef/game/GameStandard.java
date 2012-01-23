@@ -39,7 +39,7 @@ import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.arenarestoring.ArenaRestorer;
 import de.beimax.simplespleef.game.arenarestoring.HardArenaRestorer;
 import de.beimax.simplespleef.game.arenarestoring.SoftRestorer;
-import de.beimax.simplespleef.game.floortracking.FloorThread;
+import de.beimax.simplespleef.game.floortracking.FloorWorker;
 import de.beimax.simplespleef.game.floortracking.FloorTracker;
 import de.beimax.simplespleef.util.*;
 
@@ -1447,7 +1447,7 @@ public class GameStandard extends Game {
 			if (floorTracker == null) // create floor tracker, if needed
 				floorTracker = new FloorTracker();
 			// create a new tracker/restorer
-			floorTracker.addFloorThread((FloorThread) arenaRestorer);
+			floorTracker.addFloorThread((FloorWorker) arenaRestorer);
 		}
 	}
 

@@ -19,7 +19,7 @@ import de.beimax.simplespleef.util.SerializableBlockData;
  * @author mkalus
  *
  */
-public class FloorRepairThread extends FloorBaseThread {
+public class FloorRepairWorker extends FloorBaseWorker {
 	/**
 	 * keeps the data of the original blocks
 	 */
@@ -35,7 +35,7 @@ public class FloorRepairThread extends FloorBaseThread {
 	 * @param startAfter
 	 * @param tickTime
 	 */
-	public FloorRepairThread(int startAfter, int tickTime, FloorTracker tracker) {
+	public FloorRepairWorker(int startAfter, int tickTime, FloorTracker tracker) {
 		super(startAfter, tickTime, tracker);
 	}
 
@@ -43,7 +43,8 @@ public class FloorRepairThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#initializeThread(de.beimax.simplespleef.game.Game, java.util.List)
 	 */
 	@Override
-	public synchronized void initializeThread(Game game, List<Block> floor) {
+	public void initialize(Game game, List<Block> floor) {
+		super.initialize(game, floor);
 		//TODO: do we really need an original block memory or can we do something like in the SoftRestorer?
 		for (Block block : floor) {
 			if (block == null) continue; // no NPEs
@@ -58,21 +59,19 @@ public class FloorRepairThread extends FloorBaseThread {
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
-		synchronized (block) {
-			Location loc = block.getLocation();
-			if (originalBlocks.containsKey(loc)) { // only locations that are contained in the original block database
-				if (block.getType() == Material.AIR) // dissolved to air?
-					air.add(loc); //add location to repair it later on
-				else air.remove(loc); // if not dissolved, remove from repair list to prevent repairs
-			}			
-		}
+		Location loc = block.getLocation();
+		if (originalBlocks.containsKey(loc)) { // only locations that are contained in the original block database
+			if (block.getType() == Material.AIR) // dissolved to air?
+				air.add(loc); //add location to repair it later on
+			else air.remove(loc); // if not dissolved, remove from repair list to prevent repairs
+		}			
 	}
 
 	/* (non-Javadoc)
 	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseThread#tick()
 	 */
 	@Override
-	public void tick() {
+	public void executeTick() {
 		// get a random entry
 		Location location = getRandomEntry();
 		if (location != null) {
@@ -83,11 +82,9 @@ public class FloorRepairThread extends FloorBaseThread {
 			// get old data
 			int oldType = block.getTypeId();
 			byte oldData = block.getData();
-			synchronized (block) {
-				block.setTypeId(blockData.getTypeId());
-				block.setData(blockData.getData());
-				air.remove(location);				
-			}
+			block.setTypeId(blockData.getTypeId());
+			block.setData(blockData.getData());
+			air.remove(location);				
 			// notify others
 			notifyTracker(block, oldType, oldData);
 		}
@@ -107,5 +104,12 @@ public class FloorRepairThread extends FloorBaseThread {
 		}
 		
 		return null; // if all locations have been dissolved
+	}
+
+	@Override
+	public void stopTracking() {
+		originalBlocks = null;
+		air = null;
+		stop = true;
 	}
 }

@@ -4,6 +4,7 @@
 
 package de.beimax.simplespleef.game.floortracking;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import de.beimax.simplespleef.util.Cuboid;
  * @author mkalus
  * Keeps track of the floor - used by automatic arena degeneration and repair spleefs
  */
-public class FloorTracker {
+public class FloorTracker extends Thread {
 	/**
 	 * Time in seconds, after which the arena floor starts to dissolve slowly (-1 disables this)
 	 */
@@ -38,9 +39,14 @@ public class FloorTracker {
 	private int arenaFloorRepairTick = 10;
 	
 	/**
+	 * flag to stop thread
+	 */
+	private boolean stop = false;
+
+	/**
 	 * list of floor threads to be called
 	 */
-	LinkedList<FloorThread> floorThreads = new LinkedList<FloorThread>();
+	LinkedList<FloorWorker> floorWorkers = new LinkedList<FloorWorker>();
 	
 	/**
 	 * @return the arenaFloorDissolvesAfter
@@ -106,31 +112,59 @@ public class FloorTracker {
 	public void startTracking(Game game, Cuboid floor) {
 		//initialize floor dissolve thread
 		if (arenaFloorDissolvesAfter >= 0) {
-			floorThreads.add(new FloorDissolveThread(arenaFloorDissolvesAfter, arenaFloorDissolveTick, this));
+			floorWorkers.add(new FloorDissolveWorker(arenaFloorDissolvesAfter, arenaFloorDissolveTick, this));
 		}
 
 		//initialize floor repair thread
 		if (arenaFloorRepairsAfter >= 0) {
-			floorThreads.add(new FloorRepairThread(arenaFloorRepairsAfter, arenaFloorRepairTick, this));
+			floorWorkers.add(new FloorRepairWorker(arenaFloorRepairsAfter, arenaFloorRepairTick, this));
 		}
 
 		// get diggable floor
 		List<Block> blocks = floor.getDiggableBlocks(game);
 		
 		// start threads one by one
-		for (FloorThread floorThread : floorThreads) {
-			floorThread.initializeThread(game, blocks);
-			new Thread(floorThread).start(); // start tracking
+		for (FloorWorker floorThread : floorWorkers) {
+			floorThread.initialize(game, blocks);
 		}
+		
+		// start tracking thread
+		start();
+	}
+	
+	@Override
+	public void run() {
+		// actual worker thread
+		while (!stop) {
+			try {
+				Thread.sleep(200); // sleep for a fifth of a second before doing anything else
+			} catch (InterruptedException e) {}
+			//execute ticks for all workers
+			for (FloorWorker floorThread : floorWorkers) {
+				floorThread.tick();
+			}
+		}
+		
+		// stop tracking for all floors workers
+		for (FloorWorker floorThread : floorWorkers) {
+			floorThread.stopTracking();
+		}
+
+		//wait for floor workers to be stopped
+		do {
+			Iterator<FloorWorker> i = floorWorkers.iterator(); //use iterator, because one can remove while traversing...
+			while (i.hasNext()) {
+				FloorWorker floorThread = i.next();
+				if (floorThread.isStopped()) i.remove();
+			}
+		} while (floorWorkers.size() > 0);
 	}
 	
 	/**
 	 * stop tracking floor changes
 	 */
 	public void stopTracking() {
-		for (FloorThread floorThread : floorThreads) {
-			floorThread.stopTracking();
-		}
+		stop = true;
 	}
 	
 	/**
@@ -140,7 +174,7 @@ public class FloorTracker {
 	 * @param oldData - old data of block
 	 */
 	public void updateBlock(Block block, int oldType, byte oldData) {
-		for (FloorThread floorThread : floorThreads) {
+		for (FloorWorker floorThread : floorWorkers) {
 			floorThread.updateBlock(block, oldType, oldData);
 		}
 	}
@@ -153,8 +187,8 @@ public class FloorTracker {
 	 * @param oldData - old data of block
 	 * @param caller
 	 */
-	public void notifyChangedBlock(Block block, int oldType, byte oldData, FloorThread caller) {
-		for (FloorThread floorThread : floorThreads) {
+	public void notifyChangedBlock(Block block, int oldType, byte oldData, FloorWorker caller) {
+		for (FloorWorker floorThread : floorWorkers) {
 			if (floorThread != caller) // caller is not updated - has to do this itself
 				floorThread.updateBlock(block, oldType, oldData);
 		}
@@ -164,7 +198,7 @@ public class FloorTracker {
 	 * Add a new floor thread to tracker
 	 * @param thread
 	 */
-	public void addFloorThread(FloorThread thread) {
-		floorThreads.add(thread);
+	public void addFloorThread(FloorWorker thread) {
+		floorWorkers.add(thread);
 	}
 }

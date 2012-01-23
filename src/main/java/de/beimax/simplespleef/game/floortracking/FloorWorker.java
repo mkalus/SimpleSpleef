@@ -13,13 +13,18 @@ import de.beimax.simplespleef.game.Game;
  * @author mkalus
  * Interface for individual tracker threads
  */
-public interface FloorThread extends Runnable {
+public interface FloorWorker {
 	/**
-	 * Initialize the thread
+	 * Initialize the tracker
 	 * @param game
 	 * @param floor
 	 */
-	public void initializeThread(Game game, List<Block> floor);
+	public void initialize(Game game, List<Block> floor);
+	
+	/**
+	 * do an action tick, possible do floor change or the like here
+	 */
+	public void tick();
 	
 	/**
 	 * Stop tracking
@@ -33,4 +38,10 @@ public interface FloorThread extends Runnable {
 	 * @param oldData - old data of block
 	 */
 	public void updateBlock(Block block, int oldType, byte oldData);
+	
+	/**
+	 * returns true if tracker has been stopped
+	 * @return
+	 */
+	public boolean isStopped();
 }

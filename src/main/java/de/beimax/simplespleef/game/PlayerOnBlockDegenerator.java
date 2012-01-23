@@ -156,7 +156,7 @@ public class PlayerOnBlockDegenerator {
 		 * called by updatePlayer to update a block
 		 * @param block
 		 */
-		public synchronized void updateBlock(Block block) {
+		public void updateBlock(Block block) {
 			if (block == null) return; //no NPEs
 			if (block.getType() != Material.AIR &&
 					(checkedBlock == null || block.getX() != checkedBlock.getX() || block.getY() != checkedBlock.getY() || block.getZ() != checkedBlock.getZ())) { // ignore air...

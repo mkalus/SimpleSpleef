@@ -3,13 +3,17 @@
  */
 package de.beimax.simplespleef.game.floortracking;
 
+import java.util.List;
+
 import org.bukkit.block.Block;
+
+import de.beimax.simplespleef.game.Game;
 
 /**
  * @author mkalus
  *
  */
-public abstract class FloorBaseThread implements FloorThread {
+public abstract class FloorBaseWorker implements FloorWorker {
 	/**
 	 * seconds after which thread actually starts doing something
 	 */
@@ -38,57 +42,47 @@ public abstract class FloorBaseThread implements FloorThread {
 	/**
 	 * flag to stop thread
 	 */
-	private boolean stop = false;
+	protected boolean stop = false;
 	
 	/**
 	 * Constructor
 	 * @param startAfter
 	 * @param tickTime
 	 */
-	public FloorBaseThread(int startAfter, int tickTime, FloorTracker tracker) {
+	public FloorBaseWorker(int startAfter, int tickTime, FloorTracker tracker) {
 		this.startAfter = startAfter;
 		this.tickTime = tickTime;
 		this.tracker = tracker;
 	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
+	
+	/**
+	 * initialize thread
 	 */
 	@Override
-	public void run() {
-		// first, wait for thread to start
+	public void initialize(Game game, List<Block> floor) {
 		startAt = System.currentTimeMillis() + ((long) startAfter * 1000);
-		while (!stop && System.currentTimeMillis() < startAt)
-			try {
-				Thread.sleep(500); // sleep for half a second before doing anything else
-			} catch (InterruptedException e) {}
+		nextTick = startAt;
+	}
+
+	/**
+	 * do a tick
+	 */
+	@Override
+	public void tick() {
+		long now = System.currentTimeMillis();
+		// first, wait for worker to start and wait for the next tick
+		if (now < startAt || now < nextTick) return;
 		
 		// now do the actual tick work
-		nextTick = System.currentTimeMillis();
-		while (!stop) {
-			while (!stop && System.currentTimeMillis() < nextTick)
-				try {
-					Thread.sleep(200); // sleep for a fifth of a second before doing anything else
-				} catch (InterruptedException e) {}
-			// execute tick
-			tick();
-			// update tick
-			nextTick = nextTick + ((long) tickTime * 1000);
-		}
+		executeTick();
+		// update tick
+		nextTick = nextTick + ((long) tickTime * 1000);
 	}
 	
 	/**
 	 * do a tick within the thread
 	 */
-	public abstract void tick();
-	
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#stopTracking()
-	 */
-	@Override
-	public void stopTracking() {
-		stop =  true;
-	}
+	public abstract void executeTick();
 	
 	/**
 	 * Notify the tracker about a block change - called by tick() when a block changes,
@@ -97,5 +91,10 @@ public abstract class FloorBaseThread implements FloorThread {
 	 */
 	protected void notifyTracker(Block block, int oldType, byte oldData) {
 		tracker.notifyChangedBlock(block, oldType, oldData, this);
+	}
+	
+	@Override
+	public boolean isStopped() {
+		return stop;
 	}
 }

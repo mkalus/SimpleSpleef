@@ -17,7 +17,7 @@ import de.beimax.simplespleef.game.Game;
  * @author mkalus
  *
  */
-public class FloorDissolveThread extends FloorBaseThread {
+public class FloorDissolveWorker extends FloorBaseWorker {
 	/**
 	 * areas of the floor that are non-air
 	 */
@@ -28,7 +28,7 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 * @param startAfter
 	 * @param tickTime
 	 */
-	public FloorDissolveThread(int startAfter, int tickTime, FloorTracker tracker) {
+	public FloorDissolveWorker(int startAfter, int tickTime, FloorTracker tracker) {
 		super(startAfter, tickTime, tracker);
 	}
 
@@ -36,7 +36,8 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#initializeThread(de.beimax.simplespleef.game.Game, java.util.List)
 	 */
 	@Override
-	public synchronized void initializeThread(Game game, List<Block> floor) {
+	public void initialize(Game game, List<Block> floor) {
+		super.initialize(game, floor);
 		for (Block block : floor) {
 			if (block == null) continue; // no NPEs
 			if (block.getType() != Material.AIR) // add location to nonAir locations
@@ -49,22 +50,20 @@ public class FloorDissolveThread extends FloorBaseThread {
 	 */
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
-		synchronized (block) {
-			if (block == null) return; // no NPEs
-			Location loc = block.getLocation();
-			if (nonAir.contains(loc)) {
-				if (block.getType() == Material.AIR) // dissolve to air
-					nonAir.remove(loc); // remove because it is air anyway
-			} else if (block.getType() != Material.AIR) // non air added - add to dissolveable parts of arena
-				nonAir.add(loc);			
-		}
+		if (block == null) return; // no NPEs
+		Location loc = block.getLocation();
+		if (nonAir.contains(loc)) {
+			if (block.getType() == Material.AIR) // dissolve to air
+				nonAir.remove(loc); // remove because it is air anyway
+		} else if (block.getType() != Material.AIR) // non air added - add to dissolveable parts of arena
+			nonAir.add(loc);			
 	}
 
 	/* (non-Javadoc)
 	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseThread#tick()
 	 */
 	@Override
-	public void tick() {
+	public void executeTick() {
 		// get a random entry
 		Location location = getRandomEntry();
 		if (location != null) {
@@ -72,12 +71,10 @@ public class FloorDissolveThread extends FloorBaseThread {
 			// get old data
 			int oldType = block.getTypeId();
 			byte oldData = block.getData();
-			synchronized (block) {
-				// dissolve to air
-				block.setType(Material.AIR);
-				block.setData((byte) 0);
-				nonAir.remove(location);				
-			}
+			// dissolve to air
+			block.setType(Material.AIR);
+			block.setData((byte) 0);
+			nonAir.remove(location);				
 			// notify others
 			notifyTracker(block, oldType, oldData);
 		}
@@ -99,4 +96,9 @@ public class FloorDissolveThread extends FloorBaseThread {
 		return null; // if all locations have been dissolved
 	}
 
+	@Override
+	public void stopTracking() {
+		nonAir = null;
+		stop = true;
+	}
 }

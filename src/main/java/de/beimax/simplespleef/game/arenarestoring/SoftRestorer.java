@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
-import de.beimax.simplespleef.game.floortracking.FloorThread;
+import de.beimax.simplespleef.game.floortracking.FloorWorker;
 import de.beimax.simplespleef.util.Cuboid;
 import de.beimax.simplespleef.util.SerializableBlockData;
 
@@ -19,7 +19,7 @@ import de.beimax.simplespleef.util.SerializableBlockData;
  * @author mkalus
  *
  */
-public class SoftRestorer implements ArenaRestorer, FloorThread {
+public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	/**
 	 * flag to stop thread - actually starts restoration
 	 */
@@ -34,6 +34,11 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 	 * cuboid to store/restore
 	 */
 	private Cuboid cuboid;
+	
+	/**
+	 * thread has finished restoring?
+	 */
+	private boolean isStopped = false;
 
 	/**
 	 * keeps the data of the changed blocks
@@ -41,24 +46,10 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 	private LinkedList<BlockChange> changedBlocks;
 
 	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run() {
-		if (game == null || cuboid == null) return; //ignore invalid stuff
-
-		// wait until game has stopped
-		while (!startRestoring)
-			try {
-				Thread.sleep(500); // sleep for half a second before doing anything else
-			} catch (InterruptedException e) {}
-	}
-
-	/* (non-Javadoc)
 	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#initializeThread(de.beimax.simplespleef.game.Game, java.util.List)
 	 */
 	@Override
-	public void initializeThread(Game game, List<Block> floor) {
+	public void initialize(Game game, List<Block> floor) {
 		//Do nothing
 	}
 
@@ -116,6 +107,22 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 		private Location location;
 		private SerializableBlockData blockData;
 	}
+
+	@Override
+	public void tick() {
+		if (game == null || cuboid == null) return; //ignore invalid stuff
+
+		// wait for the restoration process to start
+		if (!startRestoring) return;
+		
+		restoreArena();
+	}
+
+	@Override
+	public boolean isStopped() {
+		return isStopped;
+	}
+
 	
 	/**
 	 * restorer thread
@@ -130,23 +137,24 @@ public class SoftRestorer implements ArenaRestorer, FloorThread {
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {}
-			
-			synchronized (changedBlocks) {
-				// cycle through changes and restore
-				for (BlockChange changedBlock : changedBlocks) {
+
+			for (BlockChange changedBlock : changedBlocks) {
+				synchronized (changedBlock) {
 					Block block = changedBlock.location.getBlock();
 					block.setTypeId(changedBlock.blockData.getTypeId());
-					block.setData(changedBlock.blockData.getData());
-					
-					// every 10 cycles, wait a little
-					if ((count++ % 10) == 0) {
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {}
-					}
-				}				
-			}
+					block.setData(changedBlock.blockData.getData());					
+				}
+				
+				// every 10 cycles, wait a little
+				if ((count++ % 10) == 0) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}				
 
+			// say that the thread has finished
+			isStopped = true;
 			//System.out.println("Finished");
 			// call game handler to finish the game off
 			SimpleSpleef.getGameHandler().gameOver(game);
