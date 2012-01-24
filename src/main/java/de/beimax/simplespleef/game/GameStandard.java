@@ -943,6 +943,7 @@ public class GameStandard extends Game {
 		// get block data
 		int oldType = block.getTypeId();
 		byte oldData = block.getData();
+		boolean floorBroken = false;
 		// may the block be broken?
 		if (!checkMayBreakBlock(block)) {
 			// cancel event
@@ -952,13 +953,14 @@ public class GameStandard extends Game {
 		} else if (!configuration.getBoolean("blockDropping", true)) { // otherwise: block dropping set to false => destroy blocks
 			// cancel event - because we will handle the block destruction ourselves
 			event.setCancelled(true);
+			floorBroken = true;
 			// set block to air
 			block.setType(Material.AIR);
 			block.setData((byte) 0);
-		}
+		} else floorBroken = true; // block was broken
 
 		// if there is a floor tracker running, tell it about the change
-		if (floorTracker != null && !event.isCancelled())
+		if (floorTracker != null && floorBroken)
 			updateTrackers(block, oldType, oldData);
 	}
 	
