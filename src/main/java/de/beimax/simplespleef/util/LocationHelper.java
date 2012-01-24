@@ -76,6 +76,7 @@ public abstract class LocationHelper {
 	 * @return
 	 */
 	public static Location configToExactLocation(ConfigurationSection config) {
+		if (!config.getBoolean("enabled", false)) return null; // disabled position
 		try {
 			World world = SimpleSpleef.getPlugin().getServer().getWorld(config.getString("world"));
 			return new Location(world, config.getDouble("x"), config.getDouble("y"), config.getDouble("z"), (float) config.getDouble("yaw"), (float) config.getDouble("pitch"));
