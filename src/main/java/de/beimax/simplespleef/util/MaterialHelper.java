@@ -115,6 +115,7 @@ public abstract class MaterialHelper {
 	public static boolean isSameBlockType(Block block, ItemStack compareBlock) {
 		if (block == null || compareBlock == null) return false; // no NPEs
 		
+		if (block.getTypeId() != compareBlock.getTypeId()) return false;
 		try {
 			// either type is -1 or data value matches
 			if (compareBlock.getData().getData() == -1 || block.getData() == compareBlock.getData().getData())
