@@ -139,11 +139,11 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 			} catch (InterruptedException e) {}
 
 			for (BlockChange changedBlock : changedBlocks) {
-				synchronized (changedBlock) {
-					Block block = changedBlock.location.getBlock();
-					block.setTypeId(changedBlock.blockData.getTypeId());
-					block.setData(changedBlock.blockData.getData());					
-				}
+				//synchronized (changedBlock) { // broke some threads
+				Block block = changedBlock.location.getBlock();
+				block.setTypeId(changedBlock.blockData.getTypeId());
+				block.setData(changedBlock.blockData.getData());					
+				//}
 				
 				// every 10 cycles, wait a little
 				if ((count++ % 10) == 0) {
