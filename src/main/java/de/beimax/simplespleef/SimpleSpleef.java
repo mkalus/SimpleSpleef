@@ -227,6 +227,8 @@ public class SimpleSpleef extends JavaPlugin {
 
 		// create config helper
 		ConfigHelper configHelper = new ConfigHelper();
+		// update defaults of existing arenas
+		configHelper.updateDefaults();
 		// update sample config, if needed
 		configHelper.updateSampleConfig();
 		// update language files

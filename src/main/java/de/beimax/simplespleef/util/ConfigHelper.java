@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.zip.CRC32;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -224,6 +225,38 @@ public class ConfigHelper {
 		} catch (InvalidConfigurationException e) {
 			SimpleSpleef.log.severe("[SimpleSpleef] Could not convert resource file " + file + " to valid configuration! Reason: " + e.getMessage());
 			return null;
+		}
+	}
+
+	/**
+	 * update defaults of existig arenas
+	 */
+	public void updateDefaults() {
+		boolean changed = false; // defaults changed?
+		// get default keys
+		Set<String> defaultConfigKeys = SimpleSpleef.getPlugin().getConfig().getDefaultSection().getConfigurationSection("arenas.default").getKeys(true);
+		
+		ConfigurationSection arenas = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas");
+		for (String arena : arenas.getKeys(false)) {
+			if (!arena.equalsIgnoreCase("default")) {
+				//System.out.println(arena + " found!");
+				ConfigurationSection currentConfig = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
+				for (String configKey : defaultConfigKeys) {
+					// ignore sections to avoid exceptions
+					if (SimpleSpleef.getPlugin().getConfig().isConfigurationSection("arenas.default." + configKey)) continue;
+					if (!currentConfig.contains(configKey)) {
+						//System.out.println(configKey + " is missing!");
+						changed = true; // yes, config was changed
+						// copy default
+						currentConfig.set(configKey, SimpleSpleef.getPlugin().getConfig().getDefaultSection().get("arenas.default." + configKey));
+					}
+				}
+			}
+		}
+		
+		if (changed) {
+			SimpleSpleef.log.info("[SimpleSpleef] Updated defaults in some arenas due to config changes.");
+			SimpleSpleef.getPlugin().saveConfig(); // save config to disk
 		}
 	}
 }
