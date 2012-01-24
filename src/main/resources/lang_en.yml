@@ -121,10 +121,13 @@ feedback:
     infoSpectators: 'Spectators: [SPECTATORS]'
     infoComma: ', '
     infoAnd: ', and '
-    infoTeam: 'Team [TEAM]:'
+    infoTeam: '[TEAM] team:'
     listNone: 'There are no spleefers or spectators in arena [ARENA].'
-    teamblue: 'blue'
-    teamred: 'red'
+    teamblue: 'Blue'
+    teamred: 'Red'
+    teamnone: 'No'
+    blue: 'blue'
+    red: 'red'
 admin:
     help: |
       Admin Commands (/spl admin...)

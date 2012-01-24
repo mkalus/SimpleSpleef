@@ -461,12 +461,12 @@ public class GameStandard extends Game {
 	 * helper to start game or countdown - used by ready and countdown methods
 	 */
 	private void startGameOrCountdown() {
+		// teleport players to arena
+		teleportPlayersAtGameStart();
 		// start countdown, if setting is 0 or higher
 		if (configuration.getInt("countdownFrom", 10) == 0) {
 			start(); // if countdown is null, start game right away
 		} else {
-			// teleport players to arena
-			teleportPlayersAtGameStart();
 			// create countdown and start it
 			countdown = new Countdown();
 			countdown.start();
