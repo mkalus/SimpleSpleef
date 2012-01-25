@@ -394,7 +394,7 @@ public class GameStandard extends Game {
 		}
 		// ok, ready player now
 		spleefer.setReady(true);
-		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.ready", "[ARENA]", getName()));
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.ready", "[ARENA]", getName(), "[PLAYER]", player.getDisplayName()));
 		// broadcast message of somebody readying
 		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.ready", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName());
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceReady", false)) {
