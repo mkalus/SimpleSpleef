@@ -313,7 +313,7 @@ public class GameStandard extends Game {
 	@Override
 	public boolean leave(Player player) {
 		// is the player a spectator?
-		if (spectators.contains(player)) {
+		if (spectators != null && spectators.contains(player)) {
 			return back(player); // redirect to back command instead
 		}
 		// check, if player is not a spleefer
@@ -612,7 +612,7 @@ public class GameStandard extends Game {
 			return false;
 		}
 		// check, if player is not a spectator
-		if (!spectators.contains(player)) {
+		if (spectators == null || !spectators.contains(player)) {
 			player.sendMessage(ChatColor.DARK_RED + "Internal error while back occured! Please tell the SimpleSpleef creator!");
 			return false;
 		}
@@ -651,6 +651,7 @@ public class GameStandard extends Game {
 	
 	@Override
 	public boolean hasSpectator(Player player) {
+		if (spectators == null) return false;
 		return spectators.contains(player);
 	}
 
