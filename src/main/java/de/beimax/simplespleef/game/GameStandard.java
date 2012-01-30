@@ -777,7 +777,7 @@ public class GameStandard extends Game {
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (!isInProgress() || spleefers.hasLost(player)) return; // if game is not in progress or player has lost, return
+		if (!isInGame() || spleefers.hasLost(player)) return; // if game is not in progress or player has lost, return
 		
 		//player touched certain block (setting loseOnTouchBlocks)
 		if (loseOnTouchMaterial != null) {
