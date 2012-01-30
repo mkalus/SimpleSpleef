@@ -1443,9 +1443,15 @@ public class GameStandard extends Game {
 			arenaRestorer = new HardArenaRestorer();
 			arenaRestorer.saveArena(this, floor);
 		} else { // soft restorer
+			Cuboid possibleFloor = floor==null?arena:floor;
+			if (possibleFloor == null) {
+				arenaRestorer = null;
+				return; // freestyle spleefing does not implement any floor
+			}
+
 			// create soft restorer
 			arenaRestorer = new SoftRestorer();
-			arenaRestorer.saveArena(this, floor==null?arena:floor);
+			arenaRestorer.saveArena(this, possibleFloor);
 
 			if (floorTracker == null) // create floor tracker, if needed
 				floorTracker = new FloorTracker();
@@ -1458,7 +1464,10 @@ public class GameStandard extends Game {
 	 * restore arena information, if setting restoreArenaAfterGame has been set
 	 */
 	protected void restoreArena() {
-		if (arenaRestorer == null) return;
+		if (arenaRestorer == null) {
+			SimpleSpleef.getGameHandler().gameOver(this); // notify game handler that the game has stopped
+			return;
+		}
 
 		final int wait = configuration.getInt("restoreArenaAfterGameTimer", 0);
 		if (wait > 0) { // start in timer thread
