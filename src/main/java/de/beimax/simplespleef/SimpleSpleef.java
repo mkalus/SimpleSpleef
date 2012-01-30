@@ -25,8 +25,6 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -293,21 +291,10 @@ public class SimpleSpleef extends JavaPlugin {
 		this.playerListener = new SimpleSpleefPlayerListener();
 
 		// Register our events
-		pm.registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
-
-		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.Low, this);
-		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Low, this);
-
-		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Highest, this);
-		pm.registerEvent(Type.FOOD_LEVEL_CHANGE, entityListener, Priority.Highest, this);
-
-		pm.registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Low, this);
-		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this);
-		pm.registerEvent(Type.PLAYER_GAME_MODE_CHANGE, playerListener, Priority.Lowest, this);
+		pm.registerEvents(pluginListener, this);
+		pm.registerEvents(blockListener, this);
+		pm.registerEvents(entityListener, this);
+		pm.registerEvents(playerListener, this);
 	}
 
 	/**

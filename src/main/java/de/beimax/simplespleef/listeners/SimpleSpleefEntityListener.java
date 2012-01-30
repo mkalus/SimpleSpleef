@@ -19,10 +19,12 @@
 package de.beimax.simplespleef.listeners;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -33,11 +35,11 @@ import de.beimax.simplespleef.game.Game;
  * 
  * @author mkalus
  */
-public class SimpleSpleefEntityListener extends EntityListener {
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.entity.EntityListener#onEntityDeath(org.bukkit.event.entity.EntityDeathEvent)
+public class SimpleSpleefEntityListener implements Listener {
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDeath(EntityDeathEvent event) {
 		// check if games are running and the entity is indeed a player
 		if (SimpleSpleef.getGameHandler().hasGames() && event.getEntity() instanceof Player) {
@@ -48,10 +50,10 @@ public class SimpleSpleefEntityListener extends EntityListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.entity.EntityListener#onFoodLevelChange(org.bukkit.event.entity.FoodLevelChangeEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if (event.isCancelled()) return;
 
@@ -66,10 +68,10 @@ public class SimpleSpleefEntityListener extends EntityListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.entity.EntityListener#onEntityDamage(org.bukkit.event.entity.EntityDamageEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (event.isCancelled()) return;
 

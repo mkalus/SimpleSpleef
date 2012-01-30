@@ -21,12 +21,14 @@ package de.beimax.simplespleef.listeners;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -41,11 +43,11 @@ import de.beimax.simplespleef.util.UpdateChecker;
  * 
  * @author maxkalus
  */
-public class SimpleSpleefPlayerListener extends PlayerListener {
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.player.PlayerListener#onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent)
+public class SimpleSpleefPlayerListener implements Listener {
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// update checker activated
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.updateNotificationOnLogin", true)) {
@@ -80,10 +82,10 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.player.PlayerListener#onPlayerKick(org.bukkit.event.player.PlayerKickEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler
 	public void onPlayerKick(PlayerKickEvent event) {
 		if (event.isCancelled()) return;
 
@@ -94,14 +96,10 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.bukkit.event.player.PlayerListener#onPlayerQuit(org.bukkit.event.
-	 * player.PlayerEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
@@ -110,14 +108,10 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		}
 	}	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.bukkit.event.player.PlayerListener#onPlayerMove(org.bukkit.event.
-	 * player.PlayerMoveEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		if (SimpleSpleef.getGameHandler().hasGames()) {
 			// player part of a game?
@@ -126,10 +120,10 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.player.PlayerListener#onPlayerInteract(org.bukkit.event.player.PlayerInteractEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.isCancelled()) return;
 
@@ -149,10 +143,10 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.player.PlayerListener#onPlayerTeleport(org.bukkit.event.player.PlayerTeleportEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (event.isCancelled()) return;
 
@@ -169,10 +163,10 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.player.PlayerListener#onPlayerGameModeChange(org.bukkit.event.player.PlayerGameModeChangeEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
 		if (event.isCancelled()) return;
 

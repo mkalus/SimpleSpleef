@@ -18,8 +18,10 @@
  **/
 package de.beimax.simplespleef.listeners;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -30,11 +32,11 @@ import de.beimax.simplespleef.SimpleSpleef;
  * @author mkalus
  * 
  */
-public class SimpleSpleefBlockListener extends BlockListener {
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.block.BlockListener#onBlockBreak(org.bukkit.event.block.BlockBreakEvent)
+public class SimpleSpleefBlockListener implements Listener {
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.LOW)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (event.isCancelled()) return;
 
@@ -42,10 +44,10 @@ public class SimpleSpleefBlockListener extends BlockListener {
 		SimpleSpleef.getGameHandler().checkBlockBreak(event);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.event.block.BlockListener#onBlockPlace(org.bukkit.event.block.BlockPlaceEvent)
+	/**
+	 * @param event
 	 */
-	@Override
+	@EventHandler(priority = EventPriority.LOW)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		if (event.isCancelled()) return;
 
