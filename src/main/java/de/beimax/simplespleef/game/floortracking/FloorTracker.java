@@ -39,12 +39,12 @@ public class FloorTracker extends Thread {
 	private int arenaFloorRepairTick = 10;
 	
 	/**
-	 * flag to stop thread
+	 * flag to stop worker
 	 */
 	private boolean stop = false;
 
 	/**
-	 * list of floor threads to be called
+	 * list of floor workers to be called
 	 */
 	LinkedList<FloorWorker> floorWorkers = new LinkedList<FloorWorker>();
 	

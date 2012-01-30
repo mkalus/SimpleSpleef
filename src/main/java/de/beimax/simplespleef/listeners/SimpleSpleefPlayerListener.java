@@ -52,7 +52,7 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 			final Player player = event.getPlayer();
 			// Check for updates whenever an operator or user with the right simplespleef.admin joins the game
 			if (player != null && (player.isOp() || SimpleSpleef.checkPermission(player, "simplespleef.admin"))) {
-				(new Thread() { // create a new anonymous thread that will check the version asyncronously
+				SimpleSpleef.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(SimpleSpleef.getPlugin(), new Runnable() { // create a new anonymous task/thread that will check the version asyncronously
 					@Override
 					public void run() {
 						UpdateChecker checker = new UpdateChecker();
@@ -67,7 +67,7 @@ public class SimpleSpleefPlayerListener extends PlayerListener {
 							SimpleSpleef.log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
 						}
 					}
-				}).start();
+				}, 0L);
 			}
 		}
 

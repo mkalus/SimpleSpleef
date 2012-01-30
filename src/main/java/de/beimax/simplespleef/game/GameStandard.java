@@ -79,6 +79,11 @@ public class GameStandard extends Game {
 	private Countdown countdown;
 	
 	/**
+	 * Id of the countdown task
+	 */
+	private int countdownId;
+	
+	/**
 	 * list of players which may be teleported - used by teleportPlayer and playerMayTeleport
 	 */
 	private Set<Player> teleportOkList;
@@ -474,9 +479,8 @@ public class GameStandard extends Game {
 		} else {
 			// create countdown and start it
 			countdown = new Countdown();
-			countdown.start();
+			countdownId = SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(SimpleSpleef.getPlugin(), countdown, 0L, 20L);
 		}
-		
 	}
 
 	@Override
@@ -1475,21 +1479,13 @@ public class GameStandard extends Game {
 		}
 
 		final int wait = configuration.getInt("restoreArenaAfterGameTimer", 0);
-		if (wait > 0) { // start in timer thread
-			new Thread() {
+		if (wait > 0) { // start in timer
+			SimpleSpleef.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(SimpleSpleef.getPlugin(), new Runnable() {
 				@Override
 				public void run() {
-					// end time to wait for
-					long endTime = System.currentTimeMillis() + ((long) wait * 1000);
-					do {
-						try {
-							Thread.sleep(200); // do nothing for some time
-						} catch (InterruptedException e) {}
-					} while (System.currentTimeMillis() < endTime);
-					// time has come to restore
 					arenaRestorer.restoreArena();
 				}
-			}.start();
+			}, (long) (20 * wait)); // ticks * 20 = secs
 		} else arenaRestorer.restoreArena(); // restore right away
 	}
 
@@ -1531,60 +1527,57 @@ public class GameStandard extends Game {
 	 * @author mkalus
 	 * 
 	 */
-	private class Countdown extends Thread {
+	private class Countdown implements Runnable {
 		// flag to toggle interrupts
 		private boolean interrupted = false;
+		
+		private int count = -1;
+		
+		private boolean broadcast;
+		
+		// start countdown
+		private void start() {
+			// change game status
+			status = STATUS_COUNTDOWN;
+
+			// announce countdown?
+			broadcast = SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceCountdown", true);
+			sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownStart"), broadcast);
+			
+			// get time
+			count = configuration.getInt("countdownFrom", 10);
+		}
 
 		/**
 		 * Thread method
 		 */
 		@Override
 		public void run() {
-			// change game status
-			status = STATUS_COUNTDOWN;
-
-			// announce countdown?
-			boolean broadcast = SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceCountdown", true);
-			sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownStart"), broadcast);
-			
-			// teleport players to arena
-			//teleportPlayersAtGameStart(); // this is incompatible with noLagg and other thread based plugins - moving it a section up
-
-			// get time
-			long start = System.currentTimeMillis() + 1000;
-			int count = configuration.getInt("countdownFrom", 10);
-			boolean started = false; // start flag
-			
-			// do countdown
-			do {
-				if (System.currentTimeMillis() >= start) {
-					// actually start game
-					if (count == 0)
-						started = true;
-					// set next countdown event
-					else {
-						start = start + 1000;
-						// Broadcast countdown
-						sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", GameStandard.this.getName()), broadcast);
-						count--;
-					}
-				}
-				try {
-					sleep(10);
-				} catch (InterruptedException e) {
-				}
-			} while (!started && !interrupted);
-			// countdown ended due to interruption?
 			if (interrupted) {
 				// send message
 				sendMessage(ChatColor.RED + SimpleSpleef.getPlugin().ll("feedback.countdownInterrupted"), broadcast);
+				// cancel countdown
+				SimpleSpleef.getPlugin().getServer().getScheduler().cancelTask(countdownId);
 				// end the game
 				GameStandard.this.endGame();
+			}
+			
+			// start?
+			if (count < 0) {
+				start();
+			}
+			
+			// do countdown
+			if (count > 0) {
+				sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", GameStandard.this.getName()), broadcast);
+				count--;
 			} else {
 				// send message
 				sendMessage(ChatColor.BLUE + SimpleSpleef.getPlugin().ll("feedback.countdownGo"), broadcast);
 				// start the game itself!
 				GameStandard.this.start();
+				// cancel countdown
+				SimpleSpleef.getPlugin().getServer().getScheduler().cancelTask(countdownId);
 			}
 		}
 	}

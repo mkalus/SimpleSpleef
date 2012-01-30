@@ -259,20 +259,17 @@ public class SimpleSpleef extends JavaPlugin {
 		final UpdateChecker checker = new UpdateChecker();
 		
 		// possibly check for updates in the internet on startup
-		if (this.getConfig().getBoolean("settings.updateNotificationOnStart", true)) {
-			(new Thread() { // create a new anonymous thread that will check the version asyncronously
-				@Override
-				public void run() {
-					try {
-						String newVersion = checker.checkForUpdate(SimpleSpleef.simpleSpleef.getDescription().getVersion());
-						if (newVersion != null)
-							log.info("[SimpleSpleef] Update found for SimpleSpleef - please go to http://dev.bukkit.org/server-mods/simple-spleef/ to download version " + newVersion + "!");
-					} catch (Exception e) {
-						log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
-					}
+		this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		    public void run() {
+		    	try {
+					String newVersion = checker.checkForUpdate(SimpleSpleef.simpleSpleef.getDescription().getVersion());
+					if (newVersion != null)
+						log.info("[SimpleSpleef] Update found for SimpleSpleef - please go to http://dev.bukkit.org/server-mods/simple-spleef/ to download version " + newVersion + "!");
+				} catch (Exception e) {
+					log.warning("[SimpleSpleef] Could not connect to remote server to check for update. Exception said: " + e.getMessage());
 				}
-			}).start();
-		}
+		    }
+		}, 0L);
 		
 		// also check for updates in the configuration files and update them, if needed
 		checker.updateConfigurationVersion(this);
