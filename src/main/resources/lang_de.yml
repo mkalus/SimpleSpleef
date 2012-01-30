@@ -47,6 +47,7 @@ errors:
     readyAlreadyStarted: 'Das Spiel läuft bereits in der Arena [ARENA].'
     readyNotUsed: 'Du musst dich in der Arena [ARENA] nicht bereit melden. Starte das Spiel einfach!'
     readyAlready: 'Du bist bereits bereit!'
+    readyBlock: 'Das ready-Kommando ist hier nicht erlaubt. Klicke stattdessen auf den Bin-bereit-Block!'
     start: 'Du musst an einem Spleef teilnehmen, bevor du ein Spiel starten kannst!'
     startNoSpleefer: 'In dieser Arena darf kein Spieler mit /spl start ein Spiel starten - versuche es mit /spl countdown [ARENA].'
     startMin: 'Du brauchst mindestens [NUMBER] Spieler, um ein Spiel in Arena [ARENA] starten zu können.'

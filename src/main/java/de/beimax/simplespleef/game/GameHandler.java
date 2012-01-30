@@ -380,7 +380,7 @@ public class GameHandler {
 		Player player = (Player) sender; // cast to player
 		// find player in arena
 		Game checkGame = checkPlayerInGame(player);
-		if (checkGame != null) checkGame.ready(player);
+		if (checkGame != null) checkGame.ready(player, false);
 		// sender not part of any game
 		else sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyNoGame"));		
 	}

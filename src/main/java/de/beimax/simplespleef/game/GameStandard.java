@@ -370,7 +370,7 @@ public class GameStandard extends Game {
 	}
 
 	@Override
-	public boolean ready(Player player) {
+	public boolean ready(Player player, boolean hitBlock) {
 		// game started already?
 		if (isInProgress() || countdown != null) { // avoid possible memory leak
 			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyAlreadyStarted", "[ARENA]", getName()));
@@ -379,6 +379,11 @@ public class GameStandard extends Game {
 		// readying is not used in this game
 		if (!supportsReady()) {
 			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyNotUsed", "[ARENA]", getName()));
+			return false;
+		}
+		// right command?
+		if (!hitBlock && !supportsCommandReady()) {
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyBlock", "[ARENA]", getName()));
 			return false;
 		}
 		// get spleefer
@@ -866,7 +871,7 @@ public class GameStandard extends Game {
 			updateTrackers(clickedBlock, oldType, oldData);
 		} else
 		//check if player clicked on a "ready" block (e.g. iron block) and the game is readyable
-			if (supportsReady() && isJoinable()) {
+			if (supportsBlockReady() && isJoinable()) {
 				ItemStack readyBlockMaterial;
 				try {
 					readyBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("readyBlockMaterial", null), true);
@@ -876,7 +881,7 @@ public class GameStandard extends Game {
 				if (readyBlockMaterial == null) return; // ignore null materials
 				// material has been checked, now test, if clicked block is of the same material
 				if (readyBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, readyBlockMaterial)) {
-					ready(event.getPlayer());
+					ready(event.getPlayer(), true);
 				}
 			}
 	}

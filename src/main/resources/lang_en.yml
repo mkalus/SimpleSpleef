@@ -47,6 +47,7 @@ errors:
     readyAlreadyStarted: 'There is already a game in progress in arena [ARENA].'
     readyNotUsed: 'Readying for the game is not needed for arena [ARENA]. Simply start it!'
     readyAlready: 'You are ready already!'
+    readyBlock: 'Ready command is not allowed here! Hit the ready block instead!'
     start: 'You have to join a game before starting one.'
     startNoSpleefer: 'In this arena you may not start a game by typing /spl start - try: /spl countdown [ARENA].'
     startMin: 'You need a minimum of [NUMBER] players to start a game in arena [ARENA].'

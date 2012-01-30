@@ -119,15 +119,49 @@ public abstract class Game {
 	 * Mark player as ready
 	 * @return boolean successful?
 	 */
-	public abstract boolean ready(Player player);
+	public abstract boolean ready(Player player, boolean hitBlock);
 	
 	/**
 	 * Return true, if game supports a "ready" players list. Override for your own inventions.
 	 * @return
 	 */
 	public boolean supportsReady() {
-		return SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false);
+		return supportsReady(false, false);
 	}
+	
+	/**
+	 * Return true, if game supports a "ready" players list. Override for your own inventions.
+	 * @return
+	 */
+	public boolean supportsCommandReady() {
+		return supportsReady(false, true);
+	}
+	
+	/**
+	 * Return true, if game supports a "ready" players list. Override for your own inventions.
+	 * @return
+	 */
+	public boolean supportsBlockReady() {
+		return supportsReady(true, false);
+	}
+
+	/**
+	 * Helper method to actually check useReady element
+	 * @param noCommand
+	 * @param noBlock
+	 * @return
+	 */
+	private boolean supportsReady(boolean noCommand, boolean noBlock) {
+		if (SimpleSpleef.getPlugin().getConfig().isBoolean("arenas." + getId() + ".useReady")) {
+			return SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false);
+		}
+		if (SimpleSpleef.getPlugin().getConfig().isString("arenas." + getId() + ".useReady")) {
+			String ready = SimpleSpleef.getPlugin().getConfig().getString("arenas." + getId() + ".useReady");
+			if (noCommand == false && ready.equalsIgnoreCase("command")) return true;
+			if (noBlock == false && ready.equalsIgnoreCase("block")) return true;
+		}
+		return false;	
+	}	
 
 	/**
 	 * Countdown started

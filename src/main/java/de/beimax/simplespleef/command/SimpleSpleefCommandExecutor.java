@@ -609,7 +609,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			String spleefers = game.getListOfSpleefers();
 			if (spleefers != null)
 				sender.sendMessage(plugin.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
-			if (game.supportsReady()) {
+			if (game.supportsCommandReady()) {
 				System.out.println("Unready");
 				String unready = game.getListOfUnreadySpleefers();
 				if (unready != null)
