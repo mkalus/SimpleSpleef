@@ -289,6 +289,10 @@ public class GameStandard extends Game {
 					player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinFee", "[AMOUNT]", SimpleSpleef.economy.format(entryFee)));
 					return false;
 				}
+				// ok, is a part of the fee paid to a player?
+				String playerNameGettingFees = configuration.getString("entryFeeGoesToPlayer", "none");
+				if (playerNameGettingFees != null && !playerNameGettingFees.equalsIgnoreCase("none") &&  SimpleSpleef.economy.hasAccount(playerNameGettingFees))
+					SimpleSpleef.economy.depositPlayer(playerNameGettingFees, configuration.getDouble("entryFeeAmountToPlayer", entryFee));
 			}
 		}
 		// check gamemode and change it if needed

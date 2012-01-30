@@ -98,6 +98,10 @@ arenas:
             - 64:ARROW
 # Fees to join (money) - Vault required
         entryFee: 5.0
+# Player who receives all or part of the entry fee
+        entryFeeGoesToPlayer: none
+# Amount of money the "player" specified in entryFeeGoesToPlayer receives for a joined player
+        entryFeeAmountToPlayer: 5.0
 # Turn prizes of items on/off
         giveItemPrizes: true
 # Prizes (name/id): amount:item or amount:item:subid
