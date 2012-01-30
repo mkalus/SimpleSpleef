@@ -121,7 +121,9 @@ public class FloorTracker extends Thread {
 		}
 
 		// get diggable floor
-		List<Block> blocks = floor.getDiggableBlocks(game);
+		List<Block> blocks;
+		if (floor != null) blocks = floor.getDiggableBlocks(game);
+		else blocks = null; // this will stop some of the trackers right away
 		
 		// start threads one by one
 		for (FloorWorker floorThread : floorWorkers) {

@@ -44,6 +44,11 @@ public class FloorRepairWorker extends FloorBaseWorker {
 	 */
 	@Override
 	public void initialize(Game game, List<Block> floor) {
+		if (floor == null) {
+			stop = true;
+			return; // ignore null floors
+		}
+
 		super.initialize(game, floor);
 		//TODO: do we really need an original block memory or can we do something like in the SoftRestorer?
 		for (Block block : floor) {
@@ -59,6 +64,8 @@ public class FloorRepairWorker extends FloorBaseWorker {
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
+		if (stop) return;
+
 		Location loc = block.getLocation();
 		if (originalBlocks.containsKey(loc)) { // only locations that are contained in the original block database
 			if (block.getType() == Material.AIR) // dissolved to air?

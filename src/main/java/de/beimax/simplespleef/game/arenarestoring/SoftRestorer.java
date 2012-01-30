@@ -66,7 +66,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	 */
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
-		if (block == null) return; // no NPEs
+		if (block == null || changedBlocks == null) return; // no NPEs
 		// just add original block type to list
 		BlockChange change = new BlockChange();
 		change.location = block.getLocation();
@@ -81,7 +81,10 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	 */
 	@Override
 	public void saveArena(Game game, Cuboid cuboid) {
-		if (game == null || cuboid == null) return; //ignore invalid stuff
+		if (game == null || cuboid == null) {
+			startRestoring = true; // run restore right away
+			return; //ignore invalid stuff
+		}
 		this.game = game;
 		this.cuboid = cuboid;
 
@@ -132,6 +135,8 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	private class RestoreThread extends Thread {
 		@Override
 		public void run() {
+			if (changedBlocks == null) return; // changes are ignored...
+
 			int count = 0;
 			// sleep a little to let other threads finish
 			try {

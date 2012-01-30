@@ -37,6 +37,11 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 	 */
 	@Override
 	public void initialize(Game game, List<Block> floor) {
+		if (floor == null) {
+			stop = true;
+			return; // ignore null floors
+		}
+
 		super.initialize(game, floor);
 		for (Block block : floor) {
 			if (block == null) continue; // no NPEs
@@ -51,6 +56,8 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
 		if (block == null) return; // no NPEs
+		if (stop) return;
+
 		Location loc = block.getLocation();
 		if (nonAir.contains(loc)) {
 			if (block.getType() == Material.AIR) // dissolve to air

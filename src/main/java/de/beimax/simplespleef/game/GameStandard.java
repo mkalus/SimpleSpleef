@@ -1444,7 +1444,7 @@ public class GameStandard extends Game {
 		} else { // soft restorer
 			// create soft restorer
 			arenaRestorer = new SoftRestorer();
-			arenaRestorer.saveArena(this, floor);
+			arenaRestorer.saveArena(this, floor==null?arena:floor);
 
 			if (floorTracker == null) // create floor tracker, if needed
 				floorTracker = new FloorTracker();
