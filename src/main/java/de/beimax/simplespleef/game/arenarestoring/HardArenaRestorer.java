@@ -65,42 +65,29 @@ public class HardArenaRestorer implements ArenaRestorer {
 	 */
 	@Override
 	public void restoreArena() {
-		// start restoration in new thread
-		(new RestoreThread()).start();
-	}
-
-	/**
-	 * restorer thread
-	 * @author mkalus
-	 *
-	 */
-	private class RestoreThread extends Thread {
-		@Override
-		public void run() {
-			// input file
-			File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
-			if (!file.exists()) {
-				SimpleSpleef.log.warning("[SimpleSpleef] Could find arena file " + file.getName());
-				return;
-			}
-			SerializableBlockData[][][] blockData;
-			try {
-				// deserialize objects
-				FileInputStream fileInputStream = new FileInputStream(file);
-				ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
-				blockData = (SerializableBlockData[][][]) oInputStream.readObject();
-				oInputStream.close();
-			} catch (Exception e) {
-				 SimpleSpleef.log.warning("[SimpleSpleef] Could not restore arena file " + file.getName() + ". Reason: " + e.getMessage());
-				 return;
-			}
-			// restore arena
-			cuboid.setSerializedBlocks(blockData);
-			// delete file at the end - cleanup work...
-			if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
-			
-			// call game handler to finish the game off
-			SimpleSpleef.getGameHandler().gameOver(game);			
+		// input file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
+		if (!file.exists()) {
+			SimpleSpleef.log.warning("[SimpleSpleef] Could find arena file " + file.getName());
+			return;
 		}
+		SerializableBlockData[][][] blockData;
+		try {
+			// deserialize objects
+			FileInputStream fileInputStream = new FileInputStream(file);
+			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
+			blockData = (SerializableBlockData[][][]) oInputStream.readObject();
+			oInputStream.close();
+		} catch (Exception e) {
+			 SimpleSpleef.log.warning("[SimpleSpleef] Could not restore arena file " + file.getName() + ". Reason: " + e.getMessage());
+			 return;
+		}
+		// restore arena - this is quite heavy on the server...
+		cuboid.setSerializedBlocks(blockData);
+		// delete file at the end - cleanup work...
+		if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
+		
+		// call game handler to finish the game off
+		SimpleSpleef.getGameHandler().gameOver(game);			
 	}
 }

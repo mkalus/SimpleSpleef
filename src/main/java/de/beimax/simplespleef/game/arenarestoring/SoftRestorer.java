@@ -3,6 +3,7 @@
  */
 package de.beimax.simplespleef.game.arenarestoring;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -97,8 +98,11 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	 */
 	@Override
 	public void restoreArena() {
-		// start restoration in new thread
-		(new RestoreThread()).start();
+		if (changedBlocks == null) return;
+		RestoreWorker worker = new RestoreWorker();
+
+		// start restore thread called every tick
+		worker.schedulerId = SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(SimpleSpleef.getPlugin(), worker, 0L, 1L);
 	}
 	
 	/**
@@ -128,41 +132,41 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 
 	
 	/**
-	 * restorer thread
+	 * restorer task - called every server tick
 	 * @author mkalus
 	 *
 	 */
-	private class RestoreThread extends Thread {
+	private class RestoreWorker implements Runnable {
+		private int schedulerId = -1;
+		
+		Iterator<BlockChange> it = null;
+		
 		@Override
 		public void run() {
-			if (changedBlocks == null) return; // changes are ignored...
+			// just started
+			if (it == null)
+				it = changedBlocks.iterator();
 
-			int count = 0;
-			// sleep a little to let other threads finish
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {}
-
-			for (BlockChange changedBlock : changedBlocks) {
-				//synchronized (changedBlock) { // broke some threads
-				Block block = changedBlock.location.getBlock();
-				block.setTypeId(changedBlock.blockData.getTypeId());
-				block.setData(changedBlock.blockData.getData());					
-				//}
-				
-				// every 10 cycles, wait a little
-				if ((count++ % 10) == 0) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {}
+			// 40 blocks per tick max
+			for (int i = 0; i < 40; i++) {
+				if (!it.hasNext()) {
+					isStopped = true; // yes, we are finished
+					break;
+				} else { // restore blocks
+					BlockChange changedBlock = it.next();
+					Block block = changedBlock.location.getBlock();
+					block.setTypeId(changedBlock.blockData.getTypeId());
+					block.setData(changedBlock.blockData.getData());	
 				}
-			}				
-
-			// say that the thread has finished
-			isStopped = true;
-			//System.out.println("Finished");
-			// call game handler to finish the game off
-			SimpleSpleef.getGameHandler().gameOver(game);
+			}
+			
+			// have we finished?
+			if (isStopped) {
+				// stop scheduler task
+				SimpleSpleef.getPlugin().getServer().getScheduler().cancelTask(schedulerId);
+				// call game handler to finish the game off
+				SimpleSpleef.getGameHandler().gameOver(game);
+			}
 		}
 	}
 }
