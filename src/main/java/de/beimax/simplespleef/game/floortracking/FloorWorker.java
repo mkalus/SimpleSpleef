@@ -11,7 +11,7 @@ import de.beimax.simplespleef.game.Game;
 
 /**
  * @author mkalus
- * Interface for individual tracker threads
+ * Interface for individual tracker tasks
  */
 public interface FloorWorker {
 	/**

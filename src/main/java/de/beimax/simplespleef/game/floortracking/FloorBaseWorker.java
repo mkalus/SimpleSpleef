@@ -15,17 +15,17 @@ import de.beimax.simplespleef.game.Game;
  */
 public abstract class FloorBaseWorker implements FloorWorker {
 	/**
-	 * seconds after which thread actually starts doing something
+	 * seconds after which task actually starts doing something
 	 */
 	private int startAfter;
 	
 	/**
-	 * seconds to wait each tick of the thread
+	 * seconds to wait each tick of the task
 	 */
 	private int tickTime;
 	
 	/**
-	 * system time to start thread at
+	 * system time to start task at
 	 */
 	private long startAt = 0;
 	
@@ -40,7 +40,7 @@ public abstract class FloorBaseWorker implements FloorWorker {
 	private FloorTracker tracker;
 	
 	/**
-	 * flag to stop thread
+	 * flag to stop task
 	 */
 	protected boolean stop = false;
 	
@@ -56,7 +56,7 @@ public abstract class FloorBaseWorker implements FloorWorker {
 	}
 	
 	/**
-	 * initialize thread
+	 * initialize task
 	 */
 	@Override
 	public void initialize(Game game, List<Block> floor) {
@@ -72,7 +72,7 @@ public abstract class FloorBaseWorker implements FloorWorker {
 		long now = System.currentTimeMillis();
 		// first, wait for worker to start and wait for the next tick
 		if (now < startAt || now < nextTick) return;
-		
+
 		// now do the actual tick work
 		executeTick();
 		// update tick
@@ -80,7 +80,7 @@ public abstract class FloorBaseWorker implements FloorWorker {
 	}
 	
 	/**
-	 * do a tick within the thread
+	 * do a tick within the task
 	 */
 	public abstract void executeTick();
 	

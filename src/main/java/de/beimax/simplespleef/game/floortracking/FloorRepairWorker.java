@@ -40,7 +40,7 @@ public class FloorRepairWorker extends FloorBaseWorker {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#initializeThread(de.beimax.simplespleef.game.Game, java.util.List)
+	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#initialize(de.beimax.simplespleef.game.Game, java.util.List)
 	 */
 	@Override
 	public void initialize(Game game, List<Block> floor) {
@@ -59,7 +59,7 @@ public class FloorRepairWorker extends FloorBaseWorker {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
+	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
@@ -75,7 +75,7 @@ public class FloorRepairWorker extends FloorBaseWorker {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseThread#tick()
+	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseWorker#executeTick()
 	 */
 	@Override
 	public void executeTick() {

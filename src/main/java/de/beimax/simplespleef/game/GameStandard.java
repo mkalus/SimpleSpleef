@@ -494,6 +494,9 @@ public class GameStandard extends Game {
 		// start floor tracker, if needed
 		if (floorTracker != null)
 			floorTracker.startTracking(this, floor);
+		// start degenerator if needed
+		if (playerOnBlockDegenerator != null)
+			playerOnBlockDegenerator.startBlockDegenerator();
 		// possibly clear inventory
 		clearInventories();
 		// optionally add to inventory
@@ -1465,7 +1468,7 @@ public class GameStandard extends Game {
 			if (floorTracker == null) // create floor tracker, if needed
 				floorTracker = new FloorTracker();
 			// create a new tracker/restorer
-			floorTracker.addFloorThread((FloorWorker) arenaRestorer);
+			floorTracker.addFloorWorker((FloorWorker) arenaRestorer);
 		}
 	}
 

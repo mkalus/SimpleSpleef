@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.floortracking.FloorTracker;
 import de.beimax.simplespleef.util.MaterialHelper;
 
@@ -21,7 +22,7 @@ import de.beimax.simplespleef.util.MaterialHelper;
  * @author mkalus
  * Keeps tracks of blocks players are standing on etc.
  */
-public class PlayerOnBlockDegenerator {
+public class PlayerOnBlockDegenerator implements Runnable {
 	/**
 	 * seconds to wait for degeneration
 	 */
@@ -41,6 +42,11 @@ public class PlayerOnBlockDegenerator {
 	 * reference to floor tracker
 	 */
 	private FloorTracker floorTracker;
+	
+	/**
+	 * id of the scheduler
+	 */
+	private int schedulerId;
 
 	/**
 	 * Constructor
@@ -60,6 +66,13 @@ public class PlayerOnBlockDegenerator {
 		
 		this.floorTracker = floorTracker;
 	}
+	
+	/**
+	 * start the degenerator task
+	 */
+	public void startBlockDegenerator() {
+		schedulerId = SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(SimpleSpleef.getPlugin(), this, 0L, 4L);
+	}
 
 	/**
 	 * update player's position
@@ -77,7 +90,6 @@ public class PlayerOnBlockDegenerator {
 			keeper = new DegenerationKeeper();
 			keeper.updateBlock(block);
 			degenerationList.put(player, keeper);
-			keeper.start(); // run the keeper
 		} else // just update the block
 			keeper.updateBlock(block);
 	}
@@ -88,18 +100,22 @@ public class PlayerOnBlockDegenerator {
 		
 		// if keeper found for player
 		if (keeper != null) {
-			keeper.stop = true; //stop keeper
 			degenerationList.remove(player); //remove from list
 		}
 	}
 
 	/**
-	 * stop the block degenerator (its threads, for the most part)
+	 * stop the block degenerator
 	 */
 	public void stopBlockDegenerator() {
+		SimpleSpleef.getPlugin().getServer().getScheduler().cancelTask(schedulerId);
+	}
+	
+	@Override
+	public void run() {
+		// cycle through keepers and update them
 		for (DegenerationKeeper keeper : degenerationList.values()) {
-			// iterate through keepers and stop them one by one
-			keeper.stop = true;
+			keeper.tick();
 		}
 	}
 	
@@ -108,48 +124,34 @@ public class PlayerOnBlockDegenerator {
 	 * @author mkalus
 	 *
 	 */
-	private class DegenerationKeeper extends Thread {
-		/**
-		 * set to true to stop keeping track
-		 */
-		private boolean stop = false;
-		
+	private class DegenerationKeeper {
 		/**
 		 * keeps track of the checked block
 		 */
 		private Block checkedBlock = null;
 		
 		/**
-		 * timestamp
+		 * timestamp at which the block will dissolve
 		 */
 		private long timestamp;
 		
-		@Override
-		public void run() {
-			// set timestamp to dummy value, since we have not checked anything yet
-			timestamp = Long.MAX_VALUE;
-			
-			while (!stop) { // run until the end of time (or stopped)
-				try { // try to sleep a little
-					Thread.sleep(200);
-				} catch (InterruptedException e) {}
+		public void tick() {
+			// has timestamp been exceeded?
+			if (checkedBlock != null && System.currentTimeMillis() >= timestamp) {
+				// get original data
+				int oldType = checkedBlock.getTypeId();
+				byte oldData = checkedBlock.getData();
+				checkedBlock.setType(Material.AIR); // block dissolves into thin air
+				checkedBlock.setData((byte) 0);
+				timestamp = Long.MAX_VALUE; // to not have this happen again
 
-				// has timestamp been exceeded?
-				if (System.currentTimeMillis() >= timestamp && checkedBlock != null) {
-					// get original data
-					int oldType = checkedBlock.getTypeId();
-					byte oldData = checkedBlock.getData();
-					checkedBlock.setType(Material.AIR); // block dissolves into thin air
-					checkedBlock.setData((byte) 0);
-					timestamp = Long.MAX_VALUE; // to not have this happen again
-					// notify floor tracker
-					if (floorTracker != null)
-						floorTracker.updateBlock(checkedBlock, oldType, oldData);
-				}
+				// notify floor tracker
+				if (floorTracker != null)
+					floorTracker.updateBlock(checkedBlock, oldType, oldData);
+
+				// clean up
+				checkedBlock = null;
 			}
-			
-			// clean up
-			checkedBlock = null;
 		}
 		
 		/**

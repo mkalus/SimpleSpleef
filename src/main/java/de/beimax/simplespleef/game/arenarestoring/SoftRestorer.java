@@ -22,7 +22,7 @@ import de.beimax.simplespleef.util.SerializableBlockData;
  */
 public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	/**
-	 * flag to stop thread - actually starts restoration
+	 * flag to stop worker - actually starts restoration
 	 */
 	private boolean startRestoring = false;
 
@@ -37,7 +37,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	private Cuboid cuboid;
 	
 	/**
-	 * thread has finished restoring?
+	 * worker has finished restoring?
 	 */
 	private boolean isStopped = false;
 
@@ -47,7 +47,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	private LinkedList<BlockChange> changedBlocks;
 
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#initializeThread(de.beimax.simplespleef.game.Game, java.util.List)
+	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#initialize(de.beimax.simplespleef.game.Game, java.util.List)
 	 */
 	@Override
 	public void initialize(Game game, List<Block> floor) {
@@ -55,7 +55,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#stopTracking()
+	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#stopTracking()
 	 */
 	@Override
 	public void stopTracking() {
@@ -63,7 +63,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorThread#updateBlock(org.bukkit.block.Block)
+	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#updateBlock(org.bukkit.block.Block)
 	 */
 	@Override
 	public void updateBlock(Block block, int oldType, byte oldData) {
@@ -89,7 +89,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 		this.game = game;
 		this.cuboid = cuboid;
 
-		// initialize thread data
+		// initialize task data
 		this.changedBlocks = new LinkedList<SoftRestorer.BlockChange>();
 	}
 
@@ -101,7 +101,7 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 		if (changedBlocks == null) return;
 		RestoreWorker worker = new RestoreWorker();
 
-		// start restore thread called every tick
+		// start restore task called every tick
 		worker.schedulerId = SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(SimpleSpleef.getPlugin(), worker, 0L, 1L);
 	}
 	

@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.bukkit.block.Block;
 
+import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.util.Cuboid;
 
@@ -17,7 +18,7 @@ import de.beimax.simplespleef.util.Cuboid;
  * @author mkalus
  * Keeps track of the floor - used by automatic arena degeneration and repair spleefs
  */
-public class FloorTracker extends Thread {
+public class FloorTracker implements Runnable {
 	/**
 	 * Time in seconds, after which the arena floor starts to dissolve slowly (-1 disables this)
 	 */
@@ -42,6 +43,11 @@ public class FloorTracker extends Thread {
 	 * flag to stop worker
 	 */
 	private boolean stop = false;
+	
+	/**
+	 * id of the Bukkit scheduler for the tracker
+	 */
+	int schedulerId = -1;
 
 	/**
 	 * list of floor workers to be called
@@ -110,12 +116,12 @@ public class FloorTracker extends Thread {
 	 * @param floor
 	 */
 	public void startTracking(Game game, Cuboid floor) {
-		//initialize floor dissolve thread
+		//initialize floor dissolve task
 		if (arenaFloorDissolvesAfter >= 0) {
 			floorWorkers.add(new FloorDissolveWorker(arenaFloorDissolvesAfter, arenaFloorDissolveTick, this));
 		}
 
-		//initialize floor repair thread
+		//initialize floor repair task
 		if (arenaFloorRepairsAfter >= 0) {
 			floorWorkers.add(new FloorRepairWorker(arenaFloorRepairsAfter, arenaFloorRepairTick, this));
 		}
@@ -125,41 +131,36 @@ public class FloorTracker extends Thread {
 		if (floor != null) blocks = floor.getDiggableBlocks(game);
 		else blocks = null; // this will stop some of the trackers right away
 		
-		// start threads one by one
-		for (FloorWorker floorThread : floorWorkers) {
-			floorThread.initialize(game, blocks);
+		// initialize tasks one by one
+		for (FloorWorker floorWorker : floorWorkers) {
+			floorWorker.initialize(game, blocks);
 		}
 		
-		// start tracking thread
-		start();
+		// start tracking
+		schedulerId = SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(SimpleSpleef.getPlugin(), this, 0L, 20L);
 	}
 	
 	@Override
 	public void run() {
-		// actual worker thread
-		while (!stop) {
-			try {
-				Thread.sleep(200); // sleep for a fifth of a second before doing anything else
-			} catch (InterruptedException e) {}
-			//execute ticks for all workers
-			for (FloorWorker floorThread : floorWorkers) {
-				floorThread.tick();
+		// not stopped: normal operations
+		if (!stop) {
+			// actual worker task: execute ticks for all workers
+			for (FloorWorker floorWorker : floorWorkers) {
+				floorWorker.tick();
 			}
-		}
-		
-		// stop tracking for all floors workers
-		for (FloorWorker floorThread : floorWorkers) {
-			floorThread.stopTracking();
 		}
 
 		//wait for floor workers to be stopped
-		do {
-			Iterator<FloorWorker> i = floorWorkers.iterator(); //use iterator, because one can remove while traversing...
-			while (i.hasNext()) {
-				FloorWorker floorThread = i.next();
-				if (floorThread.isStopped()) i.remove();
-			}
-		} while (floorWorkers.size() > 0);
+		Iterator<FloorWorker> i = floorWorkers.iterator(); //use iterator, because one can remove while traversing...
+		while (i.hasNext()) {
+			FloorWorker floorWorker = i.next();
+			if (floorWorker.isStopped()) i.remove();
+		}
+		
+		// is our list empty? If yes, cancel scheduler
+		if (floorWorkers.size() == 0) {
+			SimpleSpleef.getPlugin().getServer().getScheduler().cancelTask(schedulerId);
+		}
 	}
 	
 	/**
@@ -167,6 +168,10 @@ public class FloorTracker extends Thread {
 	 */
 	public void stopTracking() {
 		stop = true;
+		// stop tracking for all floors workers
+		for (FloorWorker floorWorker : floorWorkers) {
+			floorWorker.stopTracking();
+		}
 	}
 	
 	/**
@@ -176,13 +181,14 @@ public class FloorTracker extends Thread {
 	 * @param oldData - old data of block
 	 */
 	public void updateBlock(Block block, int oldType, byte oldData) {
-		for (FloorWorker floorThread : floorWorkers) {
-			floorThread.updateBlock(block, oldType, oldData);
-		}
+		if (!stop) // if stopped, do not update changes any more
+			for (FloorWorker floorWorker : floorWorkers) {
+				floorWorker.updateBlock(block, oldType, oldData);
+			}
 	}
 	
 	/**
-	 * Called by tick()-methods of FloorThreads when they change a block,
+	 * Called by tick()-methods of FloorWorkers when they change a block,
 	 * so other trackers can update their block database. 
 	 * @param block
 	 * @param oldType - old type of block
@@ -190,17 +196,17 @@ public class FloorTracker extends Thread {
 	 * @param caller
 	 */
 	public void notifyChangedBlock(Block block, int oldType, byte oldData, FloorWorker caller) {
-		for (FloorWorker floorThread : floorWorkers) {
-			if (floorThread != caller) // caller is not updated - has to do this itself
-				floorThread.updateBlock(block, oldType, oldData);
+		for (FloorWorker floorWorker : floorWorkers) {
+			if (floorWorker != caller) // caller is not updated - has to do this itself
+				floorWorker.updateBlock(block, oldType, oldData);
 		}
 	}
 	
 	/**
-	 * Add a new floor thread to tracker
-	 * @param thread
+	 * Add a new floor worker to tracker
+	 * @param worker
 	 */
-	public void addFloorThread(FloorWorker thread) {
-		floorWorkers.add(thread);
+	public void addFloorWorker(FloorWorker worker) {
+		floorWorkers.add(worker);
 	}
 }
