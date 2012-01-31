@@ -140,7 +140,7 @@ admin:
       arena a/b|Definiere Punkt a/b der Arena.
       floor a/b|Definiere Punkt a/b des Bodens.
       lose a/b|Definiere Punkt a/b des Lose-Kubus.
-      spawn lounge/game/spectator/lose|Setze Spawnpunkt.
+      spawn lounge/game/spectator/lose/winner|Setze Spawnpunkt.
       disable/enable arena|(De)aktiviere Arena.
       reload|Neuladen der config.yml.
 adminerrors:

@@ -140,7 +140,7 @@ admin:
       arena a/b|Define point a/b of arena cube.
       floor a/b|Define point a/b of the floor cube.
       lose a/b|Define point a/b of lose cube.
-      spawn lounge/game/spectator/lose|Set spawn point.
+      spawn lounge/game/spectator/lose/winner|Set spawn point.
       enable/disable arena|Enable/disable arena.
       reload|Reload config.
 adminerrors:

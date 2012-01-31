@@ -192,7 +192,7 @@ public class SimpleSpleefAdmin {
 		// check third argument
 		String spawn = args[2].toLowerCase();
 		if (spawn.equals("lounge") || spawn.equals("game") || spawn.equals("spectator") || spawn.equals("loose")
-				 || spawn.equals("lose") || spawn.equals("red") || spawn.equals("blue"))
+				 || spawn.equals("lose") || spawn.equals("red") || spawn.equals("blue") || spawn.equals("winner"))
 			return true;
 		// error feedback
 		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgumentSpawn"));

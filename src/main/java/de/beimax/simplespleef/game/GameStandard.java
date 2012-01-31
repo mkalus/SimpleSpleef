@@ -1049,8 +1049,10 @@ public class GameStandard extends Game {
 				payPrizeMoney(player);
 				payPrizeExperience(player);
 				payPrizeItems(player);
-				// teleport winners back to lounge
-				teleportPlayer(player, "lounge");
+				// teleport winners back to winner's point or to lounge
+				if (configuration.isConfigurationSection("winnerSpawn") && configuration.getBoolean("winnerSpawn.enabled", false))
+					teleportPlayer(player, "winner");
+				else teleportPlayer(player, "lounge");
 			}
 			// update original positions
 			if (configuration.getBoolean("enableBackCommand", true))
