@@ -258,7 +258,9 @@ public class GameStandard extends Game {
 	 * renew the block degenerator for players
 	 */
 	protected void renewPlayerOnBlockGenerator() {
-		int blockDegeneration = configuration.getInt("blockDegeneration", -1);
+		if (configuration == null) playerOnBlockDegenerator = null; // fix NPE
+		
+		int blockDegeneration = configuration .getInt("blockDegeneration", -1);
 		if (blockDegeneration >= 0) playerOnBlockDegenerator = new PlayerOnBlockDegenerator(blockDegeneration, configuration.getStringList("degeneratingBlocks"), floorTracker);
 		else playerOnBlockDegenerator = null;		
 	}
