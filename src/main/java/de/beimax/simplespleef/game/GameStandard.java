@@ -686,6 +686,10 @@ public class GameStandard extends Game {
 	 * @param broadcast
 	 */
 	public void sendMessage(String message, boolean broadcast) {
+		if (message == null) {
+			SimpleSpleef.log.warning("[SimpleSpleef] Message was null and could not be broadcasted!");
+			return;
+		}
 		// global broadcast
 		if (broadcast) SimpleSpleef.getPlugin().getServer().broadcastMessage(message);
 		else { // only players and specators
