@@ -1361,6 +1361,8 @@ public class GameStandard extends Game {
 		// everything ok -> teleport player
 		Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection(spawn + "Spawn"));
 		if (teleportTo == null) SimpleSpleef.log.warning("[SimpleSpleef] Teleport error - location was null!");
+		// load chunk, if needed
+		teleportTo.getWorld().loadChunk(teleportTo.getChunk());
 		// add player to teleport ok list
 		this.teleportOkList.add(player);
 		player.teleport(teleportTo);
