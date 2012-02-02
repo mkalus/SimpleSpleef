@@ -25,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -95,5 +96,15 @@ public class SimpleSpleefEntityListener implements Listener {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onEntityExplode(EntityExplodeEvent event) {
+		// TODO: check if any exploded blocks were within the arena perimeter -> restore those or cancel event
+		
+		// TODO: check for blocks exploded within the reach of a tracker -> track changed blocks!
 	}
 }
