@@ -8,6 +8,10 @@
 	<description>Simple Spleefing plugin for bukkit server</description>
 	<repositories>
 		<repository>
+			<id>sk89q-mvn2</id>
+			<url>http://mvn2.sk89q.com/repo/</url>
+		</repository>
+		<repository>
 			<id>bukkit-repo</id>
 			<url>http://repo.bukkit.org/content/groups/public/</url>
 		</repository>
@@ -25,17 +29,17 @@
 			<version>[1.1.9,)</version>
 			<artifactId>vault</artifactId>
 		</dependency>
-        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.1 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
+        <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>[5.0,)</version>
+            <version>5.1</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldguard -Dversion=5.4 -Dpackaging=jar -Dfile=WorldGuard.jar' in order to make this work: -->
-            <groupId>com.sk89q</groupId>
+		<dependency>
+			<groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>[5.4,)</version>
+            <version>5.4</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
