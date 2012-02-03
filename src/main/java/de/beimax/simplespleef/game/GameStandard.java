@@ -1132,7 +1132,7 @@ public class GameStandard extends Game {
 		int win = prizeExperienceFixed + prizeExperiencePerPlayer * spleefers.size();
 		if (win == 0) return; // if no prize xps is payed, return without telling anybody
 		// add player experience
-		player.setExp(player.getExp() + win);
+		player.giveExp(win);
 		// player gets message
 		player.sendMessage(ChatColor.AQUA + SimpleSpleef.getPlugin().ll("broadcasts.prizeExperience", "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win)));
 		// broadcast prize?
