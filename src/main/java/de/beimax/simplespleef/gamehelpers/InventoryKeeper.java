@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef.util;
+package de.beimax.simplespleef.gamehelpers;
 
 
 import java.util.HashMap;

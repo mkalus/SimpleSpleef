@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+
 package de.beimax.simplespleef;
 
 import java.util.Map;
@@ -33,19 +34,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-import de.beimax.simplespleef.admin.SimpleSpleefAdmin;
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
+import de.beimax.simplespleef.command.SimpleSpleefSignCommandExecutor;
 import de.beimax.simplespleef.game.GameHandler;
-import de.beimax.simplespleef.game.OriginalPositionKeeper;
-import de.beimax.simplespleef.listeners.*;
+import de.beimax.simplespleef.gamehelpers.OriginalPositionKeeper;
+import de.beimax.simplespleef.listeners.PluginListener;
 import de.beimax.simplespleef.util.ConfigHelper;
 import de.beimax.simplespleef.util.Translator;
 import de.beimax.simplespleef.util.UpdateChecker;
 
 /**
- * SimpleSpleef for Bukkit
- * 
  * @author mkalus
+ *
  */
 public class SimpleSpleef extends JavaPlugin {
 	public static final Logger log = Logger.getLogger("Minecraft");
@@ -77,7 +77,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// fallback to default Bukkit permission checking system
 		return sender.hasPermission(permission) || sender.hasPermission("simplespleef.*");
 	}
-	
+
 	/**
 	 * self reference to singleton
 	 */
@@ -123,12 +123,12 @@ public class SimpleSpleef extends JavaPlugin {
 	public static WorldEditAPI getWorldEditAPI() {
 		return SimpleSpleef.worldEditAPI;
 	}
-	
+
 	/**
 	 * keeper of original positions
 	 */
 	private static OriginalPositionKeeper originalPositionKeeper;
-	
+
 	/**
 	 * get originalPositionKeeper instance (singleton)
 	 * @return
@@ -139,11 +139,6 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * reference to admin class
-	 */
-	private SimpleSpleefAdmin admin;
-
-	/**
 	 * reference to command handler
 	 */
 	private SimpleSpleefCommandExecutor commandExecutor;
@@ -151,18 +146,12 @@ public class SimpleSpleef extends JavaPlugin {
 	/**
 	 * reference to translator
 	 */
-	private Translator lang;
+	private static Translator lang;
 
-	/**
-	 * reference to event handlers/listeners
-	 */
-	private SimpleSpleefBlockListener blockListener;
-	private SimpleSpleefPlayerListener playerListener;
-	private SimpleSpleefEntityListener entityListener;
-	
 	/**
 	 * Called when enabling plugin
 	 */
+	@Override
 	public void onEnable() {
 		// initialize plugin
 		log.info(this.toString() + " is loading.");	
@@ -176,9 +165,11 @@ public class SimpleSpleef extends JavaPlugin {
 		// check updates, if turned on
 		checkForUpdate();
 		
-		// create new handlers
+		// create new handler
 		SimpleSpleef.gameHandler = new GameHandler();
-		this.admin = new SimpleSpleefAdmin();
+		SimpleSpleef.gameHandler.updateGameHandlerData();
+		// start tracking
+		SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(this, gameHandler, 0L, 20L);
 		
 		// register vault stuff
 		setupEconomy();
@@ -196,17 +187,19 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public void onDisable() {
 		log.info(this.toString() + " is shutting down.");
+		// cancel all tasks for this plugin
+		SimpleSpleef.getPlugin().getServer().getScheduler().cancelTasks(this);
 		// clean memory
 		SimpleSpleef.worldEditAPI = null;
+		// stop game handler
 		SimpleSpleef.gameHandler = null;
 		SimpleSpleef.economy = null;
 		SimpleSpleef.originalPositionKeeper = null;
-		this.admin = null;
-		this.lang = null;
-		this.playerListener = null;
-		this.entityListener = null;
-		this.blockListener = null;
-		this.commandExecutor = null;
+		lang = null;
+		//this.playerListener = null;
+		//this.entityListener = null;
+		//this.blockListener = null;
+		//this.commandExecutor = null;
 		//TODO add if more stuff comes along
 
 		//save config to disk
@@ -215,6 +208,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// derefer self reference
 		SimpleSpleef.simpleSpleef = null;
 	}
+
 	
 	/**
 	 * Run some configuration stuff at the initialization of the plugin
@@ -235,7 +229,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// initialize the translator
 		lang = new Translator(this, this.getConfig().getString("language", "en"));
 	}
-	
+
 	/**
 	 * reload configuration and translation
 	 */
@@ -243,7 +237,7 @@ public class SimpleSpleef extends JavaPlugin {
 		// reload the config file
 		this.reloadConfig();
 		// have the game loader reload, too
-		SimpleSpleef.gameHandler.reloadConfig();
+		SimpleSpleef.gameHandler.updateGameHandlerData();
 
 		// re-initialize the translator
 		lang = new Translator(this, this.getConfig().getString("language", "en"));
@@ -277,59 +271,19 @@ public class SimpleSpleef extends JavaPlugin {
 	 * Configure event listeners
 	 */
 	protected void registerEvents() {
-		// add listener for other plugins
-		PluginListener pluginListener = new PluginListener();
-
 		// let my command handler take care of commands
 		this.commandExecutor = new SimpleSpleefCommandExecutor();
 		this.getCommand("spleef").setExecutor(commandExecutor);
 
 		// Prepare listeners
 		PluginManager pm = getServer().getPluginManager();
-		this.blockListener = new SimpleSpleefBlockListener();
-		this.entityListener = new SimpleSpleefEntityListener();
-		this.playerListener = new SimpleSpleefPlayerListener();
-
+		
+		// add listener for other plugins
+		pm.registerEvents(new PluginListener(), this);
 		// Register our events
-		pm.registerEvents(pluginListener, this);
-		pm.registerEvents(blockListener, this);
-		pm.registerEvents(entityListener, this);
-		pm.registerEvents(playerListener, this);
-	}
-
-	/**
-	 * @return the admin
-	 */
-	public SimpleSpleefAdmin getAdminClass() {
-		return admin;
-	}
-
-	/**
-	 * @return the commandExecutor
-	 */
-	public SimpleSpleefCommandExecutor getCommandExecutor() {
-		return commandExecutor;
-	}
-
-	/**
-	 * @return the blockListener
-	 */
-	public SimpleSpleefBlockListener getBlockListener() {
-		return blockListener;
-	}
-
-	/**
-	 * @return the playerListener
-	 */
-	public SimpleSpleefPlayerListener getPlayerListener() {
-		return playerListener;
-	}
-
-	/**
-	 * @return the entityListener
-	 */
-	public SimpleSpleefEntityListener getEntityListener() {
-		return entityListener;
+		pm.registerEvents(gameHandler, this);
+		pm.registerEvents(new UpdateChecker(), this); // check updates
+		pm.registerEvents(new SimpleSpleefSignCommandExecutor(), this); // check sign actions
 	}
 
 	/**
@@ -337,7 +291,7 @@ public class SimpleSpleef extends JavaPlugin {
 	 * @param replacers an even number of key/value pairs to replace key entries
 	 * @return translated string
 	 */
-	public String ll(String key, String... replacers) {
+	public static String ll(String key, String... replacers) {
 		return lang.ll(key, replacers);
 	}
 	
@@ -346,7 +300,7 @@ public class SimpleSpleef extends JavaPlugin {
 	 * @param key
 	 * @return
 	 */
-	public Map<String, String> lls(String section) {
+	public static Map<String, String> lls(String section) {
 		return lang.lls(section);
 	}
 

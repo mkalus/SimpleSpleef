@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef.util;
+package de.beimax.simplespleef.gamehelpers;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -123,7 +123,7 @@ public class CuboidWorldGuard implements Cuboid {
 			for (int y = coords[1]; y <= coords[4]; y++)
 				for (int z = coords[2]; z <= coords[5]; z++) {
 					Block block = this.world.getBlockAt(x, y, z);
-					if (block != null && this.region.contains(x, y, z) && game.checkMayBreakBlock(block)) { // can this block be broken and within the region
+					if (block != null && this.region.contains(x, y, z) && game.checkMayBreakBlock(block, null)) { // can this block be broken and within the region
 						diggableBlocks.add(block);
 					}
 				}

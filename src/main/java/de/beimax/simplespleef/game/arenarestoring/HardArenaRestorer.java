@@ -9,34 +9,50 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.bukkit.block.Block;
+
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.game.Game;
-import de.beimax.simplespleef.util.Cuboid;
-import de.beimax.simplespleef.util.SerializableBlockData;
+import de.beimax.simplespleef.gamehelpers.Cuboid;
+import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
 /**
  * @author mkalus
  *
  */
-public class HardArenaRestorer implements ArenaRestorer {
-	/**
-	 * game to restore
-	 */
-	private Game game;
+public class HardArenaRestorer extends ArenaRestorer {
+	public static final int STATUS_NONE = 0;
+	public static final int STATUS_SAVED = 1;
+	public static final int STATUS_RESTORED = 2;
+	
+	private int status = HardArenaRestorer.STATUS_NONE;
 	
 	/**
 	 * cuboid to store/restore
 	 */
 	private Cuboid cuboid;
 
+	/**
+	 * Constructor
+	 * @param waitBeforeRestoring
+	 */
+	public HardArenaRestorer(int waitBeforeRestoring) {
+		super(waitBeforeRestoring);
+	}
+
 	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.arenarestoring.ArenaRestorer#saveArena(de.beimax.simplespleef.game.Game)
+	 * @see de.beimax.simplespleef.game.arenarestoring.ArenaRestorer#setArena(de.beimax.simplespleef.game.Game)
 	 */
 	@Override
-	public void saveArena(Game game, Cuboid cuboid) {
-		if (game == null || cuboid == null) return; //ignore invalid stuff
-		this.game = game;
+	public void setArena(Cuboid cuboid) {
 		this.cuboid = cuboid;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.beimax.simplespleef.game.arenarestoring.ArenaRestorer#saveArena()
+	 */
+	@Override
+	public void saveArena() {
+		if (game == null || cuboid == null) return; //ignore invalid stuff
 
 		SerializableBlockData[][][] blockData = this.cuboid.getSerializedBlocks();
 		
@@ -86,8 +102,38 @@ public class HardArenaRestorer implements ArenaRestorer {
 		cuboid.setSerializedBlocks(blockData);
 		// delete file at the end - cleanup work...
 		if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
+	}
+
+	@Override
+	public boolean tick() {
+		if (interrupted == true) { // when interrupted, restore arena right awaw
+			restoreArena(); // finish arena at once
+			return true; // finish restorer
+		}
 		
-		// call game handler to finish the game off
-		SimpleSpleef.getGameHandler().gameOver(game);			
+		// wait for game to start
+		if (status == HardArenaRestorer.STATUS_NONE && game.isInGame()) { // game started and not saved yet
+			saveArena();
+			status = HardArenaRestorer.STATUS_SAVED;
+			return false;
+		}
+		
+		// wait for game to finish - or return, if already restored
+		if (!game.isFinished() || status == HardArenaRestorer.STATUS_RESTORED) return false;
+
+		// before start restoring count restore ticker to 0
+		if (this.waitBeforeRestoring > 0) {
+			this.waitBeforeRestoring--;
+			return false;
+		}
+
+		restoreArena(); // finish arena at once
+		status = HardArenaRestorer.STATUS_RESTORED;
+		return true; // finish restorer
+	}
+
+	@Override
+	public boolean updateBlock(Block block, int oldType, byte oldData) { // ignore
+		return false;
 	}
 }

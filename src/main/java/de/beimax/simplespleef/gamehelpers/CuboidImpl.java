@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef.util;
+package de.beimax.simplespleef.gamehelpers;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -151,7 +151,7 @@ public class CuboidImpl implements Cuboid {
 			for (int y = this.coords[1]; y <= this.coords[4]; y++)
 				for (int z = this.coords[2]; z <= this.coords[5]; z++) {
 					Block block = this.world.getBlockAt(x, y, z);
-					if (block != null && game.checkMayBreakBlock(block)) { // can this block be broken
+					if (block != null && game.checkMayBreakBlock(block, null)) { // can this block be broken
 						diggableBlocks.add(block);
 					}					
 				}

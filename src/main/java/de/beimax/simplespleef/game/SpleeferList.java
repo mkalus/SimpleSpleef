@@ -18,6 +18,7 @@
  **/
 package de.beimax.simplespleef.game;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,10 +40,10 @@ public class SpleeferList {
 		// build list of winners
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
-		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
+		String comma = SimpleSpleef.ll("feedback.infoComma");
 		// compile list of spleefers
 		for (Spleefer spleefer : players) {
-			if (i > 0 && i == players.size() - 1) builder.append(SimpleSpleef.getPlugin().ll("feedback.infoAnd")); // last element with end
+			if (i > 0 && i == players.size() - 1) builder.append(SimpleSpleef.ll("feedback.infoAnd")); // last element with end
 			else if (i > 0) builder.append(comma); // other elements with ,
 			builder.append(spleefer.getPlayer().getDisplayName());
 		}
@@ -168,11 +169,19 @@ public class SpleeferList {
 	}
 	
 	/**
-	 * get the whole list
+	 * gets a list of spleefers
 	 * @return
 	 */
 	public List<Spleefer> get() {
 		return spleefers;
+	}
+	
+	/**
+	 * return iterator of spleefers list
+	 * @return
+	 */
+	public Iterator<Spleefer> iterator() {
+		return spleefers.iterator();
 	}
 	
 	/**
@@ -200,5 +209,17 @@ public class SpleeferList {
 			if (!spleefer.isReady()) unready++;
 		}
 		return unready;
+	}
+	
+	/**
+	 * count lost spleefers
+	 * @return
+	 */
+	public int countLostPlayers() {
+		int lost = 0;
+		for (Spleefer spleefer : spleefers) {
+			if (!spleefer.hasLost()) lost++;
+		}
+		return lost;
 	}
 }

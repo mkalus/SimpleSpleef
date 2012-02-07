@@ -5,69 +5,102 @@ package de.beimax.simplespleef.game.arenarestoring;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.game.Game;
-import de.beimax.simplespleef.game.floortracking.FloorWorker;
-import de.beimax.simplespleef.util.Cuboid;
-import de.beimax.simplespleef.util.SerializableBlockData;
+import de.beimax.simplespleef.gamehelpers.Cuboid;
+import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
 /**
  * @author mkalus
  *
  */
-public class SoftRestorer implements ArenaRestorer, FloorWorker {
-	/**
-	 * flag to stop worker - actually starts restoration
-	 */
-	private boolean startRestoring = false;
-
-	/**
-	 * game to restore
-	 */
-	private Game game;
-	
+public class SoftRestorer extends ArenaRestorer {
 	/**
 	 * cuboid to store/restore
 	 */
 	private Cuboid cuboid;
-	
-	/**
-	 * worker has finished restoring?
-	 */
-	private boolean isStopped = false;
+	//TODO: not really needed at this place, is it?
 
 	/**
 	 * keeps the data of the changed blocks
 	 */
 	private LinkedList<BlockChange> changedBlocks;
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#initialize(de.beimax.simplespleef.game.Game, java.util.List)
+	
+	/**
+	 * iterator for the reconstruction of the arena
 	 */
-	@Override
-	public void initialize(Game game, List<Block> floor) {
-		//Do nothing
+	Iterator<BlockChange> it;
+
+	/**
+	 * Constructor
+	 * @param waitBeforeRestoring
+	 */
+	public SoftRestorer(int waitBeforeRestoring) {
+		super(waitBeforeRestoring);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#stopTracking()
-	 */
 	@Override
-	public void stopTracking() {
-		startRestoring = true;
+	public void setArena(Cuboid cuboid) {
+		this.cuboid = cuboid;
+		saveArena();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#updateBlock(org.bukkit.block.Block)
-	 */
 	@Override
-	public void updateBlock(Block block, int oldType, byte oldData) {
-		if (block == null || changedBlocks == null) return; // no NPEs
+	public void saveArena() {		
+		// initialize task data
+		this.changedBlocks = new LinkedList<SoftRestorer.BlockChange>();
+		this.it = null;
+	}
+
+	@Override
+	public void restoreArena() {
+		// just started
+		if (it == null)
+			it = changedBlocks.iterator();
+
+		// 40 blocks per tick max
+		for (int i = 0; i < 40; i++) {
+			if (!it.hasNext()) {
+				it = null;
+				break;
+			} else { // restore blocks
+				BlockChange changedBlock = it.next();
+				Block block = changedBlock.location.getBlock();
+				block.setTypeId(changedBlock.blockData.getTypeId());
+				block.setData(changedBlock.blockData.getData());	
+			}
+		}
+		
+	}
+
+	@Override
+	public boolean tick() {
+		if (interrupted == true) { // when interrupted, restore arena right awaw
+			restoreArena(); // finish arena at once
+			return true; // finish restorer
+		}
+		
+		// wait for game to finish
+		if (!game.isFinished()) return false;
+		
+		// before start restoring count restore ticker to 0
+		if (this.waitBeforeRestoring > 0) {
+			this.waitBeforeRestoring--;
+			return false;
+		}
+		
+		restoreArena(); // start restoring
+		// test, if all blocks have been restored
+		if (it == null) return true;
+		// otherwise wait another tick
+		return false;
+	}
+
+	@Override
+	public boolean updateBlock(Block block, int oldType, byte oldData) {
+		if (block == null || changedBlocks == null) return false; // no NPEs
 		// just add original block type to list
 		BlockChange change = new BlockChange();
 		change.location = block.getLocation();
@@ -75,36 +108,10 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 		// add at first position, so the restoration is done from the last block changed
 		changedBlocks.addFirst(change);
 		//System.out.println("Added!");
+		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.arenarestoring.ArenaRestorer#saveArena(de.beimax.simplespleef.game.Game, de.beimax.simplespleef.util.Cuboid)
-	 */
-	@Override
-	public void saveArena(Game game, Cuboid cuboid) {
-		if (game == null || cuboid == null) {
-			startRestoring = true; // run restore right away
-			return; //ignore invalid stuff
-		}
-		this.game = game;
-		this.cuboid = cuboid;
 
-		// initialize task data
-		this.changedBlocks = new LinkedList<SoftRestorer.BlockChange>();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.arenarestoring.ArenaRestorer#restoreArena()
-	 */
-	@Override
-	public void restoreArena() {
-		if (changedBlocks == null) return;
-		RestoreWorker worker = new RestoreWorker();
-
-		// start restore task called every tick
-		worker.schedulerId = SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(SimpleSpleef.getPlugin(), worker, 0L, 1L);
-	}
-	
 	/**
 	 * keeps original positions for blocks
 	 * @author mkalus
@@ -113,60 +120,5 @@ public class SoftRestorer implements ArenaRestorer, FloorWorker {
 	private class BlockChange {
 		private Location location;
 		private SerializableBlockData blockData;
-	}
-
-	@Override
-	public void tick() {
-		if (game == null || cuboid == null) return; //ignore invalid stuff
-
-		// wait for the restoration process to start
-		if (!startRestoring) return;
-		
-		restoreArena();
-	}
-
-	@Override
-	public boolean isStopped() {
-		return isStopped;
-	}
-
-	
-	/**
-	 * restorer task - called every server tick
-	 * @author mkalus
-	 *
-	 */
-	private class RestoreWorker implements Runnable {
-		private int schedulerId = -1;
-		
-		Iterator<BlockChange> it = null;
-		
-		@Override
-		public void run() {
-			// just started
-			if (it == null)
-				it = changedBlocks.iterator();
-
-			// 40 blocks per tick max
-			for (int i = 0; i < 40; i++) {
-				if (!it.hasNext()) {
-					isStopped = true; // yes, we are finished
-					break;
-				} else { // restore blocks
-					BlockChange changedBlock = it.next();
-					Block block = changedBlock.location.getBlock();
-					block.setTypeId(changedBlock.blockData.getTypeId());
-					block.setData(changedBlock.blockData.getData());	
-				}
-			}
-			
-			// have we finished?
-			if (isStopped) {
-				// stop scheduler task
-				SimpleSpleef.getPlugin().getServer().getScheduler().cancelTask(schedulerId);
-				// call game handler to finish the game off
-				SimpleSpleef.getGameHandler().gameOver(game);
-			}
-		}
 	}
 }

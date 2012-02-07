@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.beimax.simplespleef.game.floortracking;
+package de.beimax.simplespleef.game.trackers;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,8 +10,6 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-
-import de.beimax.simplespleef.game.Game;
 
 /**
  * @author mkalus
@@ -28,21 +26,8 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 	 * @param startAfter
 	 * @param tickTime
 	 */
-	public FloorDissolveWorker(int startAfter, int tickTime, FloorTracker tracker) {
-		super(startAfter, tickTime, tracker);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#initialize(de.beimax.simplespleef.game.Game, java.util.List)
-	 */
-	@Override
-	public void initialize(Game game, List<Block> floor) {
-		if (floor == null) {
-			stop = true;
-			return; // ignore null floors
-		}
-
-		super.initialize(game, floor);
+	public FloorDissolveWorker(int startAfter, int tickTime, List<Block> floor) {
+		super(startAfter, tickTime);
 		for (Block block : floor) {
 			if (block == null) continue; // no NPEs
 			if (block.getType() != Material.AIR) // add location to nonAir locations
@@ -50,29 +35,29 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorWorker#updateBlock(org.bukkit.block.Block)
-	 */
 	@Override
-	public void updateBlock(Block block, int oldType, byte oldData) {
-		if (block == null) return; // no NPEs
-		if (stop) return;
+	public boolean updateBlock(Block block, int oldType, byte oldData) {
+		if (block == null) return false; // no NPEs
 
 		Location loc = block.getLocation();
 		if (nonAir.contains(loc)) {
-			if (block.getType() == Material.AIR) // dissolve to air
+			if (block.getType() == Material.AIR) { // dissolve to air
 				nonAir.remove(loc); // remove because it is air anyway
-		} else if (block.getType() != Material.AIR) // non air added - add to dissolveable parts of arena
-			nonAir.add(loc);			
+				return true;
+			}
+		} else if (block.getType() != Material.AIR) { // non air added - add to dissolveable parts of arena
+			nonAir.add(loc);
+			return true;
+		}
+
+		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.beimax.simplespleef.game.floortracking.FloorBaseWorker#executeTick()
-	 */
 	@Override
 	public void executeTick() {
 		// get a random entry
 		Location location = getRandomEntry();
+		//System.out.println("Tick FloorDissolveWorker " + location);
 		if (location != null) {
 			Block block = location.getBlock();
 			// get old data
@@ -82,11 +67,11 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 			block.setType(Material.AIR);
 			block.setData((byte) 0);
 			nonAir.remove(location);				
-			// notify others
-			notifyTracker(block, oldType, oldData);
+			// notify others - and myself
+			game.trackersUpdateBlock(block, oldType, oldData);
 		}
 	}
-	
+
 	/**
 	 * picks a random entry from non-air set
 	 */
@@ -101,11 +86,5 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 		}
 		
 		return null; // if all locations have been dissolved
-	}
-
-	@Override
-	public void stopTracking() {
-		nonAir = null;
-		stop = true;
 	}
 }

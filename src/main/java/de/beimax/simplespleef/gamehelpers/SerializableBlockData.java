@@ -16,44 +16,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
-package de.beimax.simplespleef.util;
+package de.beimax.simplespleef.gamehelpers;
 
-import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-
-import de.beimax.simplespleef.game.Game;
+import java.io.Serializable;
 
 /**
- * @author mkalus Represents cube in the world - inspired by Cuboid plugin
+ * @author mkalus
+ * Keep block data of a cuboid for saving it to disk
  */
-public interface Cuboid {
+public class SerializableBlockData implements Serializable {
+	private static final long serialVersionUID = 8057033565492517528L;
+
 	/**
-	 * checks whether coordinates are within this cuboid
-	 * 
-	 * @param location
-	 * @return
+	 * type of block
 	 */
-	public boolean contains(Location location);
+	private int typeId;
+	/**
+	 * date value of block
+	 */
+	private byte data;
 	
 	/**
-	 * return array of serializable blocks
-	 * return serializable block data
-	 * @return
+	 * Constructor
+	 * @param typeId
+	 * @param data
 	 */
-	public SerializableBlockData[][][] getSerializedBlocks();
-	
+	public SerializableBlockData(int typeId, byte data) {
+		this.typeId = typeId;
+		this.data = data;
+	}
+
 	/**
-	 * restore array of serializable blocks
-	 * @param blockData
+	 * @return the typeId
 	 */
-	public void setSerializedBlocks(SerializableBlockData[][][] blockData);
-	
+	public int getTypeId() {
+		return typeId;
+	}
+
 	/**
-	 * retrieve a list of blocks from the cuboid that can be dug by a particular game
-	 * @param game
-	 * @return
+	 * @return the data
 	 */
-	public List<Block> getDiggableBlocks(Game game);
+	public byte getData() {
+		return data;
+	}
 }

@@ -16,24 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+
 package de.beimax.simplespleef.game;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -41,242 +52,82 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.util.Cuboid;
-import de.beimax.simplespleef.util.CuboidImpl;
-import de.beimax.simplespleef.util.CuboidWorldGuard;
+import de.beimax.simplespleef.gamehelpers.Cuboid;
+import de.beimax.simplespleef.gamehelpers.CuboidImpl;
+import de.beimax.simplespleef.gamehelpers.CuboidWorldGuard;
 
 /**
  * @author mkalus
- * Actual game handler - central part of the plugin
+ *
  */
-public class GameHandler {
+public class GameHandler implements Listener, Runnable {
 	/**
 	 * games array
 	 */
-	private Game[] games;
-	
-	/**
-	 * List of cuboids for arenas - help check arena protection
-	 */
-	private List<Cuboid> arenaCubes;
-	
-	/**
-	 * Constructor
-	 * @param plugin reference to plugin
-	 */
-	public GameHandler() {
-		updateGameHandlerData();
-	}
-	
+	private List<Game> games;
+
 	/**
 	 * Initialize game handler - mainly read arena cubes and update game data
 	 */
 	public void updateGameHandlerData() {
-		// define cubes as linked list
-		arenaCubes = new LinkedList<Cuboid>();
-		// get possible games
-		for (String game : getPossibleGames().keySet()) {
-			// game enabled?
-			if (!SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + game + ".enabled", false)) continue;
-			Cuboid cuboid = configToCuboid(game, "arena");
-			if (cuboid != null)
-				arenaCubes.add(cuboid); // add to list
-			else
-				SimpleSpleef.log.warning("[SimpleSpleef] Unable to load coordinates of arena for arena " + game + ". Maybe the arena is not finished yet, or its world was deleted.");
+		// recreate game list
+		games = new LinkedList<Game>();
+		// cycle through config to get arenas
+		Set<String> arenas = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas").getKeys(false);
+		for (String arena : arenas) { // have the game factory create game instances
+			String type = SimpleSpleef.getPlugin().getConfig().getString("arenas." + arena + ".type", "standard");
+			Game game = GameFactory.createGame(type, arena);
+			// define configuration section for this game
+			game.defineSettings(SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
+			// add game to list
+			games.add(game);
 		}
 	}
-	
-	/**
-	 * add a game
-	 * @param game
-	 * @return boolean if successful 
-	 */
-	public boolean addGame(Game game) {
-		if (games == null) {
-			games = new Game[1];
-			games[0] = game;
-		} else {
-			// copy array and add new game
-			Game[] newGames = new Game[games.length+1];
-			for (int i = 0; i < games.length; i++) {
-				if (games[i] == game || games[i].getId().equals(game.getId())) return false; // one cannot add the same game twice
-				newGames[i] = games[i];
-			}
-			games = newGames;
-			// add the new game, too
-			games[games.length-1] = game;
-		}
-		return true;
-	}
-	
-	/**
-	 * add a game by name
-	 * @param type
-	 * @return
-	 */
-	public boolean addGame(String type, String name) {
-		// let the factory handle the details
-		Game game = GameFactory.createGame(type, name);
-		if (game == null) return false; // no game created?
-		
-		return addGame(game); // add game
-	}
-	
-	/**
-	 * remove a game from the handler
-	 * @param game
-	 * @return
-	 */
-	public boolean removeGame(Game game) {
-		return removeGame(game.getId());
-	}
-	
-	/**
-	 * remove a game from the handler (by name)
-	 * @param game
-	 * @return
-	 */
-	public boolean removeGame(String game) {
-		if (games == null) return false;
-		// only one element left
-		if (games.length == 1) {
-			if (games[0].getId().equalsIgnoreCase(game)) {
-				games = null;
-				return true;
-			}
-			return false;
-		} 
-		// reduce array
-		Game[] newGames = new Game[games.length-1];
-		boolean found = false;
-		int pos = 0;
-		for (int i = 0; i < newGames.length; i++) {
-			if (games[i].getId().equalsIgnoreCase(game)) continue;
-			newGames[pos++] = games[i];
-		}
-		if (found) games = newGames;
-		return found;
-	}
 
 	/**
-	 * check, if a certain running game name exists
-	 * @param game name of game
-	 * @return
+	 * Heart of the game mechanic - the ticker
 	 */
-	public boolean gameExists(String game) {
-		return getGameByName(game)==null?false:true;
+	@Override
+	public void run() {
+		for (Game game : games) // cycle through games
+			game.tick(); // call tick
 	}
 
-	/**
-	 * return running game by name
-	 * @param game name of game
-	 * @return
-	 */
-	public Game getGameByName(String game) {
-		// no games present
-		if (this.games == null) return null;
-		// try to find game
-		for (int i = 0; i < this.games.length; i++)
-			if (this.games[i].getId().equalsIgnoreCase(game))
-				return this.games[i];
-		return null;
-	}
-
-	/**
-	 * check, if a certain game type or name exists generally
-	 * @param type
-	 * @return
-	 */
-	public boolean gameTypeOrNameExists(String type) {
-		Map<String, Boolean> arenas = getPossibleGames();
-		if (arenas == null) return false; // none - unlikely, but possible...
-		// cycle through possible games
-		for (Entry<String, Boolean> arena: arenas.entrySet()) {
-			if (arena.getKey().equalsIgnoreCase(type)) return true;
-		}
-
-		return false;
-	}
-	
-	/**
-	 * returns type of arena from game name
-	 * @param game
-	 * @return
-	 */
-	public String gameNameToType(String game) {
-		return SimpleSpleef.getPlugin().getConfig().getString("arenas." + game + ".type", "standard");
-	}
-
-	/**
-	 * Check if there are games on the server
-	 * @return
-	 */
-	public boolean hasGames() {
-		return games != null;
-	}
-	
 	/**
 	 * get list of games
 	 * @return List of games
 	 */
 	public List<Game> getGames() {
+		// clone list
 		LinkedList<Game> games = new LinkedList<Game>();
-		if (this.games == null) return games; // no games present?
 		for (Game game : this.games) {
 			games.add(game);
 		}
 		return games;
 	}
-
+	
 	/**
-	 * get list of games
-	 * @return List of games
+	 * return game by name
+	 * @param name of game
+	 * @return
 	 */
-	public List<String> getGameNames() {
-		LinkedList<String> games = new LinkedList<String>();
-		if (this.games == null) return games; // no games present?
-		for (Game game : this.games) {
-			games.add(game.getName());
+	public Game getGameByName(String name) {
+		for (Game game : games) {
+			if (game.getId().equalsIgnoreCase(name)) return game;
 		}
-		return games;
-	}
-
-	/**
-	 * get list of game ids
-	 * @return List of games
-	 */
-	public List<String> getGameIds() {
-		LinkedList<String> games = new LinkedList<String>();
-		if (this.games == null) return games; // no games present?
-		for (Game game : this.games) {
-			games.add(game.getId());
-		}
-		return games;
-	}
-
-	/**
-	 * get list of possible games
-	 * @return Map of arena names with a boolean for active/passive
-	 */
-	public Map<String, Boolean> getPossibleGames() {
-		Map<String, Boolean> map = new TreeMap<String, Boolean>(); // sorting is maintained
-		// get arenas from config and check if they are enabled
-		Set<String> arenas = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas").getKeys(false);
-		for (String arena : arenas) {
-			Boolean enabled = SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false);
-			map.put(arena, enabled);
-		}
-		return map;
+		return null;
 	}
 	
 	/**
-	 * check, if arena has been disabled
-	 * @param arena
+	 * check, if a certain game name exists
+	 * @param name of game
 	 * @return
 	 */
-	public boolean isArenaDisabled(String arena) {
-		arena = arena.toLowerCase();
-		return !SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".enabled", false);
+	public boolean gameExists(String name) {
+		for (Game game : games) {
+			if (game.getId().equalsIgnoreCase(name)) return true;
+		}
+		return false;
 	}
 
 	/**
@@ -286,89 +137,92 @@ public class GameHandler {
 	public String getDefaultArena() {
 		return SimpleSpleef.getPlugin().getConfig().getString("settings.defaultArena", "default");
 	}
-	
+
+	/**
+	 * checks whether the player is part of a game or not
+	 * @param player
+	 * @return Game the player is part of or null, if not
+	 */
+	public Game checkPlayerInGame(Player player) {
+		if (player == null) return null; // sanity check
+		for (Game checkGame :  games) {
+			if (checkGame.hasPlayer(player)) return checkGame;
+		}
+		return null;
+	}
+
+	/**
+	 * checks whether the player is watching a game or not
+	 * @param player
+	 * @return Game the player is part of or null, if not
+	 */
+	public Game checkSpectatorInGame(Player player) {
+		if (player == null) return null; // sanity check
+		for (Game checkGame :  games) {
+			if (checkGame.hasSpectator(player)) return checkGame;
+		}
+		return null;
+	}
+
+
+	/**
+	 * checks whether the player is either a spleefer or spectator of some game
+	 * @param sender
+	 * @param args
+	 * @param arena
+	 * @return
+	 */
+	public Game checkSpleeferOrSpectatorInGame(Player player) {
+		Game game = checkPlayerInGame(player);
+		if (game != null) return game;
+		game = checkSpectatorInGame(player);
+		return game;
+	}
+
 	/**
 	 * try to announce a new game in an arena
 	 * @param sender
-	 * @param arena
+	 * @param game
 	 * @return announced game or null
 	 */
-	public Game announce(CommandSender sender, String arena) {
-		Game game = getGameByName(arena);
-		// does the game exist already?
-		if (game != null) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaExistsAlready", "[ARENA]", game.getName()));
-			return null;
-		}
-		// check if game is disabled
-		if (isArenaDisabled(arena)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
-			return null;
-		}
-		game = createNewGame(arena);
-		// announce new game globally?
-		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceGame", true))
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(ChatColor.GOLD + SimpleSpleef.getPlugin().ll("broadcasts.announce", "[PLAYER]", sender.getName(), "[ARENA]", game.getName()));
-		else
-			sender.sendMessage(ChatColor.GOLD + SimpleSpleef.getPlugin().ll("feedback.announce", "[ARENA]", game.getName()));
-		return game;
+	public void announce(CommandSender sender, Game game) {
+		game.announce(sender);
 	}
-	
+
 	/**
 	 * try to join a game in an arena
 	 * @param sender
-	 * @param arena
+	 * @param game
 	 */
-	public void join(CommandSender sender, String arena) {
-		arena = arena.toLowerCase();
-		Game game = getGameByName(arena);
+	public void join(CommandSender sender, Game game) {
 		Player player = (Player) sender; // cast to player
-		// does the game not exist?
-		if (game == null) {
-			// check if game is disabled
-			if (isArenaDisabled(arena)) {
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
-				return;
-			}
-			// do players have the right to join unstarted games?
-			if (SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".announceOnJoin", true))
-				game = announce(sender, arena);
-			else { // tell player that he may not announce game
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.announceBeforeJoin", "[ARENA]", arena));
-				return;
-			}
+		// check, if player has already joined another game
+		Game checkDouble = checkPlayerInGame(player);
+		if (checkDouble != null && checkDouble != game) { // player already joined another arena?
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.joinDouble", "[ARENA]", checkDouble.getName()));
+			return;	
 		}
-		// player already joined another arena?
-		Game checkGame = checkPlayerInGame(player);
-		if (checkGame != null) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.joinDouble", "[ARENA]", checkGame.getName()));
-			return;			
-		} else checkGame = null;
-		// ok, try to join the game itself...
-		if (!game.join(player)) return;
-		// now we announce the joining of the player...
-		String broadcastMessage = ChatColor.GREEN + SimpleSpleef.getPlugin().ll("broadcasts.join", "[PLAYER]", sender.getName(), "[ARENA]", game.getName());
-		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) { // broadcast
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage);
-		} else { // player only
-			sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.join", "[ARENA]", game.getName()));
-			game.sendMessage(broadcastMessage, player); // notify players and spectators
-		}
-	}
 
+		// join game - if something does not work as expected, return and ignore the rest
+		if (!game.join(player)) return;
+
+		// player already spectator in another arena?
+		checkDouble = checkSpectatorInGame(player);
+		if (checkDouble != null) // remove spectator from game on joining
+			checkDouble.removeSpectator(player);
+	}
+	
 	/**
 	 * Attempt to join a team (spleefers only)
 	 * @param sender
 	 * @param team team name
 	 */
 	public void team(CommandSender sender, String team) {
-		// only senders in a game may start a game
-		Player player = (Player) sender; // cast to player
-		// find player in arena
-		Game checkGame = checkPlayerInGame(player);
-		if (checkGame != null) checkGame.team(player, team);
-		// sender not part of any game
-		else sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNoGame"));		
+		// find player's game
+		Game game = checkPlayerInGame((Player) sender);
+		if (game == null)
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.teamNoGame"));
+		else game.team((Player) sender, team);
 	}
 	
 	/**
@@ -376,163 +230,175 @@ public class GameHandler {
 	 * @param sender
 	 */
 	public void ready(CommandSender sender) {
-		// only senders in a game may start a game
-		Player player = (Player) sender; // cast to player
-		// find player in arena
-		Game checkGame = checkPlayerInGame(player);
-		if (checkGame != null) checkGame.ready(player, false);
-		// sender not part of any game
-		else sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.readyNoGame"));		
+		// find player's game
+		Game game = checkPlayerInGame((Player) sender);
+		if (game == null)
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.readyNoGame"));
+		else game.ready((Player) sender, false);
 	}
-
+	
 	/**
 	 * Attempt to start a game (spleefers only)
 	 * @param sender
 	 */
 	public void start(CommandSender sender) {
-		// only senders in a game may start a game
-		Player player = (Player) sender; // cast to player
-		// find player in arena
-		Game checkGame = checkPlayerInGame(player);
-		if (checkGame != null) {
-			String arena = checkGame.getId();
-			//is config "spleeferStart" of arena is set to true? - isJoinable added to avoid error message and let game do this instead
-			if (checkGame.isReady() && !SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + arena + ".spleeferStart", true))
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.startNoSpleefer", "[ARENA]", checkGame.getName()));
-			else // spleeferStart is true: attempt to start countdown
-				countdown(sender, arena);
-			return;
-		}
-		// sender not part of any game
-		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.start"));
+		// find player's game
+		Game game = checkPlayerInGame((Player) sender);
+		if (game == null) // sender not part of any game
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.start"));
+		else game.countdown(sender);
 	}
-
+	
 	/**
 	 * Attempt to start countdown of a game
 	 * @param sender
-	 * @param arena (may be null)
+	 * @param game (may be null)
 	 */
-	public void countdown(CommandSender sender, String arena) {
-		arena = arena.toLowerCase();
-		Game game = getGameByName(arena);
-		// does the game not exist?
-		if (game == null) {
-			// check if game is disabled
-			if (isArenaDisabled(arena)) {
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.arenaDisabled", "[ARENA]", arena));
-				return;
-			}
-			// game not announced yet...
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noGameAnnounced", "[ARENA]", arena));
-			return;
-		}
+	public void countdown(CommandSender sender, Game game) {
 		// start countdown for game
 		game.countdown(sender);
 	}
+	
 
 	/**
 	 * Attempt to leave a game (spleefers only)
 	 * @param sender
 	 */
 	public void leave(CommandSender sender) {
-		Player player;
-		try {
-			player = (Player) sender; // cast to player
-		} catch (Exception e) { // handle possible cast error
-			sender.sendMessage(ChatColor.DARK_RED + "Internal error while leaving game. CommandSender has to be player object if arena is null!");
-			return;
-		}
-		if (player == null) {
-			sender.sendMessage(ChatColor.DARK_RED + "Internal error while leaving game. Player was null!");
-			return;			
-		}
-		// player part of an active game or he/she is a spectator?
-		Game game = checkPlayerInGame(player);
-		if (game == null) game = checkSpectatorInGame(player);
-		if (game != null) {
-			game.leave(player);
-		} else
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.leave"));
+		// find player's game
+		Game game = checkPlayerInGame((Player) sender);
+		if (game == null)  // sender not part of any game
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.leave"));
+		else game.leave((Player) sender);
 	}
-
+	
 	/**
 	 * Attempt to stop a game
 	 * @param sender
 	 */
 	public void stop(CommandSender sender) {
-		// only senders in a game may start a game
-		Player player = (Player) sender; // cast to player
-		// find player in arena
-		Game checkGame = checkPlayerInGame(player);
-		if (checkGame != null) {
-			checkGame.stop(player); // stop game
-		} else //print error, since player not part of a game
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.stopNoPlaying"));
+		// find player's game
+		Game game = checkPlayerInGame((Player) sender);
+		if (game == null)  // sender not part of any game
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.stopNoPlaying"));
+		else game.stop((Player) sender);
 	}
-
+	
 	/**
 	 * Attempt to delete a game
 	 * @param sender
-	 * @param arena (may be null)
+	 * @param game (may be null)
 	 */
-	public void delete(CommandSender sender, String arena) {
-		Game game;
-		// if arena is null, get it from sender
-		if (arena == null) {
-			Player player;
-			try {
-				player = (Player) sender; // cast to player
-			} catch (Exception e) { // handle possible cast error
-				sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
-				return;
-			}
-			game = checkPlayerInGame(player);
-			if (game == null) {
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.deleteNoPlaying"));
-				return;
-			}
-		} else { // otherwise try to get arena by name
-			game = getGameByName(arena);
-			if (game == null) { // print error, arena was not found
-				sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
-				return;
-			}
-		}
+	public void delete(CommandSender sender, Game game) {
 		game.delete(sender); // delete game
 	}
-
+	
 	/**
 	 * Attempt to watch a game
 	 * @param sender
-	 * @param arena (may not be null)
+	 * @param game (may not be null)
 	 */
-	public void watch(CommandSender sender, String arena) {
-		Player player;
-		try {
-			player = (Player) sender; // cast to player
-		} catch (Exception e) { // handle possible cast error
-			sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
-			return;
-		}
+	public void watch(CommandSender sender, Game game) {
+		// find player's game - check doubles
+		Game otherGame = checkPlayerInGame((Player) sender);
 		// player part of an active game?
-		Game game = checkPlayerInGame(player);
-		if (game != null) { // part of a game - may not spectate
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchDouble", "[ARENA]", game.getName()));
+		if (otherGame != null) { // part of a game - may not spectate
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.watchDouble", "[ARENA]", game.getName()));
 			return;
 		}
-		if (!gameTypeOrNameExists(arena)) { // print error, arena was not found
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
-			return;
-		}
-		Game activeGame = getGameByName(arena);
-		if (activeGame == null) { // game is not active
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.watchNoGame", "[ARENA]", arena));
-			return;
-		}
-		// ok, player not in active game, game exists, let's watch!
-		activeGame.watch(player); // attempt to watch game
+		game.watch((Player) sender); // attempt to watch game
 	}
 
+	/**
+	 * lists all the arenas in the game
+	 * @param sender
+	 */
+	public void arenas(CommandSender sender) {
+		//TODO: info if there are no games at all
+
+		// cycle through possible games
+		for (Game game: getGames()) {
+			// color and information on game
+			ChatColor color;
+			// name of arena
+			String fullName = game.getName(); // name of arena
+			String information;
+			if (game.isEnabled() == false) {
+				color = ChatColor.DARK_GRAY; // arena has been disabled in the the config
+				information = SimpleSpleef.ll("feedback.arenaDisabled");
+			} else if (!game.isActive()) {
+				color = ChatColor.GRAY; // not an active game
+				information = null; // no information
+			} else { // is it an active game?
+				// game active or still joinable?
+				if (game.isJoinable() || game.isReady()) {
+					color = ChatColor.GREEN; // joinable
+					information = SimpleSpleef.ll("feedback.arenaJoinable");
+				}
+				else {
+					color = ChatColor.LIGHT_PURPLE; // not joinable - because running
+					information = SimpleSpleef.ll("feedback.arenaInProgress");
+				}
+				// ok, gather some more information on the game to display
+				information = information + " " + game.getNumberOfPlayers();
+			}
+			// create feedback
+			StringBuilder builder = new StringBuilder();
+			builder.append(color).append(game.getId());
+			if (information != null) builder.append(ChatColor.GRAY).append(" - ").append(information);
+			if (fullName != null && !fullName.equalsIgnoreCase(game.getId()))
+				builder.append(ChatColor.GRAY).append(" (").append(fullName).append(')');
+			sender.sendMessage(builder.toString());
+		}
+	}
+
+	/**
+	 * Show information
+	 * @param sender
+	 * @param game
+	 */
+	public void info(CommandSender sender, Game game) {
+		//TODO: info if there are no games at all
+		
+		// ok, define information on arena and print it
+		sender.sendMessage(SimpleSpleef.ll("feedback.infoHeader", "[ARENA]", ChatColor.DARK_AQUA + game.getId()));
+		// full name of arena
+		sender.sendMessage(SimpleSpleef.ll("feedback.infoName", "[NAME]", ChatColor.DARK_AQUA + game.getName()));
+		// status of arena
+		String information;
+		ChatColor color;
+		if (game.isActive()) { // game running
+			if (game.isJoinable() || game.isReady()) {
+				information = SimpleSpleef.ll("feedback.arenaJoinable");
+				color = ChatColor.GREEN;
+			} else {
+				information = SimpleSpleef.ll("feedback.arenaInProgress");
+				color = ChatColor.LIGHT_PURPLE;
+			}
+			// ok, gather some more information on the game to display
+			information = information + " " + game.getNumberOfPlayers();
+		} else if (game.isEnabled()) {
+			information = SimpleSpleef.ll("feedback.arenaOff");
+			color = ChatColor.GRAY;
+		} else {
+			information = SimpleSpleef.ll("feedback.arenaDisabled");
+			color = ChatColor.DARK_GRAY;
+		}
+		sender.sendMessage(SimpleSpleef.ll("feedback.infoStatus", "[STATUS]", color + information));
+		// list of spleefers and spectators
+		game.printGamePlayersAndSpectators(sender);
+	}
+	
+	/**
+	 * List spleefers in arena
+	 * @param sender
+	 * @param game
+	 */
+	public void list(CommandSender sender, Game game) {
+		// list of spleefers and spectators
+		game.printGamePlayersAndSpectators(sender);
+	}
+	
 	/**
 	 * Attempt to teleport back to original position
 	 * @param sender
@@ -542,7 +408,7 @@ public class GameHandler {
 		try {
 			player = (Player) sender; // cast to player
 		} catch (Exception e) { // handle possible cast error
-			sender.sendMessage(ChatColor.DARK_RED + "Internal error while deleting game. CommandSender has to be player object if arena is null!");
+			sender.sendMessage(ChatColor.DARK_RED + "Internal error while issuing back command. CommandSender has to be player object if arena is null!");
 			return;
 		}
 		// check, if player is spleefer or spectator
@@ -554,91 +420,13 @@ public class GameHandler {
 			Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
 			if (originalLocation != null) {
 				player.teleport(originalLocation);
-				player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.back"));
+				player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.back"));
 			} else {
-				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.backNoLocation"));
+				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.backNoLocation"));
 			}
 		}
 	}
 
-	/**
-	 * checks whether the player is part of a game or not
-	 * @param player
-	 * @return Game the player is part of or null, if not
-	 */
-	public Game checkPlayerInGame(Player player) {
-		if (player == null) return null; // sanity check
-		for (Game checkGame :  getGames()) {
-			if (checkGame.hasPlayer(player)) return checkGame;
-		}
-		return null;
-	}
-	
-	/**
-	 * checks whether the player is watching a game or not
-	 * @param player
-	 * @return Game the player is part of or null, if not
-	 */
-	public Game checkSpectatorInGame(Player player) {
-		if (player == null) return null; // sanity check
-		for (Game checkGame :  getGames()) {
-			if (checkGame.hasSpectator(player)) return checkGame;
-		}
-		return null;
-	}
-	
-	/**
-	 * helper to create new game and add it automatically to list
-	 * @param arena
-	 * @return new game added
-	 */
-	protected Game createNewGame(String arena) {
-		// get type of arena
-		String type = gameNameToType(arena);
-		Game game = GameFactory.createGame(type, arena);
-		// define configuration section for this game
-		game.defineSettings(SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
-		// add game to list
-		addGame(game);
-		// return newly created game
-		return game;
-	}
-
-	/**
-	 * check block breaks in- and outside of game
-	 * @param event
-	 */
-	public void checkBlockBreak(BlockBreakEvent event) {
-		Player player = event.getPlayer();
-		// check if player is a spleefer or not
-		Game game = checkPlayerInGame(player);
-		if (game != null) { // game is spleefer!
-			//send block break to game
-			game.onBlockBreak(event);
-		} else if (inProtectedArenaCube(event.getBlock())) {
-			// cancel event
-			event.setCancelled(true);
-			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noDig"));
-		}
-	}
-	
-	/**
-	 * check block placement in- and outside of game
-	 * @param event
-	 */
-	public void checkBlockPlace(BlockPlaceEvent event) {
-		Player player = event.getPlayer();
-		// check if player is a spleefer or not
-		Game game = checkPlayerInGame(player);
-		if (game != null) { // game is spleefer!
-			//send block place to game
-			game.onBlockPlace(event);
-		} else if (inProtectedArenaCube(event.getBlock())) {
-			// cancel event
-			event.setCancelled(true);
-			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.noPlacement"));
-		}
-	}
 	
 	/**
 	 * create a cuboid from a section
@@ -687,46 +475,7 @@ public class GameHandler {
 					(firstX>secondX?firstX:secondX), (firstY>secondY?firstY:secondY), (firstZ>secondZ?firstZ:secondZ));
 		}
 	}
-	
-	/**
-	 * Check if a block is in protected arena
-	 * @param block
-	 * @return
-	 */
-	public boolean inProtectedArenaCube(Block block) {
-		if (arenaCubes == null) return false;
-		Location blockLoc = block.getLocation();
-		// check position in each cube
-		for (Cuboid cuboid : arenaCubes)
-			if (cuboid.contains(blockLoc)) return true; // in protected cube!
-		
-		return false;
-	}
 
-	/**
-	 * reload the configuration of the games
-	 */
-	public void reloadConfig() {
-		// update game handler data
-		updateGameHandlerData();
-		// iterate through active games
-		for (Game game : getGames()) {
-			// redefine settings
-			game.defineSettings(SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + game.getId()));
-		}
-	}
-
-	/**
-	 * called by a game that has ended
-	 * @param game
-	 */
-	public void gameOver(Game game) {
-		// call cleaning routine of game
-		game.clean();
-		// remove game from active list
-		removeGame(game);
-	}
-	
 	/**
 	 * get a world guard instance if it exists - see http://wiki.sk89q.com/wiki/WorldGuard/Regions/API for source
 	 * @return
@@ -740,5 +489,173 @@ public class GameHandler {
 	    }
 	 
 	    return (WorldGuardPlugin) plugin;
+	}
+	
+	
+	/**
+	 * Catch block breaks
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOW)
+	public void onBlockBreak(BlockBreakEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onBlockBreak(event);
+		}
+	}
+
+	/**
+	 * Catch block placements
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOW)
+	public void onBlockPlace(BlockPlaceEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onBlockPlace(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onEntityDeath(EntityDeathEvent event) {
+		if (!(event.getEntity() instanceof Player)) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerDeath((Player) event.getEntity());
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (event.isCancelled() || !(event.getEntity() instanceof Player)) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onFoodLevelChange(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onEntityDamage(EntityDamageEvent event) {
+		if (event.isCancelled() || !(event.getEntity() instanceof Player)) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onEntityDamage(event);
+		}
+	}
+
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onEntityExplode(EntityExplodeEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onEntityExplode(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerJoin(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerKick(PlayerKickEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerKick(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerQuit(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerMove(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOW)
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerInteract(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerTeleport(event);
+		}
+	}
+	
+	/**
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		if (event.isCancelled()) return;
+		
+		// pass event to games
+		for (Game game : games) {
+			game.onPlayerGameModeChange(event);
+		}
 	}
 }

@@ -16,11 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
-package de.beimax.simplespleef.admin;
+package de.beimax.simplespleef.command;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -36,10 +34,9 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
 import de.beimax.simplespleef.game.Game;
+import de.beimax.simplespleef.gamehelpers.LocationHelper;
 import de.beimax.simplespleef.util.ConfigHelper;
-import de.beimax.simplespleef.util.LocationHelper;
 
 /**
  * @author mkalus
@@ -131,7 +128,7 @@ public class SimpleSpleefAdmin {
 		} else if (adminCommand.equals("reload")) {
 			reloadConfig(sender);
 		} else // unknown command feedback
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownCommand", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownCommand", "[COMMAND]", adminCommand));
 		
 		// should arena definition be checked?
 		if (checkArena) checkArena(sender);
@@ -147,7 +144,7 @@ public class SimpleSpleefAdmin {
 	protected boolean checkThreeArgs(CommandSender sender, String[] args, String adminCommand) {
 		// check argument length
 		if (args.length != 3) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
 			return false;
 		}
 		return true;
@@ -163,7 +160,7 @@ public class SimpleSpleefAdmin {
 	protected boolean checkFourArgs(CommandSender sender, String[] args, String adminCommand) {
 		// check argument length
 		if (args.length < 4) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.twoArguments", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.twoArguments", "[COMMAND]", adminCommand));
 			return false;
 		}
 		// more than four arguments -> reduce number three
@@ -195,7 +192,7 @@ public class SimpleSpleefAdmin {
 				 || spawn.equals("lose") || spawn.equals("red") || spawn.equals("blue") || spawn.equals("winner"))
 			return true;
 		// error feedback
-		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgumentSpawn"));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.oneArgumentSpawn"));
 		return false;		
 	}
 	
@@ -209,12 +206,12 @@ public class SimpleSpleefAdmin {
 	protected boolean checkThirdAB(CommandSender sender, String[] args,
 			String adminCommand) {
 		if (args.length != 3) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.oneArgument", "[COMMAND]", adminCommand));
 			return false;
 		}
 		
 		if (args[2].equalsIgnoreCase("a") || args[2].equalsIgnoreCase("b")) return true;
-		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.aOrB", "[COMMAND]", adminCommand));
+		sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.aOrB", "[COMMAND]", adminCommand));
 		return false;
 	}
 
@@ -224,7 +221,7 @@ public class SimpleSpleefAdmin {
 	 */
 	protected void helpCommand(CommandSender sender) {
 		// get help lines
-		String[] lines = SimpleSpleef.getPlugin().ll("admin.help").split("\n");
+		String[] lines = SimpleSpleef.ll("admin.help").split("\n");
 		for (String line : lines)
 			SimpleSpleefCommandExecutor.printCommandString(sender, line);
 	}
@@ -235,17 +232,16 @@ public class SimpleSpleefAdmin {
 	 * @param sender
 	 */
 	protected void selectedCommand(CommandSender sender) {
-		// get all possible games
-		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();
 		// get selected arena
 		String selected = getSelectedArena(sender);
-		for (Entry<String, Boolean> arena: arenas.entrySet()) {
-			sender.sendMessage((arena.getValue()?ChatColor.DARK_BLUE:ChatColor.GRAY) + arena.getKey() + (selected.equals(arena.getKey())?ChatColor.WHITE + " *":""));
+		// show selected
+		for (Game game : SimpleSpleef.getGameHandler().getGames()) {
+			sender.sendMessage((game.isEnabled()?ChatColor.DARK_BLUE:ChatColor.GRAY) + game.getId() + (selected.equals(game.getId())?ChatColor.WHITE + " *":""));
 		}
 	}
 	
 	/**
-	 * Add an arena
+	 * Set active arena
 	 * @param sender
 	 * @param arena
 	 */
@@ -253,15 +249,15 @@ public class SimpleSpleefAdmin {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// check arena existence
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(id)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		if (!SimpleSpleef.getGameHandler().gameExists(id)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return;
 		}
 
 		// set new default arena
 		setSelectedArena(sender, id);
 		// feedback
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.setarena", "[ARENA]", id));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.setarena", "[ARENA]", id));
 	}
 
 	/**
@@ -270,13 +266,11 @@ public class SimpleSpleefAdmin {
 	 * @param arena
 	 */
 	protected void addarenaCommand(CommandSender sender, String arena) {
-		// get all possible games
-		Map<String, Boolean> arenas = SimpleSpleef.getGameHandler().getPossibleGames();
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// check if arena exists already
-		if (arenas.get(id) != null) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.addarenaArenaExists", "[ARENA]", arena));
+		if (SimpleSpleef.getGameHandler().gameExists(id)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.addarenaArenaExists", "[ARENA]", arena));
 			return;
 		}
 		// create new arena entry in config
@@ -288,7 +282,7 @@ public class SimpleSpleefAdmin {
 		// set default arena
 		setSelectedArena(sender, arena);
 		// feedback to user
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.addarena", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.addarena", "[ARENA]", arena));
 	}
 
 	/**
@@ -300,8 +294,8 @@ public class SimpleSpleefAdmin {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// does arena exist?
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(id)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", id));
+		if (!SimpleSpleef.getGameHandler().gameExists(id)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", id));
 			return;
 		}
 
@@ -315,7 +309,7 @@ public class SimpleSpleefAdmin {
 		SimpleSpleef.getPlugin().saveConfig();
 
 		// feedback to user
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.delarena", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.delarena", "[ARENA]", arena));
 	}
 
 	/**
@@ -327,7 +321,7 @@ public class SimpleSpleefAdmin {
 	protected void defineArenaPoint(CommandSender sender, String aOrB,
 			String adminCommand) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
 			return;
 		}
 		
@@ -338,8 +332,8 @@ public class SimpleSpleefAdmin {
 		// get player location and arena
 		String arena = getSelectedArena(sender);
 		//check arena existence
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		if (!SimpleSpleef.getGameHandler().gameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return;
 		}
 
@@ -360,7 +354,7 @@ public class SimpleSpleefAdmin {
 		SimpleSpleef.getPlugin().saveConfig();
 		
 		// feedback to player
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineArenaPoint", "[ARENA]", arena, "[POINT]", aOrB, "[SECTION]", adminCommand));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.defineArenaPoint", "[ARENA]", arena, "[POINT]", aOrB, "[SECTION]", adminCommand));
 	}
 
 	/**
@@ -371,7 +365,7 @@ public class SimpleSpleefAdmin {
 	protected void defineArenaPointWorldEdit(CommandSender sender,
 			String adminCommand) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
 			return;
 		}
 		// correct case
@@ -383,8 +377,8 @@ public class SimpleSpleefAdmin {
 		// get player location and arena
 		String arena = getSelectedArena(sender);
 		//check arena existence
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		if (!SimpleSpleef.getGameHandler().gameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return;
 		}
 
@@ -393,7 +387,7 @@ public class SimpleSpleefAdmin {
 		try {
 			region = session.getSelection(session.getSelectionWorld());
 		} catch (Exception e) { // error in selection
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.worldEditRegion"));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.worldEditRegion"));
 			return;
 		}
 		// get minimum and maximum vectors
@@ -403,7 +397,7 @@ public class SimpleSpleefAdmin {
 		World world = SimpleSpleef.getPlugin().getServer().getWorld(region.getWorld().getName());
 		// sanity check
 		if (world == null || minP == null || maxP == null) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("adminerrors.worldEditRegion"));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.worldEditRegion"));
 			return;			
 		}
 
@@ -425,7 +419,7 @@ public class SimpleSpleefAdmin {
 		SimpleSpleef.getPlugin().saveConfig();
 
 		// feedback to player
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineArenaPointWorldEdit", "[ARENA]", arena, "[SECTION]", adminCommand));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.defineArenaPointWorldEdit", "[ARENA]", arena, "[SECTION]", adminCommand));
 	}
 
 	/**
@@ -437,7 +431,7 @@ public class SimpleSpleefAdmin {
 	protected void defineSpawnPoint(CommandSender sender, String spawn,
 			String adminCommand) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.notAPlayer", "[PLAYER]", sender.getName()));
 			return;
 		}
 		
@@ -448,8 +442,8 @@ public class SimpleSpleefAdmin {
 		// get player location and arena
 		String arena = getSelectedArena(sender);
 		// check arena existence
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		if (!SimpleSpleef.getGameHandler().gameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return;
 		}
 
@@ -463,7 +457,7 @@ public class SimpleSpleefAdmin {
 		SimpleSpleef.getPlugin().saveConfig();
 		
 		// feedback to player
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.defineSpawnPoint", "[ARENA]", arena, "[SPAWN]", spawn));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.defineSpawnPoint", "[ARENA]", arena, "[SPAWN]", spawn));
 	}
 
 	/**
@@ -471,7 +465,7 @@ public class SimpleSpleefAdmin {
 	 */
 	protected void checkArena(CommandSender sender) {
 		// reload the configuration of everything
-		SimpleSpleef.getGameHandler().reloadConfig();
+		SimpleSpleef.getGameHandler().updateGameHandlerData();
 	}
 	
 	/**
@@ -480,7 +474,7 @@ public class SimpleSpleefAdmin {
 	 */
 	protected void reloadConfig(CommandSender sender) {
 		SimpleSpleef.getPlugin().reloadSimpleSpleefConfiguration();
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.reload"));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.reload"));
 	}
 
 	/**
@@ -491,13 +485,13 @@ public class SimpleSpleefAdmin {
 	 */
 	protected boolean enableArena(CommandSender sender, String arena) {
 		// does arena exist?
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		if (!SimpleSpleef.getGameHandler().gameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return false;
 		}
 		// enable arena
 		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", true);
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.enable", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.enable", "[ARENA]", arena));
 		return true;
 	}
 
@@ -509,13 +503,13 @@ public class SimpleSpleefAdmin {
 	 */
 	protected boolean disableArena(CommandSender sender, String arena) {
 		// does arena exist?
-		if (!SimpleSpleef.getGameHandler().gameTypeOrNameExists(arena)) {
-			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.unknownArena", "[ARENA]", arena));
+		if (!SimpleSpleef.getGameHandler().gameExists(arena)) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return false;
 		}
 		// disable arena
 		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", false);
-		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("adminfeedback.disable", "[ARENA]", arena));
+		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.disable", "[ARENA]", arena));
 		return true;
 	}
 

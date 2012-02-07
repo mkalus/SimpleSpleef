@@ -21,6 +21,10 @@ package de.beimax.simplespleef.command;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
 
@@ -28,7 +32,7 @@ import de.beimax.simplespleef.SimpleSpleef;
  * @author mkalus
  * Execute sign commands
  */
-public class SimpleSpleefSignCommandExecutor {
+public class SimpleSpleefSignCommandExecutor implements Listener {
 	/**
 	 * main method of the class - takes a player and a clicked sign (to be analyzed and possibly executed)
 	 * @param player
@@ -77,5 +81,21 @@ public class SimpleSpleefSignCommandExecutor {
 		if (sign.getLine(0) == null || !sign.getLine(0).equals(signsFirstLine)) return false; // nope
 		// yes!
 		return true;
+	}
+	
+	/**
+	 * listens to sign events
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		// clicked on a sign and signs enabled?
+		if (event.getPlayer() != null && event.getClickedBlock() != null && event.getClickedBlock().getState() instanceof Sign && SimpleSpleef.getPlugin().getConfig().getBoolean("settings.enableSigns", true)) {
+			// only right click allowed?
+			boolean signsOnlyRightClick = SimpleSpleef.getPlugin().getConfig().getBoolean("settings.signsOnlyRightClick", false);
+			if (!signsOnlyRightClick || (signsOnlyRightClick && event.getAction() == Action.RIGHT_CLICK_BLOCK))
+				// let the sign command executor do the rest
+				parseSimpleSpleefSign(event.getPlayer(), (Sign)event.getClickedBlock().getState());
+		}
 	}
 }

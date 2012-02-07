@@ -1,6 +1,22 @@
 /**
+ * This file is part of the SimpleSpleef bukkit plugin.
+ * Copyright (C) 2011 Maximilian Kalus
+ * See http://dev.bukkit.org/server-mods/simple-spleef/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
- */
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ **/
+
 package de.beimax.simplespleef.game;
 
 import java.util.LinkedList;
@@ -14,8 +30,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.util.LocationHelper;
-import de.beimax.simplespleef.util.MaterialHelper;
+import de.beimax.simplespleef.gamehelpers.LocationHelper;
+import de.beimax.simplespleef.gamehelpers.MaterialHelper;
 
 /**
  * @author mkalus
@@ -29,12 +45,12 @@ public class GameWithTeams extends GameStandard {
 	public GameWithTeams(String name) {
 		super(name);
 	}
-	
+
 	@Override
 	public String getType() {
 		return "randomteams";
 	}
-	
+
 	@Override
 	public String getNumberOfPlayers() {
 		// if in progress - tell about teams
@@ -57,7 +73,7 @@ public class GameWithTeams extends GameStandard {
 		// no spleefers - return null
 		if (spleefers == null || spleefers.size() == 0) return null;
 		// create list of spleefers
-		String comma = SimpleSpleef.getPlugin().ll("feedback.infoComma");
+		String comma = SimpleSpleef.ll("feedback.infoComma");
 		StringBuilder builder = new StringBuilder();
 		for (int team = Spleefer.TEAM_RED; team >= Spleefer.TEAM_NONE; team--) {
 			// color
@@ -69,8 +85,8 @@ public class GameWithTeams extends GameStandard {
 			}
 
 			// append team
-			builder.append(SimpleSpleef.getPlugin().ll("feedback.infoTeam",
-					"[TEAM]", teamColor + SimpleSpleef.getPlugin().ll("feedback.team" + Spleefer.getTeamId(team)) + ChatColor.WHITE)).append(' ');
+			builder.append(SimpleSpleef.ll("feedback.infoTeam",
+					"[TEAM]", teamColor + SimpleSpleef.ll("feedback.team" + Spleefer.getTeamId(team)) + ChatColor.WHITE)).append(' ');
 			int i = 0;
 			for (Spleefer spleefer : spleefers.get()) {
 				if (i > 0) builder.append(comma);  // no ands here...
@@ -99,12 +115,12 @@ public class GameWithTeams extends GameStandard {
 
 		// no teams during gaming
 		if (!isJoinable()) {
-			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamAlreadyStarted", "[ARENA]", getName()));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.teamAlreadyStarted", "[ARENA]", getName()));
 			return false;
 		}
 		// is team command disallowed in the arena?
 		if (!configuration.getBoolean("teamCommand", true)) {
-			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNoTeamCommand", "[ARENA]", getName()));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.teamNoTeamCommand", "[ARENA]", getName()));
 			return false;
 		}
 		// parse team string
@@ -112,24 +128,24 @@ public class GameWithTeams extends GameStandard {
 		if (team.equalsIgnoreCase("red")) teamId = Spleefer.TEAM_RED;
 		else if (team.equalsIgnoreCase("blue")) teamId = Spleefer.TEAM_BLUE;
 		else { // no valid team name
-			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamNoValidTeam", "[NAME]", team));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.teamNoValidTeam", "[NAME]", team));
 			return false;			
 		}
 		// localize team name
-		String teamName = SimpleSpleef.getPlugin().ll("feedback." + Spleefer.getTeamId(teamId));
+		String teamName = SimpleSpleef.ll("feedback." + Spleefer.getTeamId(teamId));
 		
 		// is the player already part of this team?
 		if (spleefer.getTeam() == teamId) {
-			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.getPlugin().ll("errors.teamAlreadyInTeam", "[TEAM]", teamName));
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.teamAlreadyInTeam", "[TEAM]", teamName));
 			return false;
 		}
 
 		// clear: join the team
 		spleefer.setTeam(teamId);
-		player.sendMessage(ChatColor.GREEN + SimpleSpleef.getPlugin().ll("feedback.team", "[TEAM]", teamName));
+		player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.team", "[TEAM]", teamName));
 
 		// broadcast message of somebody joining a team
-		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.getPlugin().ll("broadcasts.team", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName(), "[TEAM]", teamName);
+		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.ll("broadcasts.team", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName(), "[TEAM]", teamName);
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceTeam", false)) {
 			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
 		} else {
@@ -207,11 +223,11 @@ public class GameWithTeams extends GameStandard {
 		else { // winning team
 			broadcastKey = ""; // just winTeam
 			// get winning team
-			team = SimpleSpleef.getPlugin().ll("feedback.team" + Spleefer.getTeamId(winners.getFirst().getTeam()));
+			team = SimpleSpleef.ll("feedback.team" + Spleefer.getTeamId(winners.getFirst().getTeam()));
 			replacePlayer = SpleeferList.getPrintablePlayerList(winners);
 		}
 		// broadcast message
-		String broadcastMessage = ChatColor.GOLD + SimpleSpleef.getPlugin().ll("broadcasts.winTeam" + broadcastKey, "[PLAYER]", replacePlayer, "[ARENA]", getName(), "[TEAM]", team);
+		String broadcastMessage = ChatColor.GOLD + SimpleSpleef.ll("broadcasts.winTeam" + broadcastKey, "[PLAYER]", replacePlayer, "[ARENA]", getName(), "[TEAM]", team);
 		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));		
 	}
 
@@ -259,10 +275,15 @@ public class GameWithTeams extends GameStandard {
 		for (Spleefer spleefer : redTeam) spleefer.setTeam(Spleefer.TEAM_RED);
 
 		// broadcast message of player teams, so everyone knows this...
-		String broadcastMessage = ChatColor.WHITE + SimpleSpleef.getPlugin().ll("broadcasts.teams", "[TEAMS]", getListOfSpleefers());
+		String broadcastMessage = ChatColor.WHITE + SimpleSpleef.ll("broadcasts.teams", "[TEAMS]", getListOfSpleefers());
 		sendMessage(broadcastMessage, SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceTeam", false));
 	}
 	
+	/**
+	 * even out the teams
+	 * @param smaller
+	 * @param larger
+	 */
 	protected void evenOutTeamLists(LinkedList<Spleefer> smaller, LinkedList<Spleefer> larger) {
 		// if the size difference is 1, ignore evening out - also ignore 1 member teams
 		if (larger.size()-1 == smaller.size() || larger.size() <= 1) return;

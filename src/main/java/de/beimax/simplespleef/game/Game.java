@@ -16,21 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+
 package de.beimax.simplespleef.game;
 
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.trackers.Tracker;
 
 /**
  * @author mkalus
@@ -40,11 +48,12 @@ public abstract class Game {
 	/**
 	 * game status constants
 	 */
-	protected static final int STATUS_NEW = 1;
-	protected static final int STATUS_READY = 2;
-	protected static final int STATUS_COUNTDOWN = 3;
-	protected static final int STATUS_STARTED = 4;
-	protected static final int STATUS_FINISHED = 5;
+	protected static final int STATUS_INACTIVE = 0; // no game started
+	protected static final int STATUS_NEW = 1; // game initialized, players may join
+	protected static final int STATUS_READY = 2; // game is ready to be started
+	protected static final int STATUS_COUNTDOWN = 3; // game countdown is running
+	protected static final int STATUS_STARTED = 4; // game is actually running
+	protected static final int STATUS_FINISHED = 5; // game has finished, now cleaning up
 
 	/**
 	 * name of the game/arena
@@ -62,7 +71,7 @@ public abstract class Game {
 	 */
 	public Game(String name) {
 		this.name = name;
-		this.status = STATUS_NEW;
+		this.status = STATUS_INACTIVE;
 	}
 
 	/**
@@ -91,10 +100,29 @@ public abstract class Game {
 	 * @return
 	 */
 	public abstract String getType();
+	
+	/**
+	 * get the list of spleefers
+	 * @return
+	 */
+	public abstract SpleeferList getSpleefers();
 
 	// read the configuration settings of this arena
 	public abstract void defineSettings(ConfigurationSection conf);
 	
+	/**
+	 * call game ticker periodically
+	 * @return
+	 */
+	public abstract void tick();
+
+	/**
+	 * Player issues announce command
+	 * @param player
+	 * @return boolean successful?
+	 */
+	public abstract boolean announce(CommandSender sender);
+
 	/**
 	 * Player issues join command
 	 * @param player
@@ -120,48 +148,92 @@ public abstract class Game {
 	 * @return boolean successful?
 	 */
 	public abstract boolean ready(Player player, boolean hitBlock);
+
+	/**
+	 * check whether a certain block may be broken
+	 * => player has been checked before this, so this does only concern block breaks
+	 * and interactions by spleefers
+	 * @param block broken/interacted (on instant-break) by spleefer
+	 * @param player - player or null for automatic changes (e.g. trackers)
+	 * @return true, if block may be destroyed
+	 */
+	public abstract boolean checkMayBreakBlock(Block block, Player player);
 	
 	/**
-	 * Return true, if game supports a "ready" players list. Override for your own inventions.
+	 * Is this arena enabled?
 	 * @return
 	 */
-	public boolean supportsReady() {
-		return supportsReady(false, false);
+	public abstract boolean isEnabled();
+
+	/**
+	 * Arena contains active game?
+	 * @return
+	 */
+	public boolean isActive() {
+		return this.status != STATUS_INACTIVE;
 	}
 	
 	/**
-	 * Return true, if game supports a "ready" players list. Override for your own inventions.
-	 * @return
+	 * is game joinable?
+	 * @return true for joinable
 	 */
-	public boolean supportsCommandReady() {
-		return supportsReady(false, true);
-	}
-	
-	/**
-	 * Return true, if game supports a "ready" players list. Override for your own inventions.
-	 * @return
-	 */
-	public boolean supportsBlockReady() {
-		return supportsReady(true, false);
+	public boolean isJoinable() {
+		return this.status <= STATUS_READY;
 	}
 
 	/**
-	 * Helper method to actually check useReady element
-	 * @param noCommand
-	 * @param noBlock
+	 * is game ready?
+	 * @return true for game ready
+	 */
+	public boolean isReady() {
+		// game must be readied?
+		if (supportsReady())
+			return this.status == STATUS_READY;
+		return this.status <= STATUS_READY; // without using ready, game is ready automatically
+	}
+
+	/**
+	 * is game in progress?
+	 * @return true/false
+	 */
+	public boolean isInProgress() {
+		return this.status == STATUS_COUNTDOWN || this.status == STATUS_STARTED;
+	}
+
+	/**
+	 * has game started (not countdown)?
+	 * @return true/false
+	 */
+	public boolean isInGame() {
+		return this.status == STATUS_STARTED;
+	}
+
+	/**
+	 * has game finished?
+	 * @return true/false
+	 */
+	public boolean isFinished() {
+		return this.status == STATUS_FINISHED;
+	}
+
+	/**
+	 * Return true, if game supports a "ready" players list. Override for your own inventions.
 	 * @return
 	 */
-	private boolean supportsReady(boolean noCommand, boolean noBlock) {
-		if (SimpleSpleef.getPlugin().getConfig().isBoolean("arenas." + getId() + ".useReady")) {
-			return SimpleSpleef.getPlugin().getConfig().getBoolean("arenas." + getId() + ".useReady", false);
-		}
-		if (SimpleSpleef.getPlugin().getConfig().isString("arenas." + getId() + ".useReady")) {
-			String ready = SimpleSpleef.getPlugin().getConfig().getString("arenas." + getId() + ".useReady");
-			if (noCommand == false && ready.equalsIgnoreCase("command")) return true;
-			if (noBlock == false && ready.equalsIgnoreCase("block")) return true;
-		}
-		return false;	
-	}	
+	public abstract boolean supportsReady();
+	
+	/**
+	 * Return true, if game supports a "ready" players list. Override for your own inventions.
+	 * @return
+	 */
+	public abstract boolean supportsCommandReady();
+	
+	/**
+	 * Return true, if game supports a "ready" players list. Override for your own inventions.
+	 * @return
+	 */
+	public abstract boolean supportsBlockReady();
+
 
 	/**
 	 * Countdown started
@@ -215,6 +287,12 @@ public abstract class Game {
 	 * @return boolean
 	 */
 	public abstract boolean hasSpectator(Player player);
+
+	/**
+	 * Remove spectator from arena
+	 * @return boolean
+	 */
+	public abstract boolean removeSpectator(Player player);
 	
 	/**
 	 * Called when a spleefer moves in this game
@@ -273,6 +351,36 @@ public abstract class Game {
 	public abstract void onBlockPlace(BlockPlaceEvent event);
 
 	/**
+	 * Called when a players food level changes
+	 * @param event
+	 */
+	public abstract void onFoodLevelChange(FoodLevelChangeEvent event);
+
+	/**
+	 * Called when a player is damaged
+	 * @param event
+	 */
+	public abstract void onEntityDamage(EntityDamageEvent event);
+
+	/**
+	 * Called when something explodes 
+	 * @param event
+	 */
+	public abstract void onEntityExplode(EntityExplodeEvent event);
+
+	/**
+	 * Called when a player teleports
+	 * @param event
+	 */
+	public abstract void onPlayerTeleport(PlayerTeleportEvent event);
+
+	/**
+	 * Called when a player changes game mode
+	 * @param event
+	 */
+	public abstract void onPlayerGameModeChange(PlayerGameModeChangeEvent event);
+
+	/**
 	 * Send a message to broadcast, or to players and spectators
 	 * @param message
 	 * @param broadcast
@@ -309,53 +417,71 @@ public abstract class Game {
 	 * @return
 	 */
 	public abstract String getListOfSpectators();
-
-	/**
-	 * is game joinable?
-	 * @return true for joinable
-	 */
-	public boolean isJoinable() {
-		return this.status <= STATUS_READY;
-	}
-
-	/**
-	 * is game ready?
-	 * @return true for game ready
-	 */
-	public boolean isReady() {
-		// game must be readied?
-		if (supportsReady())
-			return this.status == STATUS_READY;
-		return this.status <= STATUS_READY; // without using ready, game is ready automatically
-	}
-
-	/**
-	 * is game in progress?
-	 * @return true/false
-	 */
-	public boolean isInProgress() {
-		return this.status == STATUS_COUNTDOWN || this.status == STATUS_STARTED;
-	}
-
-	/**
-	 * has game started (not countdown)?
-	 * @return true/false
-	 */
-	public boolean isInGame() {
-		return this.status == STATUS_STARTED;
-	}
-
-	/**
-	 * cleaning routine called at end of game
-	 */
-	public abstract void clean();
 	
 	/**
-	 * check whether a certain block may be broken
-	 * => player has been checked before this, so this does only concern block breaks
-	 * and interactions by spleefers
-	 * @param block broken/interacted (on instant-break) by spleefer
-	 * @return true, if block may be destroyed
+	 * add a tracker
+	 * @param tracker
 	 */
-	public abstract boolean checkMayBreakBlock(Block block);
+	public abstract void addTracker(Tracker tracker);
+
+	/**
+	 * interrupt a tracker
+	 * @param tracker
+	 */
+	public abstract void interruptTracker(Tracker tracker);
+
+	/**
+	 * interrupt all tracker
+	 * @param tracker
+	 */
+	public abstract void interruptAllTrackers();
+
+	/**
+	 * update a certain block location - notify trackers of this change
+	 * @param block
+	 * @param oldType - old type of block
+	 * @param oldData - old data of block
+	 */
+	public abstract void trackersUpdateBlock(Block block, int oldType, byte oldData);
+	
+	/**
+	 * Called by tick()-methods of trackers when they change a block,
+	 * so other trackers can update their block database. 
+	 * @param block
+	 * @param oldType - old type of block
+	 * @param oldData - old data of block
+	 * @param caller
+	 */
+	public abstract void notifyChangedBlock(Block block, int oldType, byte oldData, Tracker caller);
+
+	/**
+	 * interrupt/end game
+	 */
+	public abstract boolean endGame();
+
+	/**
+	 * sends a list of players and spectators of a specific game to a sender
+	 * @param sender
+	 * @param game
+	 */
+	public void printGamePlayersAndSpectators(CommandSender sender) {
+		//TODO: info if there are no spleefers and spectators at all
+
+		// list of spleefers and spectators
+		if (sender != null) {
+			String spleefers = getListOfSpleefers();
+			if (spleefers != null)
+				sender.sendMessage(SimpleSpleef.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
+			if (supportsCommandReady()) {
+				System.out.println("Unready");
+				String unready = getListOfUnreadySpleefers();
+				if (unready != null)
+					sender.sendMessage(SimpleSpleef.ll("feedback.infoUnreadySpleefers", "[SPLEEFERS]", ChatColor.RED + unready));
+				else if (getListOfUnreadySpleefers() != null) sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.infoAllReady"));
+			}
+			String spectators = getListOfSpectators();
+			if (spectators != null)
+				sender.sendMessage(SimpleSpleef.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
+		}		
+	}
 }

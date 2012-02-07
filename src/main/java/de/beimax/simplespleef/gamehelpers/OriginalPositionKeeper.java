@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
-package de.beimax.simplespleef.game;
+package de.beimax.simplespleef.gamehelpers;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -83,8 +83,7 @@ public class OriginalPositionKeeper {
 	* @param player
 	*/
 	public void updateOriginalLocationTimestamp(Player player) {
-		PlayerOriginalLocation loc = playerOriginalLocations.get(player
-				.getName());
+		PlayerOriginalLocation loc = playerOriginalLocations.get(player.getName());
 		if (loc != null)
 			loc.timestamp = System.currentTimeMillis() / 1000;
 	}
@@ -95,7 +94,7 @@ public class OriginalPositionKeeper {
 	 * @param player
 	 */
 	public void deleteOriginalPosition(Player player) {
-
+		playerOriginalLocations.remove(player.getName());
 	}
 
 	/**
