@@ -701,6 +701,11 @@ public class GameStandard extends Game {
 
 	@Override
 	public boolean watch(Player player) {
+		if (!isEnabled() || !isActive()) { // game is not active
+			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.watchNoGame", "[ARENA]", getName()));
+			return false;
+		}
+		
 		// check, if player is spleefer
 		if (spleefers.hasSpleefer(player)) {
 			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.watchSpleefer", "[ARENA]", getName()));
