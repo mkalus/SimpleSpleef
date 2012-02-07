@@ -1106,6 +1106,10 @@ public class GameStandard extends Game {
 					teleportPlayer(spleefer.getPlayer(), "lounge");
 			}
 		}
+		
+		// remove players from game
+		spleefers = new SpleeferList();
+		
 		return true;
 	}
 

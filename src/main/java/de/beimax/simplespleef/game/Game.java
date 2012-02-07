@@ -473,7 +473,6 @@ public abstract class Game {
 			if (spleefers != null)
 				sender.sendMessage(SimpleSpleef.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
 			if (supportsCommandReady()) {
-				System.out.println("Unready");
 				String unready = getListOfUnreadySpleefers();
 				if (unready != null)
 					sender.sendMessage(SimpleSpleef.ll("feedback.infoUnreadySpleefers", "[SPLEEFERS]", ChatColor.RED + unready));
