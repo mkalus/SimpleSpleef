@@ -662,7 +662,7 @@ public class GameStandard extends Game {
 			// just remove spleefer
 			spleefers.removeSpleefer(player);
 		} else if (status == Game.STATUS_COUNTDOWN) { // during countdown - end the game...
-			// set player to lost, so that the player is not teleported twice
+			// set player to lost, so that the player is not teleported twice - see endGame() for more info
 			spleefers.setLost(player);
 			endGame(); // actually end the game
 		} else { // game is in progress - player loses - simple as that
@@ -1095,6 +1095,7 @@ public class GameStandard extends Game {
 		//isJoinable()
 		//isReady()
 		// + other cases?
+		int oldStatus = status;
 		
 		// change game status
 		status = STATUS_FINISHED;
@@ -1105,11 +1106,14 @@ public class GameStandard extends Game {
 			removeShovelItems();
 			// possibly restore inventories
 			restoreAllInventories();
-			// teleport remaining players to lounge
-			/*for (Spleefer spleefer : spleefers.get()) { // not needed any more, since we do this before...
-				if (!spleefer.hasLost())
+		}
+		
+		// do we need to teleport players?
+		if (oldStatus == Game.STATUS_COUNTDOWN) { // game ended during countdown - teleport players back to lounge
+			for (Spleefer spleefer : spleefers.get()) {
+				if (!spleefer.hasLost()) // will leave out players that left, etc.
 					teleportPlayer(spleefer.getPlayer(), "lounge");
-			}*/
+			}
 		}
 		
 		// remove players from game
