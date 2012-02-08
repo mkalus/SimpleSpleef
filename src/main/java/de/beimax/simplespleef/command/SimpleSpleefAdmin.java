@@ -95,11 +95,11 @@ public class SimpleSpleefAdmin {
 		} else if (adminCommand.equals("addarena")) {
 			// check argument length
 			if (checkThreeArgs(sender, args, adminCommand))
-				addarenaCommand(sender, args[2]);
+				checkArena = addarenaCommand(sender, args[2]);
 		} else if (adminCommand.equals("delarena")) {
 			// check argument length
 			if (checkThreeArgs(sender, args, adminCommand))
-				delarenaCommand(sender, args[2]);
+				checkArena = delarenaCommand(sender, args[2]);
 		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose") || adminCommand.equals("lose")) {
 			if (adminCommand.equals("loose")) adminCommand = "lose"; //correct spelling
 			// check for WorldEdit selection
@@ -264,39 +264,45 @@ public class SimpleSpleefAdmin {
 	 * Add an arena
 	 * @param sender
 	 * @param arena
+	 * @return true if arena was created
 	 */
-	protected void addarenaCommand(CommandSender sender, String arena) {
+	protected boolean addarenaCommand(CommandSender sender, String arena) {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// check if arena exists already
 		if (SimpleSpleef.getGameHandler().gameExists(id)) {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.addarenaArenaExists", "[ARENA]", arena));
-			return;
+			return false;
 		}
 		// create new arena entry in config
 		ConfigHelper configHelper = new ConfigHelper();
 		if (!configHelper.createNewArena(id, arena)) {
 			sender.sendMessage(ChatColor.DARK_RED + "Internal error: Could not create arena - see log file for details.");
-			return;
+			return false;
 		}
+
 		// set default arena
 		setSelectedArena(sender, arena);
+		
 		// feedback to user
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.addarena", "[ARENA]", arena));
+		
+		return true;
 	}
 
 	/**
 	 * Add an arena
 	 * @param sender
 	 * @param arena
+	 * @return true if arena was deleted
 	 */
-	protected void delarenaCommand(CommandSender sender, String arena) {
+	protected boolean delarenaCommand(CommandSender sender, String arena) {
 		// arena name to lower case
 		String id = arena.toLowerCase();
 		// does arena exist?
 		if (!SimpleSpleef.getGameHandler().gameExists(id)) {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", id));
-			return;
+			return false;
 		}
 
 		//possibly stop a running game first
@@ -310,6 +316,8 @@ public class SimpleSpleefAdmin {
 
 		// feedback to user
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.delarena", "[ARENA]", arena));
+		
+		return true;
 	}
 
 	/**
