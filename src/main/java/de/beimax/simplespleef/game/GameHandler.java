@@ -290,6 +290,17 @@ public class GameHandler implements Listener, Runnable {
 	 * @param game (may be null)
 	 */
 	public void delete(CommandSender sender, Game game) {
+		if (game == null) { // where is the sender?
+			if (sender instanceof Player) {
+				game = checkPlayerInGame((Player) sender);
+				if (game == null) {
+					sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.deleteNoPlaying"));
+					return;
+				}
+			} else {
+				sender.sendMessage("[SimpleSpleef] Can't delete null game from console!");
+			}
+		}
 		game.delete(sender); // delete game
 	}
 	

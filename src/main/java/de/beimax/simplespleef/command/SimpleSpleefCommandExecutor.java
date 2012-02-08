@@ -484,7 +484,8 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	 */
 	protected Game getArenaFromArgument(CommandSender sender, String[] args, int index) {
 		String name;
-		// of too short, get the default arena
+
+		// too short, get the default arena
 		if (args.length <= index) name = SimpleSpleef.getGameHandler().getDefaultArena();
 		else name = args[index];
 
