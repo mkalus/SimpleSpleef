@@ -137,8 +137,8 @@ public class CuboidImpl implements Cuboid {
 			for (int y = 0; y < blockData[0].length; y++)
 				for (int z = 0; z < blockData[0][0].length; z++) {
 					Block block = this.world.getBlockAt(this.coords[0] + x, this.coords[1] + y, this.coords[2] + z);
-					block.setTypeId(blockData[x][y][z].getTypeId());
-					block.setData(blockData[x][y][z].getData());
+					block.setTypeId(blockData[x][y][z].getTypeId(), false);
+					block.setData(blockData[x][y][z].getData(), false);
 				}
 	}
 

@@ -96,8 +96,8 @@ public class CuboidWorldGuard implements Cuboid {
 				for (int z = 0; z < blockData[0][0].length; z++) {
 					if (this.region.contains(coords[0] + x, coords[1] + y, coords[2] + z)) { // only restore, if within the region
 						Block block = this.world.getBlockAt(coords[0] + x, coords[1] + y, coords[2] + z);
-						block.setTypeId(blockData[x][y][z].getTypeId());
-						block.setData(blockData[x][y][z].getData());
+						block.setTypeId(blockData[x][y][z].getTypeId(), false);
+						block.setData(blockData[x][y][z].getData(), false);
 					}
 				}
 	}

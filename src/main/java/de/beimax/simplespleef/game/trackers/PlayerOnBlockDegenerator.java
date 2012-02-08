@@ -150,8 +150,8 @@ public class PlayerOnBlockDegenerator implements Tracker {
 				// get original data
 				int oldType = keeper.checkedBlock.getTypeId();
 				byte oldData = keeper.checkedBlock.getData();
-				keeper.checkedBlock.setType(Material.AIR); // block dissolves into thin air
-				keeper.checkedBlock.setData((byte) 0);
+				keeper.checkedBlock.setTypeId(Material.AIR.getId(), false); // block dissolves into thin air
+				keeper.checkedBlock.setData((byte) 0, false);
 
 				degenerationList.remove(player); // remove player from list
 				

@@ -70,8 +70,8 @@ public class FloorRepairWorker extends FloorBaseWorker {
 			// get old data
 			int oldType = block.getTypeId();
 			byte oldData = block.getData();
-			block.setTypeId(blockData.getTypeId());
-			block.setData(blockData.getData());
+			block.setTypeId(blockData.getTypeId(), false);
+			block.setData(blockData.getData(), false);
 			air.remove(location);				
 			// notify others - and myself
 			game.trackersUpdateBlock(block, oldType, oldData);

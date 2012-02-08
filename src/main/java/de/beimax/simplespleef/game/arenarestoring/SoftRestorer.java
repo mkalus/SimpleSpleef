@@ -68,8 +68,8 @@ public class SoftRestorer extends ArenaRestorer {
 			} else { // restore blocks
 				BlockChange changedBlock = it.next();
 				Block block = changedBlock.location.getBlock();
-				block.setTypeId(changedBlock.blockData.getTypeId());
-				block.setData(changedBlock.blockData.getData());	
+				block.setTypeId(changedBlock.blockData.getTypeId(), false);
+				block.setData(changedBlock.blockData.getData(), false);	
 			}
 		}
 		

@@ -911,8 +911,8 @@ public class GameStandard extends Game {
 			int oldType = clickedBlock.getTypeId();
 			byte oldData = clickedBlock.getData();
 			// set block to air
-			clickedBlock.setType(Material.AIR);
-			clickedBlock.setData((byte) 0);
+			clickedBlock.setTypeId(Material.AIR.getId(), false);
+			clickedBlock.setData((byte) 0, false);
 			// notify trackers
 			trackersUpdateBlock(clickedBlock, oldType, oldData);
 		} else
@@ -972,8 +972,8 @@ public class GameStandard extends Game {
 			event.setCancelled(true);
 			floorBroken = true;
 			// set block to air
-			block.setType(Material.AIR);
-			block.setData((byte) 0);
+			block.setTypeId(Material.AIR.getId(), false);
+			block.setData((byte) 0, false);
 		} else floorBroken = true; // block was broken
 		
 		if (floorBroken) // update trackers

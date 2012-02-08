@@ -64,8 +64,8 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 			int oldType = block.getTypeId();
 			byte oldData = block.getData();
 			// dissolve to air
-			block.setType(Material.AIR);
-			block.setData((byte) 0);
+			block.setTypeId(Material.AIR.getId(), false);
+			block.setData((byte) 0, false);
 			nonAir.remove(location);				
 			// notify others - and myself
 			game.trackersUpdateBlock(block, oldType, oldData);
