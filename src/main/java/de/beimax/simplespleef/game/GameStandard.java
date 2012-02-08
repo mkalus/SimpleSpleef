@@ -1106,10 +1106,10 @@ public class GameStandard extends Game {
 			// possibly restore inventories
 			restoreAllInventories();
 			// teleport remaining players to lounge
-			for (Spleefer spleefer : spleefers.get()) {
+			/*for (Spleefer spleefer : spleefers.get()) { // not needed any more, since we do this before...
 				if (!spleefer.hasLost())
 					teleportPlayer(spleefer.getPlayer(), "lounge");
-			}
+			}*/
 		}
 		
 		// remove players from game
