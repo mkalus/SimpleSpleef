@@ -1522,7 +1522,7 @@ public class GameStandard extends Game {
 		// add player experience
 		player.giveExp(win);
 		// player gets message
-		player.sendMessage(ChatColor.AQUA + SimpleSpleef.ll("broadcasts.prizeExperience", "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win)));
+		player.sendMessage(ChatColor.AQUA + SimpleSpleef.ll("feedback.prizeExperience", "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win)));
 		// broadcast prize?
 		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.ll("broadcasts.prizeExperience", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win));
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
