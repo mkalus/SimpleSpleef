@@ -162,9 +162,10 @@ public class GameWithTeams extends GameStandard {
 	}
 	
 	@Override
-	public void onPlayerInteract(PlayerInteractEvent event) {
+	public boolean onPlayerInteract(PlayerInteractEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		Block block = event.getClickedBlock();
-		if (block == null || event.getPlayer() == null) return; // ignore null blocks and null players
+		if (block == null || event.getPlayer() == null || !hasPlayer(event.getPlayer())) return false; // ignore null blocks and null players and players not in game
 
 		if (isJoinable() && configuration.getBoolean("teamCommand", true)) {
 			// get blocks
@@ -173,25 +174,25 @@ public class GameWithTeams extends GameStandard {
 				redBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("teamBlockMaterialRed", null), true);
 			} catch (Exception e) {
 				SimpleSpleef.log.warning("[SimpleSpleef] Could not parse teamBlockMaterialRed in arena " + getId());
-				return; // ignore exceptions
+				return true; // ignore exceptions
 			}
 			ItemStack blueBlockMaterial;
 			try {
 				blueBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("teamBlockMaterialBlue", null), true);
 			} catch (Exception e) {
 				SimpleSpleef.log.warning("[SimpleSpleef] Could not parse teamBlockMaterialBlue in arena " + getId());
-				return; // ignore exceptions
+				return true; // ignore exceptions
 			}
 
 			// blocks are ok, now check touched material and join team
 			if (redBlockMaterial != null && redBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, redBlockMaterial)) {
-				if (team(event.getPlayer(), "red")) return;
+				if (team(event.getPlayer(), "red")) return true;
 			}
 			if (blueBlockMaterial != null && blueBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, blueBlockMaterial)) {
-				if (team(event.getPlayer(), "blue")) return;
+				if (team(event.getPlayer(), "blue")) return true;
 			}
 		}
-		super.onPlayerInteract(event); // call parent
+		return super.onPlayerInteract(event); // call parent
 	}
 	
 	@Override

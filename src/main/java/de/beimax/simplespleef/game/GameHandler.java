@@ -513,7 +513,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onBlockBreak(event);
+			if (game.onBlockBreak(event)) return;
 		}
 	}
 
@@ -527,7 +527,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onBlockPlace(event);
+			if (game.onBlockPlace(event)) return;
 		}
 	}
 	
@@ -540,7 +540,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerDeath((Player) event.getEntity());
+			if (game.onPlayerDeath((Player) event.getEntity())) return;
 		}
 	}
 	
@@ -553,7 +553,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onFoodLevelChange(event);
+			if (game.onFoodLevelChange(event)) return;
 		}
 	}
 	
@@ -566,7 +566,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onEntityDamage(event);
+			if (game.onEntityDamage(event)) return;
 		}
 	}
 
@@ -579,7 +579,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onEntityExplode(event);
+			if (game.onEntityExplode(event)) return;
 		}
 	}
 	
@@ -590,7 +590,7 @@ public class GameHandler implements Listener, Runnable {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerJoin(event);
+			if (game.onPlayerJoin(event)) return;
 		}
 	}
 	
@@ -603,7 +603,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerKick(event);
+			if (game.onPlayerKick(event)) return;
 		}
 	}
 	
@@ -614,7 +614,7 @@ public class GameHandler implements Listener, Runnable {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerQuit(event);
+			if (game.onPlayerQuit(event)) return;
 		}
 	}
 	
@@ -627,7 +627,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerMove(event);
+			if (game.onPlayerMove(event)) return;
 		}
 	}
 	
@@ -640,7 +640,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerInteract(event);
+			if (game.onPlayerInteract(event)) return;
 		}
 	}
 	
@@ -653,7 +653,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerTeleport(event);
+			if (game.onPlayerTeleport(event)) return;
 		}
 	}
 	
@@ -666,7 +666,7 @@ public class GameHandler implements Listener, Runnable {
 		
 		// pass event to games
 		for (Game game : games) {
-			game.onPlayerGameModeChange(event);
+			if (game.onPlayerGameModeChange(event)) return;
 		}
 	}
 }

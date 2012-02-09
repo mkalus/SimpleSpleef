@@ -298,7 +298,7 @@ public abstract class Game {
 	 * Called when a spleefer moves in this game
 	 * @param event
 	 */
-	public abstract void onPlayerMove(PlayerMoveEvent event);
+	public abstract boolean onPlayerMove(PlayerMoveEvent event);
 	
 	/**
 	 * Called when a spleefer tries to teleport in this game
@@ -312,73 +312,78 @@ public abstract class Game {
 	 * Called when a spleefer interacts with something in this game
 	 * @param event
 	 */
-	public abstract void onPlayerInteract(PlayerInteractEvent event);
+	public abstract boolean onPlayerInteract(PlayerInteractEvent event);
 	
 	/**
 	 * Called when a spleefer quits
 	 * @param event
 	 */
-	public abstract void onPlayerQuit(PlayerQuitEvent event);
+	public abstract boolean onPlayerQuit(PlayerQuitEvent event);
 
 	/**
 	 * Called when a spleefer gets kicked
 	 * @param event
 	 */
-	public abstract void onPlayerKick(PlayerKickEvent event);
+	public abstract boolean onPlayerKick(PlayerKickEvent event);
 	
 	/**
 	 * Called when a player joins - game can check if the player has quit recently, for example
 	 * @param event
+	 * @return 
 	 */
-	public abstract void onPlayerJoin(PlayerJoinEvent event);
+	public abstract boolean onPlayerJoin(PlayerJoinEvent event);
 	
 	/**
 	 * Called when a spleefer dies during this game
 	 * @param event
+	 * @return 
 	 */
-	public abstract void onPlayerDeath(Player player);
+	public abstract boolean onPlayerDeath(Player player);
 	
 	/**
 	 * Called when a spleefer breaks a block
 	 * @param event
+	 * @return 
 	 */
-	public abstract void onBlockBreak(BlockBreakEvent event);
+	public abstract boolean onBlockBreak(BlockBreakEvent event);
 	
 	/**
 	 * Called when a spleefer places a block
 	 * @param event
+	 * @return 
 	 */
-	public abstract void onBlockPlace(BlockPlaceEvent event);
+	public abstract boolean onBlockPlace(BlockPlaceEvent event);
 
 	/**
 	 * Called when a players food level changes
 	 * @param event
 	 */
-	public abstract void onFoodLevelChange(FoodLevelChangeEvent event);
+	public abstract boolean onFoodLevelChange(FoodLevelChangeEvent event);
 
 	/**
 	 * Called when a player is damaged
 	 * @param event
 	 */
-	public abstract void onEntityDamage(EntityDamageEvent event);
+	public abstract boolean onEntityDamage(EntityDamageEvent event);
 
 	/**
 	 * Called when something explodes 
 	 * @param event
 	 */
-	public abstract void onEntityExplode(EntityExplodeEvent event);
+	public abstract boolean onEntityExplode(EntityExplodeEvent event);
 
 	/**
 	 * Called when a player teleports
 	 * @param event
 	 */
-	public abstract void onPlayerTeleport(PlayerTeleportEvent event);
+	public abstract boolean onPlayerTeleport(PlayerTeleportEvent event);
 
 	/**
 	 * Called when a player changes game mode
 	 * @param event
+	 * @return 
 	 */
-	public abstract void onPlayerGameModeChange(PlayerGameModeChangeEvent event);
+	public abstract boolean onPlayerGameModeChange(PlayerGameModeChangeEvent event);
 
 	/**
 	 * Send a message to broadcast, or to players and spectators

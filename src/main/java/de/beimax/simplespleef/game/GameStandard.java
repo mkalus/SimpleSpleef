@@ -777,25 +777,39 @@ public class GameStandard extends Game {
 	}
 
 	@Override
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		if (!isEnabled() || !hasPlayer(event.getPlayer())) return; // ignore disabled arenas and if player not here
-		
-		// call helper method
-		loseOnQuitOrKick(event.getPlayer());
-	}
-
-	@Override
-	public void onPlayerKick(PlayerKickEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerQuit(PlayerQuitEvent event) {
+		if (!isEnabled() || !hasPlayer(event.getPlayer())) return false; // ignore disabled arenas and if player not here
 		
 		// in game?
 		if (hasPlayer(event.getPlayer())) {
 			// call helper method
 			loseOnQuitOrKick(event.getPlayer());
+			return true;
 		}
+		return false;
+	}
+
+	@Override
+	public boolean onPlayerKick(PlayerKickEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		
-		// delete original position, because player is banned anyhow
-		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
+		// in game?
+		if (hasPlayer(event.getPlayer())) {
+			// call helper method
+			loseOnQuitOrKick(event.getPlayer());
+			
+			// delete original position, because player is banned anyhow
+			SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
+			return true;
+		}
+		// also delete position if spectator
+		if (hasSpectator(event.getPlayer())) {
+			// delete original position, because player is banned anyhow
+			SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
+			return true;
+		}
+
+		return false;
 	}
 	
 	/**
@@ -818,38 +832,43 @@ public class GameStandard extends Game {
 	}
 
 	@Override
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerJoin(PlayerJoinEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 
 		// right now, do nothing... later on maybe give shovel back or so (if it has been taken away before the game ended - that gets complicated...)
+		return true; //change this to false once enabled
 	}
 
 	@Override
-	public void onPlayerDeath(Player player) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerDeath(Player player) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		
-		// delete original position, because player spawns somewhere else anyhow
-		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
-
-		if (configuration.getBoolean("loseOnDeath", true)) {
-			// broadcast message of somebody loosing
-			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.lostByDeath", "[PLAYER]", player.getName(), "[ARENA]", getName());
-			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
-				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
-			} else {
-				// send message to all receivers
-				sendMessage(broadcastMessage, player);
-			}
-			// player loses, if set to true
-			playerLoses(player, false); // do not teleport dead players...
-		} // else - do nothing...
+		if (hasPlayer(player)) {
+			// delete original position, because player spawns somewhere else anyhow
+			SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
+	
+			if (configuration.getBoolean("loseOnDeath", true)) {
+				// broadcast message of somebody loosing
+				String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.lostByDeath", "[PLAYER]", player.getName(), "[ARENA]", getName());
+				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
+					SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+				} else {
+					// send message to all receivers
+					sendMessage(broadcastMessage, player);
+				}
+				// player loses, if set to true
+				playerLoses(player, false); // do not teleport dead players...
+			} // else - do nothing...
+			return true;
+		}
+		return false;
 	}
 
 	@Override
-	public void onPlayerMove(PlayerMoveEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerMove(PlayerMoveEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		Player player = event.getPlayer();
-		if (!hasPlayer(player) || !isInGame() || spleefers.hasLost(player)) return; // if not in game or game is not in progress or player has lost, return
+		if (!hasPlayer(player) || !isInGame() || spleefers.hasLost(player)) return false; // if not in game or game is not in progress or player has lost, return
 		
 		//player touched certain block (setting loseOnTouchBlocks)
 		if (loseOnTouchMaterial != null) {
@@ -876,7 +895,7 @@ public class GameStandard extends Game {
 				}
 				// Ha, lost!
 				playerLoses(player, true);
-				return;
+				return true;
 			}
 		}
 		
@@ -892,15 +911,16 @@ public class GameStandard extends Game {
 			}
 			// Ha, lost!
 			playerLoses(player, true);
-			return;			
+			//return true; //redundant right now		
 		}
+		return true;
 	}
 
 	@Override
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerInteract(PlayerInteractEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		Block block = event.getClickedBlock();
-		if (block == null || event.getPlayer() == null || !hasPlayer(event.getPlayer())) return; // ignore null blocks and null players and players not in game
+		if (block == null || event.getPlayer() == null || !hasPlayer(event.getPlayer())) return false; // ignore null blocks and null players and players not in game
 		
 		// check instant dig and block may be broken
 		if (event.getAction() == Action.LEFT_CLICK_BLOCK && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block, event.getPlayer())) {
@@ -922,32 +942,36 @@ public class GameStandard extends Game {
 				try {
 					readyBlockMaterial = MaterialHelper.getItemStackFromString(configuration.getString("readyBlockMaterial", null), true);
 				} catch (Exception e) {
-					return; // ignore exceptions
+					return true; // ignore exceptions
 				}
-				if (readyBlockMaterial == null) return; // ignore null materials
+				if (readyBlockMaterial == null) return true; // ignore null materials
 				// material has been checked, now test, if clicked block is of the same material
 				if (readyBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, readyBlockMaterial)) {
 					ready(event.getPlayer(), true);
 				}
 			}
+		return true;
 	}
 
 	@Override
-	public void onBlockBreak(BlockBreakEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onBlockBreak(BlockBreakEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		Player player = event.getPlayer();
-		if (player == null) return; // no NPEs
+		if (player == null) return false; // no NPEs
 		
 		// is player a spleefer?
 		if (hasPlayer(player)) {
 			blockBreakInGame(event);
+			return true;
 		} else { // not in spleefer list, check arena area nevertheless
 			if (inProtectedArenaCube(event.getBlock())) { //check if block is in cube
 				// cancel event
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.noDig"));
+				return true;
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -994,21 +1018,24 @@ public class GameStandard extends Game {
 	}
 
 	@Override
-	public void onBlockPlace(BlockPlaceEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onBlockPlace(BlockPlaceEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		Player player = event.getPlayer();
-		if (player == null) return; // no NPEs
+		if (player == null) return true; // no NPEs
 		
 		// is player a spleefer?
 		if (hasPlayer(player)) {
 			blockPlaceInGame(event);
+			return true;
 		} else { // not in spleefer list, check arena area nevertheless
 			if (inProtectedArenaCube(event.getBlock())) { //check if block is in cube
 				// cancel event
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.noPlacement"));
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	/**
@@ -1030,17 +1057,20 @@ public class GameStandard extends Game {
 	}
 
 	@Override
-	public void onFoodLevelChange(FoodLevelChangeEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		//if (event.getEntity() == null || !(event.getEntity() instanceof Player)) return;
 		Player player = (Player) event.getEntity();
 
-		if (hasPlayer(player) && configuration.getBoolean("noHunger", true)) // if setting noHunger has been set for this arena, do not feel any hunger
-				event.setCancelled(true);
+		if (hasPlayer(player) && configuration.getBoolean("noHunger", true)) {// if setting noHunger has been set for this arena, do not feel any hunger
+			event.setCancelled(true);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
-	public void onEntityDamage(EntityDamageEvent event) {
+	public boolean onEntityDamage(EntityDamageEvent event) {
 		//if (event.getEntity() == null || !(event.getEntity() instanceof Player)) return;
 		Player player = (Player) event.getEntity();
 		
@@ -1048,41 +1078,49 @@ public class GameStandard extends Game {
 		if (hasPlayer(player) && player.getWorld().getPVP() && configuration.getBoolean("noPvP", true) && event instanceof EntityDamageByEntityEvent) {
 			EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
 			// only consider player damage
-			if (damageEvent.getDamager() instanceof Player)
+			if (damageEvent.getDamager() instanceof Player) {
 				event.setCancelled(true); // cancel damage event by caused by other players
+				return true;
+			}
 		}
+		return false;
 	}
 
 	@Override
-	public void onEntityExplode(EntityExplodeEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onEntityExplode(EntityExplodeEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		// TODO: check if any exploded blocks were within the arena perimeter -> restore those or cancel event
 		
 		// TODO: check for blocks exploded within the reach of a tracker -> track changed blocks!
+		return false; // change this once something happens here
 	}
 
 	@Override
-	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerTeleport(PlayerTeleportEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		if (hasPlayer(event.getPlayer())) {
 			// check, if arena allows the player's teleportation
 			if (!playerMayTeleport(event.getPlayer())) {
 				event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.teleport", "[ARENA]", getName()));
 				event.setCancelled(true); //cancel event
+				return true;
 			}
 		}
+		return false;
 	}
 
 	@Override
-	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
-		if (!isEnabled()) return; // ignore disabled arenas
+	public boolean onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		if (!isEnabled()) return false; // ignore disabled arenas
 		Player player = event.getPlayer();
 		
 		// players and spectators may not change game mode
 		if (hasPlayer(player) || hasSpectator(player)) {
 			event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.gamemodeChange"));
 			event.setCancelled(true); //cancel event
+			return true;
 		}
+		return false;
 	}
 
 	/**
