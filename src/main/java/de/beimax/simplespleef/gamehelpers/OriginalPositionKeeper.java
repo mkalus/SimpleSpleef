@@ -69,6 +69,8 @@ public class OriginalPositionKeeper {
 	 * @return
 	 */
 	public Location getOriginalPosition(Player player) {
+		if (player == null) return null; // no NPEs!
+
 		// prune first
 		pruneOriginalLocations();
 
@@ -94,7 +96,8 @@ public class OriginalPositionKeeper {
 	 * @param player
 	 */
 	public void deleteOriginalPosition(Player player) {
-		playerOriginalLocations.remove(player.getName());
+		if (player != null)
+			playerOriginalLocations.remove(player.getName());
 	}
 
 	/**

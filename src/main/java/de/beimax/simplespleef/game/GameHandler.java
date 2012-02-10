@@ -574,6 +574,12 @@ public class GameHandler implements Listener, Runnable {
 		for (Game game : games) {
 			if (game.onPlayerJoin(event)) return;
 		}
+		
+		// not part of any game, but still in original positions? => teleport to last
+		// known position, since it is very likely that the player is still in the arena
+		Location loc = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(event.getPlayer());
+		if (loc != null)
+			event.getPlayer().teleport(loc);
 	}
 	
 	/**
@@ -598,6 +604,9 @@ public class GameHandler implements Listener, Runnable {
 		for (Game game : games) {
 			if (game.onPlayerQuit(event)) return;
 		}
+		
+		// player has quit without being in games - delete
+		SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(event.getPlayer());
 	}
 	
 	/**
