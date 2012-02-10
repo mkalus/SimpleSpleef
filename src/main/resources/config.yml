@@ -194,8 +194,10 @@ arenas:
         diggingIfArenaUndefined: floorOnly
 # If floor not defined: none, inArena, outsideArena, everywhere (if arena is undefined, inArena and outsideArena will default to everywhere)
         diggingIfFloorUndefined: inArena
-# Protect arena against changes by non-players
+# Protect arena against changes by non-players (arena cube has to be defined)
         protectArena: true
+# Disallow creatures to spawn in the arena (arena cube has to be defined)
+        disallowCreatureSpawns: true
 # Restore arena after the game - this setting allows several options:
 # - false: turn arena restoration off completely
 # - true/soft: keeps track of removed/placed blocks and restores them after the game in a "soft" way - recommended but more memory intensive

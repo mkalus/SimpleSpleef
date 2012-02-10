@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -1120,6 +1121,19 @@ public class GameStandard extends Game {
 			event.setCancelled(true); //cancel event
 			return true;
 		}
+		return false;
+	}
+	
+	@Override
+	public boolean onCreatureSpawn(CreatureSpawnEvent event) {
+		if (!isEnabled() || arena == null || !configuration.getBoolean("disallowCreatureSpawns", true)) return false; // ignore disabled and undifined arenas, as well as those that allow spawning
+		
+		// check location of spawn event
+		Location loc = event.getLocation();
+		if (arena.contains(loc)) { // if within arena...
+			event.setCancelled(true); //..cancel spawn event
+		}
+		
 		return false;
 	}
 

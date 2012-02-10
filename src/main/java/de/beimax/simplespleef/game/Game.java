@@ -26,6 +26,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -384,6 +385,13 @@ public abstract class Game {
 	 * @return 
 	 */
 	public abstract boolean onPlayerGameModeChange(PlayerGameModeChangeEvent event);
+	
+	/**
+	 * Called when a creature spawns
+	 * @param event
+	 * @return
+	 */
+	public abstract boolean onCreatureSpawn(CreatureSpawnEvent event);
 
 	/**
 	 * Send a message to broadcast, or to players and spectators
