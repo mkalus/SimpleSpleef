@@ -33,6 +33,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
 import de.beimax.simplespleef.command.SimpleSpleefSignCommandExecutor;
@@ -365,4 +366,20 @@ public class SimpleSpleef extends JavaPlugin {
 					.info("[SimpleSpleef] Found WorldEdit " + plugin.getDescription().getVersion() + ". Using it for selections.");
 		}
 	}
+
+	/**
+	 * get a world guard instance if it exists - see http://wiki.sk89q.com/wiki/WorldGuard/Regions/API for source
+	 * @return
+	 */
+	public WorldGuardPlugin getWorldGuard() {
+	    Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+	 
+	    // WorldGuard may not be loaded
+	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+	        return null; // Maybe you want throw an exception instead
+	    }
+	 
+	    return (WorldGuardPlugin) plugin;
+	}
+	
 }

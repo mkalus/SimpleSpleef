@@ -456,11 +456,11 @@ public class GameHandler implements Listener, Runnable {
 		if (!conf.isConfigurationSection(confbase) ||
 				!conf.getBoolean("arenas." + arena + ".arena.enabled", false)) return null;
 		// do we have a world guard region here?
-		if (conf.getString(confbase + ".worldguardRegion") != null && conf.getString(confbase + ".worldguardWorld") != null && getWorldGuard() != null) {
+		if (conf.getString(confbase + ".worldguardRegion") != null && conf.getString(confbase + ".worldguardWorld") != null && SimpleSpleef.getPlugin().getWorldGuard() != null) {
 			// get world guard region
 			World world = SimpleSpleef.getPlugin().getServer().getWorld(conf.getString(confbase + ".worldguardWorld"));
 			// get region manager
-			RegionManager regionManager = world!=null?getWorldGuard().getRegionManager(world):null;
+			RegionManager regionManager = world!=null?SimpleSpleef.getPlugin().getWorldGuard().getRegionManager(world):null;
 			// error?
 			if (world == null || regionManager == null) return null;
 			// get region
@@ -486,22 +486,6 @@ public class GameHandler implements Listener, Runnable {
 					(firstX>secondX?firstX:secondX), (firstY>secondY?firstY:secondY), (firstZ>secondZ?firstZ:secondZ));
 		}
 	}
-
-	/**
-	 * get a world guard instance if it exists - see http://wiki.sk89q.com/wiki/WorldGuard/Regions/API for source
-	 * @return
-	 */
-	private WorldGuardPlugin getWorldGuard() {
-	    Plugin plugin = SimpleSpleef.getPlugin().getServer().getPluginManager().getPlugin("WorldGuard");
-	 
-	    // WorldGuard may not be loaded
-	    if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
-	        return null; // Maybe you want throw an exception instead
-	    }
-	 
-	    return (WorldGuardPlugin) plugin;
-	}
-	
 	
 	/**
 	 * Catch block breaks
