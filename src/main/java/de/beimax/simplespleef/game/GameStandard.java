@@ -1839,7 +1839,7 @@ public class GameStandard extends Game {
 		// already running?
 		if (isActive()) {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.arenaExistsAlready", "[ARENA]", getName()));
-			return false;
+			return true;
 		}
 		return false;
 	}
