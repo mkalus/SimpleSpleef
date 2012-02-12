@@ -62,7 +62,7 @@ public class SoftRestorer extends ArenaRestorer {
 
 		// 40 blocks per tick max
 		for (int i = 0; i < 40; i++) {
-			if (!it.hasNext()) {
+			if (it == null || !it.hasNext()) {
 				it = null;
 				break;
 			} else { // restore blocks
