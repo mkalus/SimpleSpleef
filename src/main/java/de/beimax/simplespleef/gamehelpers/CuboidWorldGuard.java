@@ -52,16 +52,8 @@ public class CuboidWorldGuard implements Cuboid {
 	 */
 	@Override
 	public SerializableBlockData[][][] getSerializedBlocks() {
-		BlockVector max = region.getMaximumPoint();
-		BlockVector min = region.getMinimumPoint();
-		
 		// get blocks
-		final int[] coords = {(min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
-			(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
-			(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
-			(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
-			(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
-			(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ())};
+		final int[] coords = getCoords();
 		
 		SerializableBlockData[][][] blockData =
 			new SerializableBlockData[coords[3]-coords[0]+1][coords[4]-coords[1]+1][coords[5]-coords[2]+1];
@@ -105,18 +97,10 @@ public class CuboidWorldGuard implements Cuboid {
 
 	@Override
 	public List<Block> getDiggableBlocks(Game game) {
-		BlockVector max = region.getMaximumPoint();
-		BlockVector min = region.getMinimumPoint();
-		
 		LinkedList<Block> diggableBlocks = new LinkedList<Block>();
 		
 		// get blocks
-		final int[] coords = {(min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
-			(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
-			(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
-			(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
-			(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
-			(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ())};
+		final int[] coords = getCoords();
 
 		// copy data from blocks
 		for (int x = coords[0]; x <= coords[3]; x++)
@@ -129,5 +113,33 @@ public class CuboidWorldGuard implements Cuboid {
 				}
 
 		return diggableBlocks;
+	}
+
+	@Override
+	public Location getCenter() {
+		// get blocks
+		final int[] coords = getCoords();
+
+		// return middle location
+		return new Location(this.world, (coords[3] - coords[0])/2 + coords[0],
+				(coords[4] - coords[1])/2 + coords[1],
+				(coords[5] - coords[2])/2 + coords[2]);
+	}
+	
+	/**
+	 * get coordinates
+	 * @return
+	 */
+	private final int[] getCoords() {
+		BlockVector max = region.getMaximumPoint();
+		BlockVector min = region.getMinimumPoint();
+		
+		final int[] coords = {(min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
+				(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
+				(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ()),
+				(min.getBlockX()>max.getBlockX()?min.getBlockX():max.getBlockX()),
+				(min.getBlockY()>max.getBlockY()?min.getBlockY():max.getBlockY()),
+				(min.getBlockZ()>max.getBlockZ()?min.getBlockZ():max.getBlockZ())};
+		return coords;
 	}
 }

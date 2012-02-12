@@ -51,6 +51,8 @@ settings:
     announceWin: true
 # globally announce the prize won by a player
     announcePrize: true
+# maximum announcement radius for broadcasts - you have to define the arena block to make this work and set the radius > -1
+    announcementRadius: -1
 # prevent players from teleporting into/out of the arena during the game
     preventTeleportingDuringGames: true
 # Keep original positions of players/spectators for this number of seconds (default is 1h)

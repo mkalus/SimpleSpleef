@@ -158,4 +158,12 @@ public class CuboidImpl implements Cuboid {
 
 		return diggableBlocks;
 	}
+
+	@Override
+	public Location getCenter() {
+		// return middle location
+		return new Location(this.world, (this.coords[3] - this.coords[0])/2 + this.coords[0],
+				(this.coords[4] - this.coords[1])/2 + this.coords[1],
+				(this.coords[5] - this.coords[2])/2 + this.coords[2]);
+	}
 }

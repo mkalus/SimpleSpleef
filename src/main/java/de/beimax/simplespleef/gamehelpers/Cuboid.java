@@ -56,4 +56,10 @@ public interface Cuboid {
 	 * @return
 	 */
 	public List<Block> getDiggableBlocks(Game game);
+	
+	/**
+	 * return center of cuboid
+	 * @return
+	 */
+	public Location getCenter();
 }
