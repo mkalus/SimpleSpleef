@@ -203,6 +203,9 @@ arenas:
         protectArena: true
 # Disallow creatures to spawn in the arena (arena cube has to be defined)
         disallowCreatureSpawns: true
+# Disallow explosions during the game (protectArena protects the arena outside the games, this is to actually allow explosions during the game)
+# This setting does not work in conjunction with arenaFloorDissolvesAfter and arenaFloorRepairsAfter.
+        enableExplosionsDuringGame: false
 # Restore arena after the game - this setting allows several options:
 # - false: turn arena restoration off completely
 # - true/soft: keeps track of removed/placed blocks and restores them after the game in a "soft" way - recommended but more memory intensive

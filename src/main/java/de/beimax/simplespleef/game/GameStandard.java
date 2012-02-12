@@ -1091,11 +1091,30 @@ public class GameStandard extends Game {
 
 	@Override
 	public boolean onEntityExplode(EntityExplodeEvent event) {
-		if (!isEnabled()) return false; // ignore disabled arenas
-		// TODO: check if any exploded blocks were within the arena perimeter -> restore those or cancel event
-		
-		// TODO: check for blocks exploded within the reach of a tracker -> track changed blocks!
-		return false; // change this once something happens here
+		if (!isEnabled() || !configuration.getBoolean("protectArena", true)
+				|| (arena == null && floor == null)) return false; // ignore disabled arenas, as well as unprotected ones or ones without blocks to protect
+
+		// check if any exploded blocks were within the arena perimeter
+		if (isInGame() && configuration.getBoolean("enableExplosionsDuringGame", false)) {
+			// check for blocks exploded within the reach of a tracker...
+			for (Block block : event.blockList()) {
+				Cuboid checkCuboid = arena==null?floor:arena;
+				if (checkCuboid.contains(block.getLocation())) { 
+					trackersUpdateBlock(block, block.getTypeId(), block.getData());
+				}
+			}
+			return true;
+		} else { // not in game, cancel explosions close to the arena
+			for (Block block : event.blockList()) {
+				Cuboid checkCuboid = arena==null?floor:arena;
+				if (checkCuboid.contains(block.getLocation())) {
+					event.setCancelled(true);
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	@Override
