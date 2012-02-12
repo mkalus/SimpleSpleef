@@ -429,7 +429,7 @@ public class GameHandler implements Listener, Runnable {
 		} else { // otherwise look up player in OriginalPositionKeeper and teleport him/her back
 			Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
 			if (originalLocation != null) {
-				player.teleport(originalLocation);
+				SimpleSpleef.simpleSpleefTeleport(player, originalLocation);
 				player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.back"));
 			} else {
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.backNoLocation"));
@@ -580,7 +580,7 @@ public class GameHandler implements Listener, Runnable {
 		// known position, since it is very likely that the player is still in the arena
 		Location loc = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(event.getPlayer());
 		if (loc != null)
-			event.getPlayer().teleport(loc);
+			SimpleSpleef.simpleSpleefTeleport(event.getPlayer(), loc);
 	}
 	
 	/**

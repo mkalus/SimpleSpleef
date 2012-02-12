@@ -25,7 +25,9 @@ import java.util.logging.Logger;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -137,6 +139,15 @@ public class SimpleSpleef extends JavaPlugin {
 	public static OriginalPositionKeeper getOriginalPositionKeeper() {
 		if (originalPositionKeeper == null) originalPositionKeeper = new OriginalPositionKeeper();
 		return originalPositionKeeper;
+	}
+	
+	/**
+	 * Teleport a player to a location - fixes people falling through the floor
+	 * @param player
+	 * @param location
+	 */
+	public static void simpleSpleefTeleport(Player player, Location location) {
+		player.teleport(location.add(0, 0.25, 0)); // add a quarter block to the height of the location to let the player "fall" onto the block
 	}
 
 	/**
@@ -381,5 +392,4 @@ public class SimpleSpleef extends JavaPlugin {
 	 
 	    return (WorldGuardPlugin) plugin;
 	}
-	
 }

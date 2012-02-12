@@ -654,7 +654,7 @@ public class GameStandard extends Game {
 			// add player to teleport ok list
 			this.teleportOkList.add(player);
 			// teleport player to original position
-			player.teleport(originalLocation);
+			SimpleSpleef.simpleSpleefTeleport(player, originalLocation);
 			player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.back"));
 		}
 		
@@ -731,7 +731,7 @@ public class GameStandard extends Game {
 
 		// teleport spectator
 		Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection("spectatorSpawn"));
-		player.teleport(teleportTo);
+		SimpleSpleef.simpleSpleefTeleport(player, teleportTo);
 
 		// add to spectator list
 		spectators.add(player);
@@ -771,7 +771,7 @@ public class GameStandard extends Game {
 		// remove player from watch list
 		removeSpectator(player);
 		// teleport player to original position
-		player.teleport(originalLocation);
+		SimpleSpleef.simpleSpleefTeleport(player, originalLocation);
 
 		player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.back"));
 		return true;
@@ -1444,7 +1444,7 @@ public class GameStandard extends Game {
 		teleportTo.getWorld().loadChunk(teleportTo.getChunk());
 		// add player to teleport ok list
 		this.teleportOkList.add(player);
-		player.teleport(teleportTo);
+		SimpleSpleef.simpleSpleefTeleport(player, teleportTo);
 	}
 
 
