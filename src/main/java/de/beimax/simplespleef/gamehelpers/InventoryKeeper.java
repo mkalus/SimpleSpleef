@@ -18,6 +18,14 @@ import org.bukkit.inventory.ItemStack;
  */
 public class InventoryKeeper {
 	/**
+	 * inventory positions of armor
+	 */
+	public static final int HELMET = -10;
+	public static final int CHESTPLATE = -11;
+	public static final int LEGGINGS = -12;
+	public static final int BOOTS = -13;
+	
+	/**
 	 * keeps the players' inventories
 	 */
 	private HashMap<Player, List<InventoryEntry>> playerInventories = new HashMap<Player, List<InventoryEntry>>();
@@ -40,6 +48,19 @@ public class InventoryKeeper {
 				copiedInventory.add(new InventoryEntry(i, stack.clone()));
 			i++;
 		}
+		// now get armor
+		ItemStack stack = player.getInventory().getHelmet();
+		if (stack != null)
+			copiedInventory.add(new InventoryEntry(HELMET, stack.clone()));
+		stack = player.getInventory().getChestplate();
+		if (stack != null)
+			copiedInventory.add(new InventoryEntry(CHESTPLATE, stack.clone()));
+		stack = player.getInventory().getLeggings();
+		if (stack != null)
+			copiedInventory.add(new InventoryEntry(LEGGINGS, stack.clone()));
+		stack = player.getInventory().getBoots();
+		if (stack != null)
+			copiedInventory.add(new InventoryEntry(BOOTS, stack.clone()));
 		
 		// remove old entry, if needed
 		if (playerInventories.containsKey(player))
@@ -50,6 +71,10 @@ public class InventoryKeeper {
 
 		// finally, clear player's inventory
 		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
 
 		return true;
 	}
@@ -68,10 +93,30 @@ public class InventoryKeeper {
 		// clear player's inventory first
 		Inventory inventory = player.getInventory();
 		inventory.clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
 		
 		// get contents from list and put them into player inventory
-		for (InventoryEntry inventoryEntry : playerInventories.get(player)) {
-			inventory.setItem(inventoryEntry.index, inventoryEntry.item.clone());
+		List<InventoryEntry> playerInventory = playerInventories.get(player);
+		for (InventoryEntry inventoryEntry : playerInventory) {
+			if (inventoryEntry.index >= 0)
+				inventory.setItem(inventoryEntry.index, inventoryEntry.item.clone());
+			else switch (inventoryEntry.index) {
+			case HELMET:
+				player.getInventory().setHelmet(inventoryEntry.item.clone());
+				break;
+			case CHESTPLATE:
+				player.getInventory().setChestplate(inventoryEntry.item.clone());
+				break;
+			case LEGGINGS:
+				player.getInventory().setLeggings(inventoryEntry.item.clone());
+				break;
+			case BOOTS:
+				player.getInventory().setBoots(inventoryEntry.item.clone());
+				break;
+			}
 		}
 		
 		// finally, remove old entry
