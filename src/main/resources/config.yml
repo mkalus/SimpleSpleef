@@ -62,6 +62,7 @@ settings:
 # arena specific settings
 arenas:
 # default arena
+# IMPORTANT NOTE: Arena keys have to be lower case! Please do not delete default arena! If you do not need it, simply disable it!
     default:
 # fancy name of arena
         name: 'Spleef Arena'

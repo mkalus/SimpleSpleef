@@ -239,13 +239,20 @@ public class ConfigHelper {
 		ConfigurationSection arenas = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas");
 		for (String arena : arenas.getKeys(false)) {
 			if (!arena.equalsIgnoreCase("default")) {
-				//System.out.println(arena + " found!");
+				// note uppercase arenas
+				for (char c : arena.toCharArray()) {
+					if (Character.isUpperCase(c)) {
+						SimpleSpleef.log.warning("[SimpleSpleef] Arena " + arena + " contains uppercase letters - please use all lowercase letters for the arena id.");
+						break;
+					}
+				}
+				//System.out.println("Arena " + arena + " found!");
 				ConfigurationSection currentConfig = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
 				for (String configKey : defaultConfigKeys) {
 					// ignore sections to avoid exceptions
 					if (SimpleSpleef.getPlugin().getConfig().isConfigurationSection("arenas.default." + configKey)) continue;
 					if (!currentConfig.contains(configKey)) {
-						//System.out.println(configKey + " is missing!");
+						//System.out.println(configKey + " is missing! Replacing it with default.");
 						changed = true; // yes, config was changed
 						// copy default
 						currentConfig.set(configKey, SimpleSpleef.getPlugin().getConfig().getDefaultSection().get("arenas.default." + configKey));
