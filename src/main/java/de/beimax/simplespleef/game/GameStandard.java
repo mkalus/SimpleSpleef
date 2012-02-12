@@ -1381,9 +1381,10 @@ public class GameStandard extends Game {
 		if (broadcast) {
 			// get announcement radius
 			int announcementRadius = SimpleSpleef.getPlugin().getConfig().getInt("settings.announcementRadius", -1);
-			if (announcementRadius <= 0 || arena == null)
+			if (announcementRadius <= 0 || arena == null) {
 				SimpleSpleef.getPlugin().getServer().broadcastMessage(message); // broadcast globally, of radius set to -1 or arena undefined
-			else {
+				return; // do not send to console twice
+			} else {
 				// get (rough) center of arena
 				Location center = arena.getCenter();
 
@@ -1404,8 +1405,10 @@ public class GameStandard extends Game {
 			for (Player player : this.spectators) {
 				player.sendMessage(message);
 			}
-			// send to console, too
-			SimpleSpleef.log.info(message); //TODO: limit console log
+		}
+		// send to console, too?
+		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.sendMessagesToConsole", true)) {
+			SimpleSpleef.getPlugin().getServer().getConsoleSender().sendMessage(message);
 		}
 	}
 

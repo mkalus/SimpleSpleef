@@ -53,6 +53,8 @@ settings:
     announcePrize: true
 # maximum announcement radius for broadcasts - you have to define the arena block to make this work and set the radius > -1
     announcementRadius: -1
+# should messages be sent to the console, too?
+    sendMessagesToConsole: true
 # prevent players from teleporting into/out of the arena during the game
     preventTeleportingDuringGames: true
 # Keep original positions of players/spectators for this number of seconds (default is 1h)
