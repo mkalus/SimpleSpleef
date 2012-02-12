@@ -41,22 +41,24 @@ public class OriginalPositionKeeper {
 	 * there is an original position saved already
 	 * 
 	 * @param player
+	 * @param upgradeModeToCreative true if player used to be in creative mode (keep this and upgrade player again after this)
 	 */
-	public void keepPosition(Player player) {
+	public void keepPosition(Player player, boolean upgradeModeToCreative) {
 		long maxTime = SimpleSpleef.getPlugin().getConfig().getInt("keepOriginalLocationsSeconds", 3600);
 		if (maxTime < 0) return; // should not happen...
 
 		// prune first
 		pruneOriginalLocations();
 		String playerName = player.getName();
-		// already in list? => delete old etry
+		// already in list? => delete old entry
 		if (playerOriginalLocations.containsKey(playerName))
 			updateOriginalLocationTimestamp(player);
-		// add position
+		// add new position
 		else {
 			PlayerOriginalLocation loc = new PlayerOriginalLocation();
 			loc.timestamp = System.currentTimeMillis() / 1000;
 			loc.location = player.getLocation().clone();
+			loc.upgradeModeToCreative = upgradeModeToCreative;
 
 			playerOriginalLocations.put(player.getName(), loc);
 		}
@@ -78,6 +80,22 @@ public class OriginalPositionKeeper {
 		if (loc == null) return null;
 		playerOriginalLocations.remove(player.getName());
 		return loc.location;
+	}
+	
+	/**
+	 * returns true, of player is in list and was in creative mode before
+	 * @param player
+	 * @return
+	 */
+	public boolean wasInCreativeBefore(Player player) {
+		if (player == null) return false; // no NPEs!
+
+		// prune first
+		pruneOriginalLocations();
+		
+		PlayerOriginalLocation loc = playerOriginalLocations.get(player.getName());
+		if (loc == null) return false;
+		return loc.upgradeModeToCreative;
 	}
 	
 	/**
@@ -127,5 +145,10 @@ public class OriginalPositionKeeper {
 		long timestamp;
 
 		Location location;
+		
+		/**
+		 * change gamemode to creative, if player restores original position
+		 */
+		boolean upgradeModeToCreative = false;
 	}
 }

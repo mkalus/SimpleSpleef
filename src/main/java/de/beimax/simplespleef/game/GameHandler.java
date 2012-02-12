@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -427,9 +428,11 @@ public class GameHandler implements Listener, Runnable {
 		if (game != null) {
 			game.back(player);
 		} else { // otherwise look up player in OriginalPositionKeeper and teleport him/her back
+			boolean upgradeToCreative = SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player);
 			Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
 			if (originalLocation != null) {
 				SimpleSpleef.simpleSpleefTeleport(player, originalLocation);
+				if (upgradeToCreative) player.setGameMode(GameMode.CREATIVE); // also update to creative mode, if needed
 				player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.back"));
 			} else {
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.backNoLocation"));
@@ -578,9 +581,13 @@ public class GameHandler implements Listener, Runnable {
 		
 		// not part of any game, but still in original positions? => teleport to last
 		// known position, since it is very likely that the player is still in the arena
-		Location loc = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(event.getPlayer());
-		if (loc != null)
-			SimpleSpleef.simpleSpleefTeleport(event.getPlayer(), loc);
+		Player player = event.getPlayer();
+		boolean upgradeToCreative = SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player);
+		Location loc = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
+		if (loc != null) {
+			SimpleSpleef.simpleSpleefTeleport(player, loc);
+			if (upgradeToCreative) player.setGameMode(GameMode.CREATIVE); // also update to creative mode, if needed
+		}
 	}
 	
 	/**

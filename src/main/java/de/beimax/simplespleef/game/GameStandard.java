@@ -432,9 +432,11 @@ public class GameStandard extends Game {
 		}
 		
 		// check gamemode and change it if needed
+		boolean upgradeModeToCreative = false; // needed for OriginalPositionKeeper
 		if (player.getGameMode() != GameMode.SURVIVAL) {
 			player.setGameMode(GameMode.SURVIVAL);
 			player.sendMessage(ChatColor.YELLOW + SimpleSpleef.ll("feedback.gamemodeChanged"));
+			upgradeModeToCreative = true;
 		}
 
 		// actually add player
@@ -450,7 +452,7 @@ public class GameStandard extends Game {
 
 		// remember player's last position
 		if (configuration.getBoolean("enableBackCommand", true))
-			SimpleSpleef.getOriginalPositionKeeper().keepPosition(player);
+			SimpleSpleef.getOriginalPositionKeeper().keepPosition(player, upgradeModeToCreative);
 		// teleport player to lounge
 		teleportPlayer(player, "lounge");
 
@@ -727,7 +729,7 @@ public class GameStandard extends Game {
 
 		// save spectator's original position
 		if (configuration.getBoolean("enableBackCommand", true))
-			SimpleSpleef.getOriginalPositionKeeper().keepPosition(player);
+			SimpleSpleef.getOriginalPositionKeeper().keepPosition(player, false); // never change game mode here
 
 		// teleport spectator
 		Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection("spectatorSpawn"));
