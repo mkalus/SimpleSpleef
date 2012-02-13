@@ -41,6 +41,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EndermanPickupEvent;
+import org.bukkit.event.entity.EndermanPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -1164,6 +1166,33 @@ public class GameStandard extends Game {
 		
 		return false;
 	}
+	
+	@Override
+	public boolean onEndermanPickup(EndermanPickupEvent event) {
+		if (!isEnabled() || (arena == null && floor == null) || !configuration.getBoolean("protectArena", true)) return false; // ignore disabled and undifined arenas, as well as those that are not protected
+		
+		// check location of enderman event
+		Location loc = event.getBlock().getLocation();
+		if ((arena != null && arena.contains(loc)) || (floor != null && floor.contains(loc))) { // if within arena or floor...
+			event.setCancelled(true); //..cancel spawn event
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean onEndermanPlace(EndermanPlaceEvent event) {
+		if (!isEnabled() || (arena == null && floor == null) || !configuration.getBoolean("protectArena", true)) return false; // ignore disabled and undifined arenas, as well as those that are not protected
+		
+		// check location of enderman event
+		Location loc = event.getLocation();
+		if ((arena != null && arena.contains(loc)) || (floor != null && floor.contains(loc))) { // if within arena or floor...
+			event.setCancelled(true); //..cancel spawn event
+		}
+		
+		return false;
+	}
+
 
 	/**
 	 * Do end game maintenance

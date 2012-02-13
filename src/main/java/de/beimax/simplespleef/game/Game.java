@@ -27,6 +27,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EndermanPickupEvent;
+import org.bukkit.event.entity.EndermanPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -392,6 +394,20 @@ public abstract class Game {
 	 * @return
 	 */
 	public abstract boolean onCreatureSpawn(CreatureSpawnEvent event);
+	
+	/**
+	 * Called when an enderman picks up a block
+	 * @param event
+	 * @return
+	 */
+	public abstract boolean onEndermanPickup(EndermanPickupEvent event);
+	
+	/**
+	 * Called when an enderman places a block
+	 * @param event
+	 * @return
+	 */
+	public abstract boolean onEndermanPlace(EndermanPlaceEvent event);
 
 	/**
 	 * Send a message to broadcast, or to players and spectators
