@@ -19,6 +19,7 @@
 
 package de.beimax.simplespleef;
 
+import java.io.File;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -229,6 +230,11 @@ public class SimpleSpleef extends JavaPlugin {
 		// define that default config should be copied
 		this.getConfig().options().copyDefaults(true);
 
+		// check for the existance of plugin folder
+		if (!getDataFolder().exists()) {
+			getDataFolder().mkdir(); // create it!
+		}
+		
 		// create config helper
 		ConfigHelper configHelper = new ConfigHelper();
 		// update defaults of existing arenas
