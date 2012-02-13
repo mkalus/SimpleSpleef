@@ -147,7 +147,7 @@ public class GameWithTeams extends GameStandard {
 		// broadcast message of somebody joining a team
 		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.ll("broadcasts.team", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName(), "[TEAM]", teamName);
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceTeam", false)) {
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			// send message to all receivers
 			sendMessage(broadcastMessage, player);

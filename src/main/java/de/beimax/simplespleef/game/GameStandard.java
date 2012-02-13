@@ -372,7 +372,7 @@ public class GameStandard extends Game {
 		
 		// announce new game globally?
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceGame", true))
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(ChatColor.GOLD + SimpleSpleef.ll("broadcasts.announce", "[PLAYER]", sender.getName(), "[ARENA]", getName()));
+			broadcastMessage(ChatColor.GOLD + SimpleSpleef.ll("broadcasts.announce", "[PLAYER]", sender.getName(), "[ARENA]", getName()));
 		else
 			sender.sendMessage(ChatColor.GOLD + SimpleSpleef.ll("feedback.announce", "[ARENA]", getName()));
 
@@ -459,7 +459,7 @@ public class GameStandard extends Game {
 		// now we announce the joining of the player...
 		String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.join", "[PLAYER]", player.getName(), "[ARENA]", getName());
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) { // broadcast
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage);
+			broadcastMessage(broadcastMessage);
 		} else { // player only
 			player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.join", "[ARENA]", getName()));
 			sendMessage(broadcastMessage, player); // notify players and spectators
@@ -515,7 +515,7 @@ public class GameStandard extends Game {
 		// broadcast message of somebody readying
 		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.ll("broadcasts.ready", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName());
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceReady", false)) {
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			// send message to all receivers
 			sendMessage(broadcastMessage, player);
@@ -639,7 +639,7 @@ public class GameStandard extends Game {
 		// broadcast message of somebody loosing
 		String broadcastMessage = ChatColor.DARK_PURPLE + SimpleSpleef.ll("broadcasts.leave", "[PLAYER]", player.getDisplayName(), "[ARENA]", getName());
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceJoin", true)) {
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			// send message to all receivers
 			sendMessage(broadcastMessage, player);
@@ -824,7 +824,7 @@ public class GameStandard extends Game {
 			// broadcast message of somebody loosing
 			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.lostByQuitting", "[PLAYER]", player.getName(), "[ARENA]", getName());
 			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
-				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+				broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				// send message to all receivers
 				sendMessage(broadcastMessage, player);
@@ -854,7 +854,7 @@ public class GameStandard extends Game {
 				// broadcast message of somebody loosing
 				String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.lostByDeath", "[PLAYER]", player.getName(), "[ARENA]", getName());
 				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
-					SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+					broadcastMessage(broadcastMessage); // broadcast message
 				} else {
 					// send message to all receivers
 					sendMessage(broadcastMessage, player);
@@ -891,7 +891,7 @@ public class GameStandard extends Game {
 				// broadcast message of somebody loosing
 				String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.lostByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MATERIAL]", blockName);
 				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
-					SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+					broadcastMessage(broadcastMessage); // broadcast message
 				} else {
 					// send message to all receivers
 					sendMessage(broadcastMessage, player);
@@ -907,7 +907,7 @@ public class GameStandard extends Game {
 			// broadcast message of somebody loosing
 			String broadcastMessage = ChatColor.GREEN + SimpleSpleef.ll("broadcasts.lostByCuboid", "[PLAYER]", player.getName(), "[ARENA]", getName());
 			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceLose", true)) {
-				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+				broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				// send message to all receivers
 				sendMessage(broadcastMessage, player);
@@ -1399,24 +1399,8 @@ public class GameStandard extends Game {
 			return;
 		}
 		// global broadcast
-		if (broadcast) {
-			// get announcement radius
-			int announcementRadius = SimpleSpleef.getPlugin().getConfig().getInt("settings.announcementRadius", -1);
-			if (announcementRadius <= 0 || arena == null) {
-				SimpleSpleef.getPlugin().getServer().broadcastMessage(message); // broadcast globally, of radius set to -1 or arena undefined
-				return; // do not send to console twice
-			} else {
-				// get (rough) center of arena
-				Location center = arena.getCenter();
-
-				//get players and calculate distance - only players in distance or in the game receive a message
-				if (center != null)
-					for (Player player : SimpleSpleef.getPlugin().getServer().getOnlinePlayers()) {
-						if ((player.getWorld() == center.getWorld() && player.getLocation().distance(center) <= announcementRadius) || spleefers.hasSpleefer(player) || spectators.contains(player))
-							player.sendMessage(message);
-					}
-			}
-		}
+		if (broadcast)
+			broadcastMessage(message);
 		else { // only players and specators
 			// players
 			for (Spleefer spleefer : spleefers.get()) {
@@ -1453,7 +1437,29 @@ public class GameStandard extends Game {
 		// send to console, too
 		SimpleSpleef.log.info(message);
 	}
+	
+	/**
+	 * broadcast message considering announcementRadius
+	 * @param message
+	 */
+	protected void broadcastMessage(String message) {
+		// get announcement radius
+		int announcementRadius = SimpleSpleef.getPlugin().getConfig().getInt("settings.announcementRadius", -1);
+		if (announcementRadius <= 0 || arena == null) {
+			broadcastMessage(message); // broadcast globally, of radius set to -1 or arena undefined
+			return; // do not send to console twice
+		} else {
+			// get (rough) center of arena
+			Location center = arena.getCenter();
 
+			//get players and calculate distance - only players in distance or in the game receive a message
+			if (center != null)
+				for (Player player : SimpleSpleef.getPlugin().getServer().getOnlinePlayers()) {
+					if ((player.getWorld() == center.getWorld() && player.getLocation().distance(center) <= announcementRadius) || spleefers.hasSpleefer(player) || spectators.contains(player))
+						player.sendMessage(message);
+				}
+		}
+	}
 
 	@Override
 	public boolean playerMayTeleport(Player player) {
@@ -1598,7 +1604,7 @@ public class GameStandard extends Game {
 			// broadcast prize?
 			String broadcastMessage = ChatColor.AQUA + SimpleSpleef.ll("broadcasts.prizeMoney", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[MONEY]", formated);
 			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
-				SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+				broadcastMessage(broadcastMessage); // broadcast message
 			} else {
 				sendMessage(broadcastMessage, player); // send message to all receivers
 			}
@@ -1622,7 +1628,7 @@ public class GameStandard extends Game {
 		// broadcast prize?
 		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.ll("broadcasts.prizeExperience", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[EXPERIENCE]", String.valueOf(win));
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			sendMessage(broadcastMessage, player); // send message to all receivers
 		}
@@ -1654,7 +1660,7 @@ public class GameStandard extends Game {
 		// broadcast prize?
 		String broadcastMessage = ChatColor.AQUA + SimpleSpleef.ll("broadcasts.prizeItems", "[PLAYER]", player.getName(), "[ARENA]", getName(), "[ITEM]", itemStack.getType().toString(), "[AMOUNT]", String.valueOf(itemStack.getAmount()));
 		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announcePrize", true)) {
-			SimpleSpleef.getPlugin().getServer().broadcastMessage(broadcastMessage); // broadcast message
+			broadcastMessage(broadcastMessage); // broadcast message
 		} else {
 			sendMessage(broadcastMessage, player); // send message to all receivers
 		}
