@@ -30,7 +30,7 @@ import de.beimax.simplespleef.game.Game;
  * @author mkalus
  *
  */
-public class Countdown implements Tracker {
+public class ArenaTimeout implements Tracker {
 	/**
 	 * flag to toggle interrupts
 	 */
@@ -42,11 +42,6 @@ public class Countdown implements Tracker {
 	private int count = -1;
 	
 	/**
-	 * should coundown be broadcast?
-	 */
-	private boolean broadcast;
-	
-	/**
 	 * game reference
 	 */
 	private Game game;
@@ -55,7 +50,7 @@ public class Countdown implements Tracker {
 	 * Constructor
 	 * @param count
 	 */
-	public Countdown(int count) {
+	public ArenaTimeout(int count) {
 		this.count = count;
 	}
 
@@ -65,11 +60,6 @@ public class Countdown implements Tracker {
 	@Override
 	public void initialize(Game game) {
 		this.game = game;
-
-		// announce countdown?
-		broadcast = SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceCountdown", true);
-		// start announcing
-		game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.countdownStart"), broadcast);
 	}
 
 	/* (non-Javadoc)
@@ -85,24 +75,31 @@ public class Countdown implements Tracker {
 	 */
 	@Override
 	public boolean tick() {
-		if (interrupted) {
+		// if interrupted or finished - kill timeout
+		if (interrupted || game.isFinished()) return true;
+		
+		// wait until in game
+		if (!game.isInGame()) return false;
+		
+		// in game - decrease timer
+		count--;
+		
+		// zero?
+		if (count == 0) {
 			// send message
-			game.sendMessage(ChatColor.RED + SimpleSpleef.ll("feedback.countdownInterrupted"), broadcast);
+			game.sendMessage(ChatColor.GOLD + SimpleSpleef.ll("broadcasts.winTimeout"), SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));
 			game.endGame();
 			return true;
 		}
 		
-		// do countdown
-		if (count > 0) {
-			game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.countdown", "[COUNT]", String.valueOf(count), "[ARENA]", game.getName()), broadcast);
-			count--;
-		} else {
-			// send message
-			game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.countdownGo"), broadcast);
-			// start the game itself!
-			game.start();
-			// cancel countdown
-			return true;
+		if (count % 60 == 0) { // announce full minutes
+			int minutes = count / 60;
+			if (minutes > 1) game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutMinutes", "[COUNT]", String.valueOf(count), "[ARENA]", game.getName()), false);
+			else game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutMinute", "[ARENA]", game.getName()), false);
+		} else if (count == 30) { // 30 secs
+			game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutHalfMinute", "[ARENA]", game.getName()), false);
+		} else if (count <= 10) { // last ten seconds
+			game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutCountdown", "[COUNT]", String.valueOf(count), "[ARENA]", game.getName()), false);
 		}
 		
 		return false;

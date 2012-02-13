@@ -87,6 +87,7 @@ broadcasts:
     winMulti: '[PLAYER] have won the spleef in arena [ARENA]. Congratulations to all!'
     winTeamNone: 'Strangely there was no winning team in arena [ARENA].'
     winTeam: 'Team [TEAM] has won a game in area [ARENA]. Congratulations to [PLAYER]!'
+    winTimeout: 'Time ran out! There was no winner in arena [ARENA].'
 feedback:
     arenaDisabled: disabled
     arenaOff: 'no game'
@@ -129,6 +130,10 @@ feedback:
     teamnone: 'No'
     blue: 'blue'
     red: 'red'
+    timeoutMinutes: '[COUNT] minutes remain to play in arena [ARENA].'
+    timeoutMinute: 'Only one minute remains to play in arena [ARENA].'
+    timeoutHalfMinute: '30 seconds to play in arena [ARENA].'
+    timeoutCountdown: '[COUNT] seconds to play.'
 admin:
     help: |
       Admin Commands (/spl admin...)

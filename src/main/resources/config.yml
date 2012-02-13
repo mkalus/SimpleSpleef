@@ -224,6 +224,8 @@ arenas:
         arenaFloorRepairsAfter: -1
 # Time in seconds for new blocks to get repaired
         arenaFloorRepairTick: 10
+# Timeout for the game in seconds - e.g. 10 minutes will be 60 secs * 10 = 600 (0 or lower to disable this setting)
+        arenaTimeout: 0
 # Arena cube that will be protected (saved on disk for restoration)
         arena:
             enabled: false

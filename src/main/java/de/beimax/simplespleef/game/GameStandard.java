@@ -59,6 +59,7 @@ import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.arenarestoring.ArenaRestorer;
 import de.beimax.simplespleef.game.arenarestoring.HardArenaRestorer;
 import de.beimax.simplespleef.game.arenarestoring.SoftRestorer;
+import de.beimax.simplespleef.game.trackers.ArenaTimeout;
 import de.beimax.simplespleef.game.trackers.Countdown;
 import de.beimax.simplespleef.game.trackers.FloorDissolveWorker;
 import de.beimax.simplespleef.game.trackers.FloorRepairWorker;
@@ -330,6 +331,12 @@ public class GameStandard extends Game {
 					addTracker(new PlayerOnBlockDegenerator(blockDegeneration, configuration.getStringList("degeneratingBlocks")));
 				}
 			}
+		}
+		
+		// arena timeout
+		int arenaTimeout = configuration.getInt("arenaTimeout", -1);
+		if (arenaTimeout > 0) {
+			addTracker(new ArenaTimeout(arenaTimeout));
 		}
 		
 		// determine type of arena
@@ -1446,7 +1453,7 @@ public class GameStandard extends Game {
 		// get announcement radius
 		int announcementRadius = SimpleSpleef.getPlugin().getConfig().getInt("settings.announcementRadius", -1);
 		if (announcementRadius <= 0 || arena == null) {
-			broadcastMessage(message); // broadcast globally, of radius set to -1 or arena undefined
+			SimpleSpleef.getPlugin().getServer().broadcastMessage(message); // broadcast globally, of radius set to -1 or arena undefined
 			return; // do not send to console twice
 		} else {
 			// get (rough) center of arena
