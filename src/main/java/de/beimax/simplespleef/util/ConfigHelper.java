@@ -248,6 +248,11 @@ public class ConfigHelper {
 				}
 				//System.out.println("Arena " + arena + " found!");
 				ConfigurationSection currentConfig = SimpleSpleef.getPlugin().getConfig().getConfigurationSection("arenas." + arena);
+				// sanity check - it seems that some users somehow warp their configuration in strange ways...
+				if (currentConfig == null) {
+					SimpleSpleef.log.warning("[SimpleSpleef] Arena " + arena + " configuration seems to be broken somehow - no configuration key arenas." + arena + " could be retreived from the config.");
+					continue;
+				}
 				for (String configKey : defaultConfigKeys) {
 					// ignore sections to avoid exceptions
 					if (SimpleSpleef.getPlugin().getConfig().isConfigurationSection("arenas.default." + configKey)) continue;
