@@ -114,6 +114,7 @@ feedback:
     prizeExperience: 'Du hast [EXPERIENCE] Erfahrungspunkte für dein Spiel in Arena [ARENA] erhalten.'
     prizeItems: 'Du hast [AMOUNT] [ITEM] gewonnen.'
     update: 'SimpleSpleef [OLDVERSION] bitte auf Version [NEWVERSION] updaten.'
+    infoEmpty: 'Niemand hier...'
     infoHeader: 'Arena: [ARENA]'
     infoName: 'Name: [NAME]'
     infoStatus: 'Status: [STATUS]'

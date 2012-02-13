@@ -494,11 +494,19 @@ public abstract class Game {
 	 * @param game
 	 */
 	public void printGamePlayersAndSpectators(CommandSender sender) {
-		//TODO: info if there are no spleefers and spectators at all
 
 		// list of spleefers and spectators
 		if (sender != null) {
 			String spleefers = getListOfSpleefers();
+			String spectators = getListOfSpectators();
+
+			//info if there are no spleefers and spectators at all
+			if (spleefers == null && spectators == null) {
+				sender.sendMessage(SimpleSpleef.ll("feedback.infoEmpty"));
+				return;
+			}
+
+			// otherwise list separately
 			if (spleefers != null)
 				sender.sendMessage(SimpleSpleef.ll("feedback.infoSpleefers", "[SPLEEFERS]", spleefers));
 			if (supportsCommandReady()) {
@@ -507,7 +515,6 @@ public abstract class Game {
 					sender.sendMessage(SimpleSpleef.ll("feedback.infoUnreadySpleefers", "[SPLEEFERS]", ChatColor.RED + unready));
 				else if (getListOfUnreadySpleefers() != null) sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.infoAllReady"));
 			}
-			String spectators = getListOfSpectators();
 			if (spectators != null)
 				sender.sendMessage(SimpleSpleef.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
 		}		
