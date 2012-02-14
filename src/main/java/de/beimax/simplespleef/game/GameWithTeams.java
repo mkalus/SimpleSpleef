@@ -212,6 +212,27 @@ public class GameWithTeams extends GameStandard {
 			if (!stillHere[i]) return true; // one team has lost
 		return false;
 	}
+
+	@Override
+	protected void winByTouching(Player player) {
+		// get team
+		int team = -99;
+		for (Spleefer spleefer : spleefers.get()) {
+			if (spleefer.getPlayer() == player) {
+				team = spleefer.getTeam();
+				break;
+			}
+		}
+		if (team == -99) {
+			SimpleSpleef.log.warning("[SimpleSpleef] Could not determine winning team while touching a block.");
+		}
+		
+		for (Spleefer spleefer : spleefers.get()) {
+			// if not the winning team and not already lost and not in same team
+			if (spleefer.getTeam() != team && !spleefer.hasLost())
+				playerLoses(spleefer.getPlayer(), true);
+		}
+	}
 	
 	@Override
 	protected void broadcastWinners(LinkedList<Spleefer> winners) {

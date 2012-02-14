@@ -82,6 +82,7 @@ broadcasts:
     prizeMoney: '[PLAYER] hat [MONEY] als Preisgeld in Arena [ARENA] erhalten.'
     prizeExperience: '[PLAYER] hat [EXPERIENCE] Erfahrungspunkte für das Spiel in Arena [ARENA] erhalten.'
     prizeItems: '[PLAYER] hat [AMOUNT] [ITEM] in Arena [ARENA] gewonnen.'
+    winByTouching: '[PLAYER] hat in der Arena [ARENA] das Zielgebiet erreicht.'
     winNone: 'Komischerweise gab es keinen Gewinner in der Arena [ARENA].'
     winOne: '[PLAYER] hat das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
     winMulti: '[PLAYER] haben das Spleef in Arena [ARENA] gewonnen. Herzlichen Glückwunsch!'
@@ -145,7 +146,8 @@ admin:
       delarena arena|Lösche Arena.
       arena a/b|Definiere Punkt a/b der Arena.
       floor a/b|Definiere Punkt a/b des Bodens.
-      lose a/b|Definiere Punkt a/b des Lose-Kubus.
+      lose a/b|Definiere Punkt a/b des Verlierer-Kubus.
+      win a/b|Definiere Punkt a/b des Gewinner-Kubus.
       spawn lounge/game/spectator/lose/winner|Setze Spawnpunkt.
       disable/enable arena|(De)aktiviere Arena.
       reload|Neuladen der config.yml.

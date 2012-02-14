@@ -152,6 +152,11 @@ arenas:
         loseBlocks:
             - STATIONARY_WATER
             - STATIONARY_LAVA
+# Win game by touching certain blocks?
+        winOnTouchBlocks: false
+# Win game by touching these blocks (in them/standing on them - name/id)
+        winBlocks:
+            - GOLD_BLOCK
 # Players dying lose
         loseOnDeath: true
 # Players logging out lose
@@ -225,6 +230,8 @@ arenas:
 # Time in seconds for new blocks to get repaired
         arenaFloorRepairTick: 10
 # Timeout for the game in seconds - e.g. 10 minutes will be 60 secs * 10 = 600 (0 or lower to disable this setting)
+# Note: If you use NoLagg the teleportation back to the lounge after the game has finished will throw a warning.
+# Can't do much about this at the moment. 
         arenaTimeout: 0
 # Arena cube that will be protected (saved on disk for restoration)
         arena:
@@ -260,6 +267,19 @@ arenas:
                 z: 0
 # Entering this cube area will make players lose
         lose:
+            enabled: false
+            a:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+            b:
+                world: world
+                x: 0
+                y: 0
+                z: 0
+# Entering this cube area will make players win
+        win:
             enabled: false
             a:
                 world: world

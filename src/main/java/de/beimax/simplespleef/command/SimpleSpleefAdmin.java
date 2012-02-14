@@ -100,7 +100,7 @@ public class SimpleSpleefAdmin {
 			// check argument length
 			if (checkThreeArgs(sender, args, adminCommand))
 				checkArena = delarenaCommand(sender, args[2]);
-		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose") || adminCommand.equals("lose")) {
+		} else if (adminCommand.equals("arena") || adminCommand.equals("floor") || adminCommand.equals("loose") || adminCommand.equals("lose") || adminCommand.equals("win")) {
 			if (adminCommand.equals("loose")) adminCommand = "lose"; //correct spelling
 			// check for WorldEdit selection
 			if (args.length == 2 && SimpleSpleef.getWorldEditAPI() != null) {

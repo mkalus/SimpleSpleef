@@ -82,6 +82,7 @@ broadcasts:
     prizeMoney: '[PLAYER] has received [MONEY] as prize money in arena [ARENA].'
     prizeExperience: '[PLAYER] was awarded [EXPERIENCE] experience points for playing in arena [ARENA].'
     prizeItems: '[PLAYER] has received [AMOUNT] [ITEM] as prize in arena [ARENA].'
+    winByTouching: '[PLAYER] has reached the goal in arena [ARENA].'
     winNone: 'Strangely there was no winner in arena [ARENA].'
     winOne: '[PLAYER] has won the spleef in arena [ARENA]. Congratulation!'
     winMulti: '[PLAYER] have won the spleef in arena [ARENA]. Congratulations to all!'
@@ -146,6 +147,7 @@ admin:
       arena a/b|Define point a/b of arena cube.
       floor a/b|Define point a/b of the floor cube.
       lose a/b|Define point a/b of lose cube.
+      win a/b|Define point a/b of win cube.
       spawn lounge/game/spectator/lose/winner|Set spawn point.
       enable/disable arena|Enable/disable arena.
       reload|Reload config.

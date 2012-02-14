@@ -106,6 +106,11 @@ public class GameStandard extends Game {
 	 * to make game faster:
 	 */
 	protected Set<Material> loseOnTouchMaterial;
+
+	/**
+	 * to make game faster:
+	 */
+	protected Set<Material> winOnTouchMaterial;
 	
 	/**
 	 * list of players which may be teleported - used by teleportPlayer and playerMayTeleport
@@ -126,6 +131,11 @@ public class GameStandard extends Game {
 	 * lose cuboid
 	 */
 	private Cuboid lose;
+
+	/**
+	 * win cuboid
+	 */
+	private Cuboid win;
 	
 	/**
 	 * set to false, if disallowDigBlocks has been chosen in config
@@ -262,11 +272,26 @@ public class GameStandard extends Game {
 				if (this.loseOnTouchMaterial.size() == 0) this.loseOnTouchMaterial = null; //no
 			} else this.loseOnTouchMaterial = null; //no
 		} else this.loseOnTouchMaterial = null; // reset
+		
+		if (conf.getBoolean("winOnTouchBlocks", false)) {
+			// is winBlocks a valid list?
+			if (conf.isList("winBlocks")) { //yes
+				this.winOnTouchMaterial = new HashSet<Material>();
+				for (String material : conf.getStringList("winBlocks")) {
+					Material m = Material.getMaterial(material);
+					// check existence of material
+					if (m == null) SimpleSpleef.log.warning("[SimpleSpleef] " + getId() + " configuration warning! Unknown Material in winBlocks: " + material);
+					else this.winOnTouchMaterial.add(m);
+				}
+				if (this.winOnTouchMaterial.size() == 0) this.winOnTouchMaterial = null; //no
+			} else this.winOnTouchMaterial = null; //no
+		} else this.winOnTouchMaterial = null; // reset
 
 		// define arena, floor and lose cuboids
 		arena = SimpleSpleef.getGameHandler().configToCuboid(getId(), "arena");
 		floor = SimpleSpleef.getGameHandler().configToCuboid(getId(), "floor");
 		lose = SimpleSpleef.getGameHandler().configToCuboid(getId(), "lose");
+		win = SimpleSpleef.getGameHandler().configToCuboid(getId(), "win");
 		// block destruction/keep hashes
 		if (conf.isList("allowDigBlocks")) {
 			allowDigBlocks = true;
@@ -911,6 +936,28 @@ public class GameStandard extends Game {
 			}
 		}
 		
+		//player touched certain block (setting winOnTouchBlocks)
+		if (winOnTouchMaterial != null) {
+			Material touchedBlock = event.getTo().getBlock().getType();
+			Material onBlock = player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType();
+			// what happened exactly?
+			boolean wonByTouching = winOnTouchMaterial.contains(touchedBlock);
+			boolean wonByStandingOn = winOnTouchMaterial.contains(onBlock);
+			if (wonByTouching || wonByStandingOn) {
+				// broadcast message of somebody loosing
+				String broadcastMessage = ChatColor.GOLD + SimpleSpleef.ll("broadcasts.winByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName());
+				if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true)) {
+					broadcastMessage(broadcastMessage); // broadcast message
+				} else {
+					// send message to all receivers
+					sendMessage(broadcastMessage, player);
+				}
+				//player wins
+				winByTouching(player);
+				return true;
+			}
+		}
+		
 		// check location within "lose" cuboid (setting lose)
 		if (lose != null && lose.contains(player.getLocation())) {
 			// broadcast message of somebody loosing
@@ -923,6 +970,21 @@ public class GameStandard extends Game {
 			}
 			// Ha, lost!
 			playerLoses(player, true);
+			//return true; //redundant right now		
+		}
+		
+		// check location within "win" cuboid (setting win)
+		if (win != null && win.contains(player.getLocation())) {
+			// broadcast message of somebody loosing
+			String broadcastMessage = ChatColor.GOLD + SimpleSpleef.ll("broadcasts.winByTouching", "[PLAYER]", player.getName(), "[ARENA]", getName());
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true)) {
+				broadcastMessage(broadcastMessage); // broadcast message
+			} else {
+				// send message to all receivers
+				sendMessage(broadcastMessage, player);
+			}
+			// Player wins
+			winByTouching(player);
 			//return true; //redundant right now		
 		}
 		return true;
@@ -1562,6 +1624,18 @@ public class GameStandard extends Game {
 		// check for number of players that have to remain on the field to tell it a win
 		if (spleefers.inGame() <= configuration.getInt("remainingPlayersWin", 1)) return true;
 		return false;
+	}
+	
+	/**
+	 * Player wins by touching or reaching a certain part of the arena
+	 * @param player
+	 */
+	protected void winByTouching(Player player) {
+		for (Spleefer spleefer : spleefers.get()) {
+			// if not the winning player and not already lost
+			if (spleefer.getPlayer() != player && !spleefer.hasLost())
+				playerLoses(spleefer.getPlayer(), true);
+		}
 	}
 	
 	/**
