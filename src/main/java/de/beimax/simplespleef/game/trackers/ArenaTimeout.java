@@ -87,7 +87,8 @@ public class ArenaTimeout implements Tracker {
 		// zero?
 		if (count == 0) {
 			// send message
-			game.sendMessage(ChatColor.GOLD + SimpleSpleef.ll("broadcasts.winTimeout"), SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));
+			game.sendMessage(ChatColor.GOLD + SimpleSpleef.ll("broadcasts.winTimeout", "[ARENA]", game.getName()), SimpleSpleef.getPlugin().getConfig().getBoolean("settings.announceWin", true));
+			game.setInterrupted(); // set game status to interrupted
 			game.endGame();
 			return true;
 		}

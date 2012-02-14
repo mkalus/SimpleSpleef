@@ -57,6 +57,7 @@ public abstract class Game {
 	protected static final int STATUS_COUNTDOWN = 3; // game countdown is running
 	protected static final int STATUS_STARTED = 4; // game is actually running
 	protected static final int STATUS_FINISHED = 5; // game has finished, now cleaning up
+	protected static final int STATUS_INTERRUPTED = 10; // game has been interrupted
 
 	/**
 	 * name of the game/arena
@@ -219,6 +220,22 @@ public abstract class Game {
 		return this.status == STATUS_FINISHED;
 	}
 
+	/**
+	 * has game been interrupted?
+	 * @return true/false
+	 */
+	public boolean isInterrupted() {
+		return this.status == STATUS_INTERRUPTED;
+	}
+
+	/**
+	 * set game status to interrupted - mostly for trackers to teleport players back
+	 * @return true/false
+	 */
+	public void setInterrupted() {
+		this.status = STATUS_INTERRUPTED;
+	}
+	
 	/**
 	 * Return true, if game supports a "ready" players list. Override for your own inventions.
 	 * @return

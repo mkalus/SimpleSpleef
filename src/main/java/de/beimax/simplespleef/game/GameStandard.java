@@ -1218,9 +1218,9 @@ public class GameStandard extends Game {
 		}
 		
 		// do we need to teleport players?
-		if (oldStatus == Game.STATUS_COUNTDOWN) { // game ended during countdown - teleport players back to lounge
+		if (oldStatus == Game.STATUS_COUNTDOWN || oldStatus == Game.STATUS_INTERRUPTED) { // game ended during countdown - teleport players back to lounge
 			for (Spleefer spleefer : spleefers.get()) {
-				if (!spleefer.hasLost()) // will leave out players that left, etc.
+				if (!spleefer.hasLost()) // will leave out players that left, died, lost, etc.
 					teleportPlayer(spleefer.getPlayer(), "lounge");
 			}
 		}
