@@ -98,6 +98,7 @@ feedback:
     join: 'You have joined a game in arena [ARENA].'
     leave: 'You have left the game.'
     joinFee: 'You paid [AMOUNT] to join the game.'
+    refund: 'You were refunded [AMOUNT].'
     gamemodeChanged: 'Your game mode was changed.'
     team: 'You have joined team [TEAM].'
     ready: 'You are ready for the game!'

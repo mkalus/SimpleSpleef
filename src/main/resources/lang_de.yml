@@ -99,6 +99,7 @@ feedback:
     join: 'Du nimmst am Spleef in der Arena [ARENA] teil.'
     leave: 'Du verlässt das Spiel.'
     joinFee: '[AMOUNT] für die Teilnahme am Spiel gezahlt.'
+    refund: 'Dir wurden [AMOUNT] gutgeschrieben.'
     gamemodeChanged: 'Dein game mode wurde geändert.'
     ready: 'Du bist bereit für das Spiel!'
     readyTimeoutStart: 'Der erste Spieler ist bereit zum Spiel in der Arena [ARENA! Macht euch jetzt ebenfalls möglichst schnell bereit!'

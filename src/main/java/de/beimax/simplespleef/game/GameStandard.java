@@ -693,6 +693,7 @@ public class GameStandard extends Game {
 		if (isJoinable() || isReady() || isFinished()) { //still joinable or ready or finished state - not so bad!
 			// just remove spleefer
 			spleefers.removeSpleefer(player);
+			refundPlayer(player);
 		} else if (status == Game.STATUS_COUNTDOWN) { // during countdown - end the game...
 			// set player to lost, so that the player is not teleported twice - see endGame() for more info
 			spleefers.setLost(player);
@@ -723,6 +724,12 @@ public class GameStandard extends Game {
 
 	@Override
 	public boolean delete(CommandSender sender) {
+		// refund players, if possible
+		if (configuration.getDouble("refundMoney", 0.0) > 0) {
+			for (Spleefer spleefer : spleefers.get())
+				refundPlayer(spleefer.getPlayer());
+		}
+		
 		// end the game first, if game is started
 		if (!endGame()) return false;
 		// send message
@@ -1974,5 +1981,21 @@ public class GameStandard extends Game {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * refund player, if possible
+	 * @param player
+	 */
+	private void refundPlayer(Player player) {
+		// refund player?
+		if (configuration.getDouble("refundMoney", 0.0) > 0 && SimpleSpleef.economy != null) {
+			double money = configuration.getDouble("refundMoney", 0.0);
+			String formated = SimpleSpleef.economy.format(money);
+			// give money to player
+			SimpleSpleef.economy.depositPlayer(player.getName(), money);
+			// player gets message
+			player.sendMessage(ChatColor.AQUA + SimpleSpleef.ll("feedback.refund", "[ARENA]", getName(), "[MONEY]", formated));
+		}
 	}
 }

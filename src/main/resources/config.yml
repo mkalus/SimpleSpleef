@@ -150,6 +150,8 @@ arenas:
         prizeExperiencePerPlayer: 0
 # Winner gets this amount of experience fixed (total is per player + fixed)
         prizeExperienceFixed: 0
+# If a player leaves the game before it has started or the game is deleted, refund this amount of money
+        refundMoney: 0.0
 # Lose game by touching certain blocks?
         loseOnTouchBlocks: true
 # Lose game by touching these blocks (in them/standing on them - name/id)
