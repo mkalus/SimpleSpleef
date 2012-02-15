@@ -95,7 +95,7 @@ public class ArenaTimeout implements Tracker {
 		
 		if (count % 60 == 0) { // announce full minutes
 			int minutes = count / 60;
-			if (minutes > 1) game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutMinutes", "[COUNT]", String.valueOf(count), "[ARENA]", game.getName()), false);
+			if (minutes > 1) game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutMinutes", "[COUNT]", String.valueOf(minutes), "[ARENA]", game.getName()), false);
 			else game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutMinute", "[ARENA]", game.getName()), false);
 		} else if (count == 30) { // 30 secs
 			game.sendMessage(ChatColor.BLUE + SimpleSpleef.ll("feedback.timeoutHalfMinute", "[ARENA]", game.getName()), false);
