@@ -94,6 +94,10 @@ arenas:
 # If useReady has the value block or commandAndBlock, use the following material block that can be touched to ready the game (default iron block = 42)
 # If you use colored wool, please use WOOL:4 (for yellow wool) - in team games, this will ready the gamer for any team.
         readyBlockMaterial: '42'
+# Timeout in seconds for readying. If set to a number above 1, a timer starts after the first player readies. It waits for [readyTimeout]
+# seconds for other players to ready. Once the timer expires, unready players will be kicked from the spleef game. If readyAutoStart has
+# been set to true and enough players are available, the game will then start. Otherwise, the game will be ready to start via command/sign.
+        readyTimeout: 0
 # Clear inventory at game start and restore after game has ended
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid

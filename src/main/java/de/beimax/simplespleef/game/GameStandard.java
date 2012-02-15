@@ -58,19 +58,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import de.beimax.simplespleef.SimpleSpleef;
-import de.beimax.simplespleef.game.arenarestoring.ArenaRestorer;
-import de.beimax.simplespleef.game.arenarestoring.HardArenaRestorer;
-import de.beimax.simplespleef.game.arenarestoring.SoftRestorer;
-import de.beimax.simplespleef.game.trackers.ArenaTimeout;
-import de.beimax.simplespleef.game.trackers.Countdown;
-import de.beimax.simplespleef.game.trackers.FloorDissolveWorker;
-import de.beimax.simplespleef.game.trackers.FloorRepairWorker;
-import de.beimax.simplespleef.game.trackers.PlayerOnBlockDegenerator;
-import de.beimax.simplespleef.game.trackers.Tracker;
-import de.beimax.simplespleef.gamehelpers.Cuboid;
-import de.beimax.simplespleef.gamehelpers.InventoryKeeper;
-import de.beimax.simplespleef.gamehelpers.MaterialHelper;
-import de.beimax.simplespleef.gamehelpers.LocationHelper;
+import de.beimax.simplespleef.game.arenarestoring.*;
+import de.beimax.simplespleef.game.trackers.*;
+import de.beimax.simplespleef.gamehelpers.*;
 
 /**
  * @author mkalus
@@ -366,6 +356,13 @@ public class GameStandard extends Game {
 			addTracker(new ArenaTimeout(arenaTimeout));
 		}
 		
+		if (configuration.getBoolean("useReady", false)) {
+			int readyTimeout = configuration.getInt("readyTimeout", 0);
+			if (readyTimeout > 0) {
+				addTracker(new ReadyTimeout(arenaTimeout));
+			}
+		}
+		
 		// determine type of arena
 		String type;
 		if (configuration.isBoolean("restoreArenaAfterGame")) type = "soft";
@@ -591,10 +588,8 @@ public class GameStandard extends Game {
 		return true;
 	}
 
-	/**
-	 * check the readiness status of a game and possibly start it
-	 */
-	protected void checkReadyAndStartGame() {
+	@Override
+	public void checkReadyAndStartGame() {
 		if (spleefers.countUnreadyPlayers() == 0) {
 			// autostart game once all are ready
 			if (configuration.getBoolean("readyAutoStart", false)) {

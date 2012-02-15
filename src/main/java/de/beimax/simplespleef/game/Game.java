@@ -315,6 +315,11 @@ public abstract class Game {
 	public abstract boolean removeSpectator(Player player);
 	
 	/**
+	 * check the readiness status of a game and possibly start it
+	 */
+	public abstract void checkReadyAndStartGame();
+	
+	/**
 	 * Called when a spleefer moves in this game
 	 * @param event
 	 */

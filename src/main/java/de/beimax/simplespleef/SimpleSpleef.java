@@ -19,7 +19,6 @@
 
 package de.beimax.simplespleef;
 
-import java.io.File;
 import java.util.Map;
 import java.util.logging.Logger;
 
