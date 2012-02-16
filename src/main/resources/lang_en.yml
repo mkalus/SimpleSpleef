@@ -84,7 +84,7 @@ broadcasts:
     prizeItems: '[PLAYER] has received [AMOUNT] [ITEM] as prize in arena [ARENA].'
     winByTouching: '[PLAYER] has reached the goal in arena [ARENA].'
     winNone: 'Strangely there was no winner in arena [ARENA].'
-    winOne: '[PLAYER] has won the spleef in arena [ARENA]. Congratulation!'
+    winOne: '[PLAYER] has won the spleef in arena [ARENA]. Congratulations!'
     winMulti: '[PLAYER] have won the spleef in arena [ARENA]. Congratulations to all!'
     winTeamNone: 'Strangely there was no winning team in arena [ARENA].'
     winTeam: 'Team [TEAM] has won a game in area [ARENA]. Congratulations to [PLAYER]!'

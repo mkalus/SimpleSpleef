@@ -1638,6 +1638,8 @@ public class GameStandard extends Game {
 			if (spleefer.getPlayer() != player && !spleefer.hasLost())
 				playerLoses(spleefer.getPlayer(), true);
 		}
+		// check game over manually, if there was no winner yet
+		if (!isFinished() && checkGameOver()) gameOver();
 	}
 	
 	/**
