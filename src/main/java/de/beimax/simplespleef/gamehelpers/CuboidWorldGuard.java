@@ -6,6 +6,7 @@ package de.beimax.simplespleef.gamehelpers;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -79,6 +80,8 @@ public class CuboidWorldGuard implements Cuboid {
 		BlockVector max = region.getMaximumPoint();
 		BlockVector min = region.getMinimumPoint();
 
+		LinkedList<Chunk> chunksChanged = new LinkedList<Chunk>();
+
 		final int[] coords = {(min.getBlockX()<max.getBlockX()?min.getBlockX():max.getBlockX()),
 				(min.getBlockY()<max.getBlockY()?min.getBlockY():max.getBlockY()),
 				(min.getBlockZ()<max.getBlockZ()?min.getBlockZ():max.getBlockZ())};
@@ -88,10 +91,23 @@ public class CuboidWorldGuard implements Cuboid {
 				for (int z = 0; z < blockData[0][0].length; z++) {
 					if (this.region.contains(coords[0] + x, coords[1] + y, coords[2] + z)) { // only restore, if within the region
 						Block block = this.world.getBlockAt(coords[0] + x, coords[1] + y, coords[2] + z);
+
+						// load chunk if needed
+						Chunk here = block.getChunk();
+						if (!here.isLoaded()) here.load();
+
 						block.setTypeId(blockData[x][y][z].getTypeId(), false);
 						block.setData(blockData[x][y][z].getData(), false);
+						
+						// add to list of changed chunks
+						if (!chunksChanged.contains(here))
+							chunksChanged.addFirst(here);
 					}
 				}
+		
+		// refresh chunks
+		for (Chunk chunk : chunksChanged)
+			this.world.refreshChunk(chunk.getX(), chunk.getZ());
 	}
 
 

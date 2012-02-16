@@ -6,6 +6,7 @@ package de.beimax.simplespleef.gamehelpers;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -133,13 +134,28 @@ public class CuboidImpl implements Cuboid {
 	 * @see de.beimax.simplespleef.util.Cuboid#setSerializedBlocks(de.beimax.simplespleef.util.SerializableBlockData[][][])
 	 */
 	public void setSerializedBlocks(SerializableBlockData[][][] blockData) {
+		LinkedList<Chunk> chunksChanged = new LinkedList<Chunk>();
+		
 		for (int x = 0; x < blockData.length; x++)
 			for (int y = 0; y < blockData[0].length; y++)
-				for (int z = 0; z < blockData[0][0].length; z++) {
+				for (int z = 0; z < blockData[0][0].length; z++) {					
 					Block block = this.world.getBlockAt(this.coords[0] + x, this.coords[1] + y, this.coords[2] + z);
+
+					// load chunk if needed
+					Chunk here = block.getChunk();
+					if (!here.isLoaded()) here.load();
+
 					block.setTypeId(blockData[x][y][z].getTypeId(), false);
 					block.setData(blockData[x][y][z].getData(), false);
+					
+					// add to list of changed chunks
+					if (!chunksChanged.contains(here))
+						chunksChanged.addFirst(here);
 				}
+		
+		// refresh chunks
+		for (Chunk chunk : chunksChanged)
+			this.world.refreshChunk(chunk.getX(), chunk.getZ());
 	}
 
 	@Override

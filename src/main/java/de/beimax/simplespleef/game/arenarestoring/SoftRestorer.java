@@ -6,9 +6,11 @@ package de.beimax.simplespleef.game.arenarestoring;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.gamehelpers.Cuboid;
 import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
@@ -60,19 +62,36 @@ public class SoftRestorer extends ArenaRestorer {
 		if (it == null)
 			it = changedBlocks.iterator();
 
-		// 40 blocks per tick max
-		for (int i = 0; i < 40; i++) {
+		LinkedList<Chunk> chunksChanged = new LinkedList<Chunk>();
+
+		// 200 blocks per tick max
+		for (int i = 0; i < 200; i++) {
 			if (it == null || !it.hasNext()) {
+				if (it == null)
+					SimpleSpleef.log.warning("[SimpleSpleef] Could not restore the whole arena - changed blocks iterator has been killed somehow.");
 				it = null;
 				break;
 			} else { // restore blocks
 				BlockChange changedBlock = it.next();
+
 				Block block = changedBlock.location.getBlock();
+
+				// load chunk if needed
+				Chunk here = block.getChunk();
+				if (!here.isLoaded()) here.load();
+
 				block.setTypeId(changedBlock.blockData.getTypeId(), false);
 				block.setData(changedBlock.blockData.getData(), false);	
+				
+				// add to list of changed chunks
+				if (!chunksChanged.contains(here))
+					chunksChanged.addFirst(here);
 			}
 		}
-		
+
+		// refresh chunks
+		for (Chunk chunk : chunksChanged)
+			chunk.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
 	}
 
 	@Override
