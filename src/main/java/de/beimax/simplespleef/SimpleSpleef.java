@@ -43,6 +43,8 @@ import de.beimax.simplespleef.command.SimpleSpleefSignCommandExecutor;
 import de.beimax.simplespleef.game.GameHandler;
 import de.beimax.simplespleef.gamehelpers.OriginalPositionKeeper;
 import de.beimax.simplespleef.listeners.PluginListener;
+import de.beimax.simplespleef.statistics.StatisticsFactory;
+import de.beimax.simplespleef.statistics.StatisticsModule;
 import de.beimax.simplespleef.util.ConfigHelper;
 import de.beimax.simplespleef.util.Translator;
 import de.beimax.simplespleef.util.UpdateChecker;
@@ -105,6 +107,18 @@ public class SimpleSpleef extends JavaPlugin {
 	 */
 	public static GameHandler getGameHandler() {
 		return gameHandler;
+	}
+	
+	/**
+	 * reference to statistics handler
+	 */
+	private static StatisticsModule statisticsModule;
+
+	/**
+	 * @return the statisticsModule
+	 */
+	public static StatisticsModule getStatisticsModule() {
+		return statisticsModule;
 	}
 
 	/**
@@ -193,6 +207,8 @@ public class SimpleSpleef extends JavaPlugin {
 		
 		// check for WorldEdit 
 		checkForWorldEdit();
+		// create statistics handler
+		createStatisticsHander();
 	}
 
 	/**
@@ -208,11 +224,8 @@ public class SimpleSpleef extends JavaPlugin {
 		SimpleSpleef.gameHandler = null;
 		SimpleSpleef.economy = null;
 		SimpleSpleef.originalPositionKeeper = null;
-		lang = null;
-		//this.playerListener = null;
-		//this.entityListener = null;
-		//this.blockListener = null;
-		//this.commandExecutor = null;
+		SimpleSpleef.lang = null;
+		SimpleSpleef.statisticsModule = null;
 		//TODO add if more stuff comes along
 
 		//save config to disk
@@ -397,5 +410,22 @@ public class SimpleSpleef extends JavaPlugin {
 	    }
 	 
 	    return (WorldGuardPlugin) plugin;
+	}
+
+
+	/**
+	 * create new statistics handler instance
+	 */
+	private void createStatisticsHander() {
+		if (getConfig().getBoolean("settings.enableStatistics", true))
+			try {
+				StatisticsFactory statisticsHandler = new StatisticsFactory();
+				statisticsModule = statisticsHandler.getStatisticsModuleByName(getConfig().getString("settings.statisticsModule", "file"),
+						getConfig().getConfigurationSection("settings.statisticsSettings"));
+			} catch (Exception e) {
+				SimpleSpleef.log.warning("[SimpleSpleef] Could not initiate statistics module - settings bugged somehow or database error. Disabling statistics for now.");
+				statisticsModule = null;
+			}
+		else statisticsModule = null;
 	}
 }

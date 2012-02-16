@@ -19,6 +19,7 @@
 
 package de.beimax.simplespleef.game;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -153,6 +154,16 @@ public class GameStandard extends Game {
 	 * blocks that can be dug or (if allowDigBlocks is false) cannot
 	 */
 	private LinkedList<ItemStack> digBlocks;
+	
+	/**
+	 * start timestamp
+	 */
+	protected long startTime = -1;
+
+	/**
+	 * finish timestamp
+	 */
+	protected long finishTime = -1;
 
 	/**
 	 * Constructor
@@ -637,6 +648,11 @@ public class GameStandard extends Game {
 	public boolean start() {
 		// change game status
 		status = STATUS_STARTED;
+		startTime = new Date().getTime();
+
+		// notify statistics
+		if (SimpleSpleef.getStatisticsModule() != null)
+			SimpleSpleef.getStatisticsModule().gameStarted(this);
 
 		// possibly clear inventory
 		clearInventories();
@@ -1272,7 +1288,12 @@ public class GameStandard extends Game {
 		
 		// change game status
 		status = STATUS_FINISHED;
-		
+		finishTime = new Date().getTime();
+
+		// notify statistics
+		if (SimpleSpleef.getStatisticsModule() != null)
+			SimpleSpleef.getStatisticsModule().gameFinished(this);
+
 		// only do this when game was in progress
 		if (wasInProgress) {
 			// possibly take away shovel items
@@ -1603,6 +1624,9 @@ public class GameStandard extends Game {
 	protected void playerLoses(Player player, boolean teleport) {
 		// set player to lost
 		spleefers.setLost(player);
+		// notify statistics
+		if (SimpleSpleef.getStatisticsModule() != null)
+			SimpleSpleef.getStatisticsModule().playerLostGame(player, this);
 		// if degeneration keeper is on, delete player from list
 		//if (playerOnBlockDegenerator != null) playerOnBlockDegenerator.removePlayer(player); //TODO check on how to do this
 		// message to player
@@ -1661,6 +1685,11 @@ public class GameStandard extends Game {
 				payPrizeMoney(player);
 				payPrizeExperience(player);
 				payPrizeItems(player);
+
+				// notify statistics
+				if (SimpleSpleef.getStatisticsModule() != null)
+					SimpleSpleef.getStatisticsModule().playerWonGame(player, this);
+
 				// teleport winners back to winner's point or to lounge
 				if (configuration.isConfigurationSection("winnerSpawn") && configuration.getBoolean("winnerSpawn.enabled", false))
 					teleportPlayer(player, "winner");
@@ -1999,5 +2028,15 @@ public class GameStandard extends Game {
 			// player gets message
 			player.sendMessage(ChatColor.AQUA + SimpleSpleef.ll("feedback.refund", "[ARENA]", getName(), "[MONEY]", formated));
 		}
+	}
+
+	@Override
+	public long getStartTime() {
+		return startTime;
+	}
+
+	@Override
+	public  long getFinishTime() {
+		return finishTime;
 	}
 }

@@ -486,6 +486,18 @@ public abstract class Game {
 	 * @param tracker
 	 */
 	public abstract void interruptAllTrackers();
+	
+	/**
+	 * get time when game started
+	 * @return timestamp or -1
+	 */
+	public abstract long getStartTime();
+
+	/**
+	 * get time when game finished
+	 * @return timestamp or -1
+	 */
+	public abstract long getFinishTime();
 
 	/**
 	 * update a certain block location - notify trackers of this change

@@ -59,6 +59,10 @@ settings:
     preventTeleportingDuringGames: true
 # Keep original positions of players/spectators for this number of seconds (default is 1h)
     keepOriginalLocationsSeconds: 3600
+# Enable statistics module?
+    enableStatistics: true
+# Type of statistics module; possible values are: file
+    statisticsModule: file
 # arena specific settings
 arenas:
 # default arena
