@@ -32,7 +32,21 @@ public class StatisticsFactory {
 	 * @return
 	 */
 	public StatisticsModule getStatisticsModuleByName(String moduleName, ConfigurationSection configuration) throws Exception {
+		if (moduleName == null) throw new Exception(); // no NPEs here!
+		StatisticsModule module = null;
+		
+		// file module?
+		if (moduleName.equalsIgnoreCase("file")) {
+			// just create file statistics - do nothing else
+			module = new FileStatisticsModule();
+		}
+		// TODO: more module types here
+		
 		// end by throwing an exception
-		throw new Exception();
+		if (module == null)
+			throw new Exception();
+		// initialize module and return reference
+		module.initialize();
+		return module;
 	}
 }

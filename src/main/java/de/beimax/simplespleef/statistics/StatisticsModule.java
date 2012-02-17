@@ -31,6 +31,11 @@ import de.beimax.simplespleef.game.Game;
  */
 public interface StatisticsModule {
 	/**
+	 * called on plugin enable to so some initial work
+	 */
+	public void initialize() throws Exception;
+
+	/**
 	 * Notify statistics that player won a game
 	 * @param player
 	 * @param game

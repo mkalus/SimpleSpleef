@@ -63,6 +63,8 @@ settings:
     enableStatistics: true
 # Type of statistics module; possible values are: file
     statisticsModule: file
+# Settings for statistics modules
+    statisticsSettings: false
 # arena specific settings
 arenas:
 # default arena
