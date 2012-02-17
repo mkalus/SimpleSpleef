@@ -733,19 +733,30 @@ public class GameHandler implements Listener, Runnable {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.statisticsNoPlayer", "[PLAYER]", playerName));
 			return;			
 		}
+
 		// ok, we have the statistics, print them
 		sender.sendMessage(SimpleSpleef.ll("feedback.statisticsPlayer", "[PLAYER]", playerName));
 		try {
 			int played = (Integer) statistics.get("gamesCount");
 			sender.sendMessage(SimpleSpleef.ll("feedback.statisticsGamesCount", "[COUNT]", String.valueOf(played)));
 		} catch (Exception e) {} // do not print it...
+
 		try {
 			int won = (Integer) statistics.get("gamesWon");
 			sender.sendMessage(SimpleSpleef.ll("feedback.statisticsGamesWon", "[COUNT]", String.valueOf(won)));
 		} catch (Exception e) {} // do not print it...
+
 		try {
 			int lost = (Integer) statistics.get("gamesLost");
 			sender.sendMessage(SimpleSpleef.ll("feedback.statisticsGamesLost", "[COUNT]", String.valueOf(lost)));
+		} catch (Exception e) {} // do not print it...
+
+		SimpleDateFormat sdf = new SimpleDateFormat();
+		sdf.applyPattern(SimpleSpleef.ll("localization.dateFormat"));
+		try {
+			long datetime = (Long) statistics.get("lastGameTick");
+			if (datetime > 0)
+				sender.sendMessage(SimpleSpleef.ll("feedback.statisticsLastGameTick", "[DATETIME]", sdf.format(new Date(datetime))));
 		} catch (Exception e) {} // do not print it...
 	}
 
@@ -767,10 +778,20 @@ public class GameHandler implements Listener, Runnable {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.statisticsEmpty"));
 			return;			
 		}
+
+		if (arena == null) sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.statisticsTopTenGlobal"));
+		else sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.statisticsTopTen", "[ARENA]", arena.getName()));
+
 		// ok, we have the statistics, print them
-		
-		// TODO Auto-generated method stub
-		
+		int count = 0;
+		for (TopTenEntry entry : topten) {
+			StringBuilder sb = new StringBuilder();
+			if ((++count) < 10) sb.append(' ');
+			sb.append(count).append(") ").append(ChatColor.LIGHT_PURPLE).append(entry.player).append(ChatColor.GRAY).append(" (").append(entry.won).
+				append('/').append(entry.lost).append('/').append(entry.games).append(')');
+			
+			sender.sendMessage(sb.toString());
+		}
 	}
 
 	/**
@@ -781,12 +802,14 @@ public class GameHandler implements Listener, Runnable {
 	private void sendStatistics(CommandSender sender, Game game) {
 		if (SimpleSpleef.getStatisticsModule() != null) {
 			HashMap<String, Object> statistics = SimpleSpleef.getStatisticsModule().getStatistics(game);
+
 			sender.sendMessage(SimpleSpleef.ll("feedback.statisticsGamesCount", "[COUNT]", String.valueOf(statistics.get("gamesCount"))));
 			try {
 				DecimalFormat df = new DecimalFormat("0.00");
 				double averagePlayers = (double) (Integer) statistics.get("gamesTotalPlayers") / (double) (Integer) statistics.get("gamesCount");
 				sender.sendMessage(SimpleSpleef.ll("feedback.statisticsPlayersAverage", "[COUNT]", df.format(averagePlayers)));
 			} catch (Exception e) {} // do not print it...
+
 			try {
 				DecimalFormat df = new DecimalFormat("00");
 				double averageLength = (double) (Integer) statistics.get("gamesTotalLength") / (double) (Integer) statistics.get("gamesCount") / 1000;
@@ -797,6 +820,7 @@ public class GameHandler implements Listener, Runnable {
 
 				sender.sendMessage(SimpleSpleef.ll("feedback.statisticsLengthAverage", "[COUNT]", length));
 			} catch (Exception e) {} // do not print it...
+
 			SimpleDateFormat sdf = new SimpleDateFormat();
 			sdf.applyPattern(SimpleSpleef.ll("localization.dateFormat"));
 			try {
@@ -804,6 +828,7 @@ public class GameHandler implements Listener, Runnable {
 				String lastOrThis = game.isInGame()?"statisticsThisStarted":"statisticsLastStarted";
 				sender.sendMessage(SimpleSpleef.ll("feedback." + lastOrThis, "[DATETIME]", sdf.format(new Date(datetime))));
 			} catch (Exception e) {} // do not print it...
+
 			try {
 				long datetime = (Long) statistics.get("lastGameFinishedAt");
 				if (datetime > 0) // if -1 or so, do not print, since game is still in progress

@@ -19,6 +19,8 @@
 
 package de.beimax.simplespleef.statistics;
 
+import java.util.Comparator;
+
 /**
  * Simple class to contain top ten entry
  * @author mkalus
@@ -30,7 +32,49 @@ public class TopTenEntry {
 	public String player;
 	
 	/**
-	 * number of games won/lost
+	 * number of games total
 	 */
 	public int games;
+	
+	/**
+	 * number of games won
+	 */
+	public int lost;
+	
+	/**
+	 * number of games lost
+	 */
+	public int won;
+	
+	/**
+	 * @return new ascending comparator for TopTenEntries
+	 */
+	public static Comparator<TopTenEntry> getAscendingComparator() {
+		return new TopTenEntryAscendingComparator();
+	}
+	
+	/**
+	 * Ascending comparator class for sorted list using top ten entries
+	 * @author mkalus
+	 */
+	private static class TopTenEntryAscendingComparator implements Comparator<TopTenEntry> {
+		@Override
+		public int compare(TopTenEntry entry1, TopTenEntry entry2) {
+			// first compare games won
+			if (entry1.won > entry2.won) return -1;
+			if (entry1.won < entry2.won) return 1;
+			
+			// now compare lost games, too - but negatively
+			if (entry1.lost < entry2.lost) return -1;
+			if (entry1.lost > entry2.lost) return 1;
+			
+			// lastly, compare games total
+			if (entry1.games > entry2.games) return -1;
+			if (entry1.games < entry2.games) return 1;
+
+			// compare name, if everything above fails
+			return entry1.player.compareTo(entry2.player);
+		}
+		
+	}
 }

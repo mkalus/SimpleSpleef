@@ -159,6 +159,9 @@ feedback:
     statisticsPlayer: 'Spleef-Statistiken von [PLAYER]'
     statisticsGamesWon: 'Gewonnene Spiele: [COUNT]'
     statisticsGamesLost: 'Verlorene Spiele: [COUNT]'
+    statisticsLastGameTick: 'Letztes Spielupdate: [DATETIME]'
+    statisticsTopTenGlobal: 'Top 10 Spleefers (gewonnen/verloren/Spiele)'
+    statisticsTopTen: 'Top 10 [ARENA] (gew./verl./Spiele)'
 admin:
     help: |
       Adminkommandos (/spl admin...)

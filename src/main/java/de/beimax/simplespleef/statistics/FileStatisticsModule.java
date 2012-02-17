@@ -22,7 +22,9 @@ package de.beimax.simplespleef.statistics;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -82,10 +84,13 @@ public class FileStatisticsModule implements StatisticsModule {
 		statistics.set(key + "gamesWon", gamesCount);
 
 		// increase arena winner count
-		String gkey = "arenas." + game.getId() + ".winners." + player.getName();
+		String gkey = "arenas." + game.getId() + ".players." + player.getName() + ".gamesWon";
 		int arenaWon = statistics.getInt(gkey, 0) + 1;
 		statistics.set(gkey, arenaWon);
 		
+		// add last game activity entry
+		statistics.set(key + "lastGameTick", game.getStartTime());
+
 		// save statistics
 		saveStatistics();
 	}
@@ -102,9 +107,12 @@ public class FileStatisticsModule implements StatisticsModule {
 		statistics.set(key + "gamesLost", gamesCount);
 
 		// increase arena loser count
-		String gkey = "arenas." + game.getId() + ".losers." + player.getName();
+		String gkey = "arenas." + game.getId() + ".players." + player.getName() + ".gamesLost";
 		int arenaLost = statistics.getInt(gkey, 0) + 1;
 		statistics.set(gkey, arenaLost);
+
+		// add last game activity entry
+		statistics.set(key + "lastGameTick", game.getStartTime());
 
 		// save statistics
 		saveStatistics();
@@ -142,6 +150,13 @@ public class FileStatisticsModule implements StatisticsModule {
 		for (Spleefer spleefer : game.getSpleefers().get()) {
 			String pkey = "players." + spleefer.getPlayer().getName() + ".";
 			statistics.set(pkey + "gamesCount", statistics.getInt(pkey + "gamesCount", 0) + 1);
+
+			// add last game activity entry
+			statistics.set(pkey + "lastGameTick", game.getStartTime());
+			
+			// increase game counter for player in this arena
+			pkey = key + pkey + "gamesCount";
+			statistics.set(pkey, statistics.getInt(pkey, 0) + 1);
 		}
 
 		// save statistics
@@ -191,6 +206,7 @@ public class FileStatisticsModule implements StatisticsModule {
 		map.put("gamesCount", playerSection.getInt("gamesCount", 0));
 		map.put("gamesLost", playerSection.getInt("gamesLost", 0));
 		map.put("gamesWon", playerSection.getInt("gamesWon", 0));
+		map.put("lastGameTick", playerSection.getLong("lastGameTick", -1));
 
 		return map;
 	}
@@ -222,14 +238,43 @@ public class FileStatisticsModule implements StatisticsModule {
 
 	@Override
 	public List<TopTenEntry> getTopTen() {
-		// TODO Auto-generated method stub
-		return null;
+		return getTopTen("players");
 	}
 
 	@Override
 	public List<TopTenEntry> getTopTen(Game game) {
-		// TODO Auto-generated method stub
-		return null;
+		return getTopTen("arenas." + game.getId() + ".players");
+	}
+	
+	/**
+	 * actual worker method to get top 10 players
+	 * @param key
+	 * @return
+	 */
+	private List<TopTenEntry> getTopTen(String key) {
+		TreeSet<TopTenEntry> topTenList = new TreeSet<TopTenEntry>(TopTenEntry.getAscendingComparator());
+		// get list of all gamers
+		for (String playerName : statistics.getConfigurationSection(key).getKeys(false)) {
+			ConfigurationSection playerSection = statistics.getConfigurationSection(key + "." + playerName);
+
+			TopTenEntry topTenEntry = new TopTenEntry();
+			topTenEntry.player = playerName;
+			topTenEntry.games = playerSection.getInt("gamesCount", 0);
+			topTenEntry.lost = playerSection.getInt("gamesLost", 0);
+			topTenEntry.won = playerSection.getInt("gamesWon", 0);
+			
+			topTenList.add(topTenEntry);
+		}
+
+		// get top 10
+		int count = 0;
+		LinkedList<TopTenEntry> topten = new LinkedList<TopTenEntry>();
+		for (TopTenEntry entry : topTenList) {
+			topten.add(entry);
+			if (++count >= 10) break;
+		}
+
+		return topten;
 	}
 
 	/**
