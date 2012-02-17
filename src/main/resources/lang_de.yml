@@ -144,6 +144,12 @@ feedback:
     timeoutMinute: 'Nur noch eine Minute zu spielen in der Arena [ARENA].'
     timeoutHalfMinute: '30 Sekunden verbleiben in der Arena [ARENA].'
     timeoutCountdown: 'Noch [COUNT] Sekunden zu spielen.'
+    statisticsGamesCount: 'Bisherige Spiele: [COUNT]'
+    statisticsPlayersAverage: 'Durchschnittliche Spielerzahl: [COUNT]'
+    statisticsLengthAverage: 'Durchschnittliche Spieldauer: [COUNT]'
+    statisticsLastStarted: 'Letztes Spiel startete: [DATETIME]'
+    statisticsThisStarted: 'Dieses Spiel startete: [DATETIME]'
+    statisticsLastFinished: 'Letztes Spiel endete:   [DATETIME]'
 admin:
     help: |
       Adminkommandos (/spl admin...)
@@ -176,6 +182,8 @@ adminfeedback:
     enable: '[ARENA] aktiviert.'
     disable: '[ARENA] deaktiviert.'
     reload: 'Konfiguration neu geladen.'
+localization:
+    dateFormat: 'dd.MM.yyyy HH:mm:ss'
 material:
     STATIONARY_WATER: Wasser
     STATIONARY_LAVA: Lava

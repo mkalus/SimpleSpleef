@@ -19,6 +19,10 @@
 
 package de.beimax.simplespleef.game;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -398,10 +402,51 @@ public class GameHandler implements Listener, Runnable {
 			color = ChatColor.DARK_GRAY;
 		}
 		sender.sendMessage(SimpleSpleef.ll("feedback.infoStatus", "[STATUS]", color + information));
+		// print statistics, if activated
+		sendStatistics(sender, game);
 		// list of spleefers and spectators
 		game.printGamePlayersAndSpectators(sender);
 	}
 	
+	/**
+	 * send statistics of a game to a sender
+	 * @param sender
+	 * @param game
+	 */
+	private void sendStatistics(CommandSender sender, Game game) {
+		if (SimpleSpleef.getStatisticsModule() != null) {
+			HashMap<String, Object> statistics = SimpleSpleef.getStatisticsModule().getStatistics(game);
+			sender.sendMessage(SimpleSpleef.ll("feedback.statisticsGamesCount", "[COUNT]", String.valueOf(statistics.get("gamesCount"))));
+			try {
+				DecimalFormat df = new DecimalFormat("0.00");
+				double averagePlayers = (double) (Integer) statistics.get("gamesTotalPlayers") / (double) (Integer) statistics.get("gamesCount");
+				sender.sendMessage(SimpleSpleef.ll("feedback.statisticsPlayersAverage", "[COUNT]", df.format(averagePlayers)));
+			} catch (Exception e) {} // do not print it...
+			try {
+				DecimalFormat df = new DecimalFormat("00");
+				double averageLength = (double) (Integer) statistics.get("gamesTotalLength") / (double) (Integer) statistics.get("gamesCount") / 1000;
+				int h = (int) (averageLength / 3600);
+				int m = (int) ((averageLength / 60) % 60);
+				int s = (int) (averageLength % 60);
+				String length =  df.format(h) + ":" + df.format(m) + ":" + df.format(s);
+
+				sender.sendMessage(SimpleSpleef.ll("feedback.statisticsLengthAverage", "[COUNT]", length));
+			} catch (Exception e) {} // do not print it...
+			SimpleDateFormat sdf = new SimpleDateFormat();
+			sdf.applyPattern(SimpleSpleef.ll("localization.dateFormat"));
+			try {
+				long datetime = (Long) statistics.get("lastGameStartedAt");
+				String lastOrThis = game.isInGame()?"statisticsThisStarted":"statisticsLastStarted";
+				sender.sendMessage(SimpleSpleef.ll("feedback." + lastOrThis, "[DATETIME]", sdf.format(new Date(datetime))));
+			} catch (Exception e) {} // do not print it...
+			try {
+				long datetime = (Long) statistics.get("lastGameFinishedAt");
+				if (datetime > 0) // if -1 or so, do not print, since game is still in progress
+					sender.sendMessage(SimpleSpleef.ll("feedback.statisticsLastFinished", "[DATETIME]", sdf.format(new Date(datetime))));
+			} catch (Exception e) {} // do not print it...
+		}
+	}
+
 	/**
 	 * List spleefers in arena
 	 * @param sender

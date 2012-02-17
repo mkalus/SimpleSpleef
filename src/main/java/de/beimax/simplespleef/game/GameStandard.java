@@ -1627,8 +1627,6 @@ public class GameStandard extends Game {
 		// notify statistics
 		if (SimpleSpleef.getStatisticsModule() != null)
 			SimpleSpleef.getStatisticsModule().playerLostGame(player, this);
-		// if degeneration keeper is on, delete player from list
-		//if (playerOnBlockDegenerator != null) playerOnBlockDegenerator.removePlayer(player); //TODO check on how to do this
 		// message to player
 		player.sendMessage(ChatColor.RED + SimpleSpleef.ll("feedback.lost"));
 		// broadcast message has to be sent by calling method

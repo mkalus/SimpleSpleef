@@ -144,6 +144,12 @@ feedback:
     timeoutMinute: 'Only one minute remains to play in arena [ARENA].'
     timeoutHalfMinute: '30 seconds to play in arena [ARENA].'
     timeoutCountdown: '[COUNT] seconds to play.'
+    statisticsGamesCount: 'Games played: [COUNT]'
+    statisticsPlayersAverage: 'Average number of players: [COUNT]'
+    statisticsLengthAverage: 'Average length: [COUNT]'
+    statisticsLastStarted: 'Last game started:  [DATETIME]'
+    statisticsThisStarted: 'This game started: [DATETIME]'
+    statisticsLastFinished: 'Last game finished: [DATETIME]'
 admin:
     help: |
       Admin Commands (/spl admin...)
@@ -176,6 +182,8 @@ adminfeedback:
     enable: '[ARENA] enabled.'
     disable: '[ARENA] disabled.'
     reload: 'configuration reloaded.'
+localization:
+    dateFormat: 'MM/dd/yyyy hh:mm:ss a'
 material:
     STATIONARY_WATER: water
     STATIONARY_LAVA: lava
