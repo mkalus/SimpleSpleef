@@ -39,11 +39,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	/**
 	 * list of all commands
 	 */
-	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "ready", "team", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin" };
+	private final static String[] commands = {"help", "announce", "join", "arenas", "info", "list", "ready", "team", "start", "countdown", "leave", "stop", "delete", "reset", "watch", "back", "admin", "me", "player", "topten" };
 	/**
 	 * commands possible from the console
 	 */
-	private final static String[] consoleCommands = {"help", "announce", "arenas", "info", "list", "countdown", "reset", "admin"};
+	private final static String[] consoleCommands = {"help", "announce", "arenas", "info", "list", "countdown", "reset", "admin", "player", "topten" };
 
 	/**
 	 * Print command string from settings line
@@ -380,6 +380,45 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 		// too many arguments?
 		if (tooManyArguments(sender, args, 0)) return;
 		SimpleSpleef.getGameHandler().back(sender);
+	}
+	
+	/**
+	 * Me command
+	 * @param sender
+	 * @param args
+	 */
+	protected void meCommand(CommandSender sender, String[] args) {
+		// too many arguments?
+		if (tooManyArguments(sender, args, 0)) return;
+		SimpleSpleef.getGameHandler().playerStatistics(sender, sender.getName());
+	}
+	
+	/**
+	 * Player command
+	 * @param sender
+	 * @param args
+	 */
+	protected void playerCommand(CommandSender sender, String[] args) {
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// too few arguments?
+		if (tooFewArguments(sender, args, 1)) return;
+		SimpleSpleef.getGameHandler().playerStatistics(sender, args[1]);
+	}
+	
+	/**
+	 * Topten command
+	 * @param sender
+	 * @param args
+	 */
+	protected void toptenCommand(CommandSender sender, String[] args) {
+		// too many arguments?
+		if (tooManyArguments(sender, args, 1)) return;
+		// get game from 2nd argument
+		Game arena;
+		if (args.length < 2) arena = null;
+		else arena = this.getArenaFromArgument(sender, args, 1);
+		SimpleSpleef.getGameHandler().toptenStatistics(sender, arena);
 	}
 	
 	//TODO: add further commands here...

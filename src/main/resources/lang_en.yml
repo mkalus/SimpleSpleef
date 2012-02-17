@@ -16,6 +16,9 @@ command:
     reset: 'reset arena|Reset a game in arena (delete for admins/moderators)'
     watch: 'watch [arena]|Watch a game (in arena)'
     back: 'back|Teleport back to original position'
+    me: 'me|Show my game statistics'
+    player: 'player name|Show game statistics of player'
+    topten: 'topten [arena]|Show top 10 total or by arena'
     admin: 'admin [cammand]|Execute an admin command.'
 errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
@@ -67,6 +70,9 @@ errors:
     list: 'No game in [ARENA]!'
     teleport: 'Teleportation is not allowed during the game in arena [ARENA].'
     gamemodeChange: 'You cannot change your gamemode while spleefing!'
+    statisticsDisabled: 'Statistics have been disabled.'
+    statisticsNoPlayer: 'Player [PLAYER] not found in spleef statistics.'
+    statisticsEmpty: 'Could not find any statics entries.'
 broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'
@@ -150,6 +156,9 @@ feedback:
     statisticsLastStarted: 'Last game started:  [DATETIME]'
     statisticsThisStarted: 'This game started: [DATETIME]'
     statisticsLastFinished: 'Last game finished: [DATETIME]'
+    statisticsPlayer: 'Spleef Statistics of [PLAYER]'
+    statisticsGamesWon: 'Games won: [COUNT]'
+    statisticsGamesLost: 'Games lost: [COUNT]'
 admin:
     help: |
       Admin Commands (/spl admin...)

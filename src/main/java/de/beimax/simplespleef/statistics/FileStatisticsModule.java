@@ -22,6 +22,7 @@ package de.beimax.simplespleef.statistics;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -177,9 +178,9 @@ public class FileStatisticsModule implements StatisticsModule {
 	 * @see de.beimax.simplespleef.statistics.StatisticsModule#getStatistics(org.bukkit.entity.Player)
 	 */
 	@Override
-	public HashMap<String, Object> getStatistics(Player player) {
+	public HashMap<String, Object> getStatistics(String player) {
 		// get config section
-		ConfigurationSection playerSection = statistics.getConfigurationSection("players." + player.getName());
+		ConfigurationSection playerSection = statistics.getConfigurationSection("players." + player);
 		
 		// is it null?
 		if (playerSection == null) return null;
@@ -217,6 +218,18 @@ public class FileStatisticsModule implements StatisticsModule {
 		map.put("gamesTotalLength", arenaSection.getInt("gamesTotalLength", 0));
 
 		return map;
+	}
+
+	@Override
+	public List<TopTenEntry> getTopTen() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<TopTenEntry> getTopTen(Game game) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

@@ -61,6 +61,15 @@ permissions:
   simplespleef.back:
     description: Teleport back from arena
     default: true
+  simplespleef.me:
+    description: Show my game statistics
+    default: true
+  simplespleef.player:
+    description: Show game statistics of player
+    default: true
+  simplespleef.topten:
+    description: Show top 10 total or by arena
+    default: true
   simplespleef.admin:
     description: Admin commands
     default: op
@@ -111,3 +120,13 @@ permissions:
   simplespleef.sign.back:
     description: Teleport back from arena (sign command)
     default: true
+  simplespleef.sign.me:
+    description: Show my game statistics (sign command)
+    default: true
+  simplespleef.sign.player:
+    description: Show game statistics of player (sign command)
+    default: true
+  simplespleef.sign.topten:
+    description: Show top 10 total or by arena (sign command)
+    default: true
+ 

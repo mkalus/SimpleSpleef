@@ -16,6 +16,9 @@ command:
     reset: 'reset arena|Lösche ein Spiel in einer Arena (für Admins/Moderatoren)'
     watch: 'watch [arena]|Schaue bei einem Spiel (in Arena) zu'
     back: 'back|Zur ursprünglichen Position zurückteleportieren'
+    me: 'me|Meine Spielstatistik ansehen'
+    player: 'playername|Spielstatistik von Spieler ansehen'
+    topten: 'topten [arena]|Top 10 insgesamt oder von Arena ansehen'
     admin: 'admin [kommando]|Führt ein Admin-Kommando aus'
 errors:
     noPermissionAtAll: 'Keine Berechtigungen für SimpleSpleef!'
@@ -67,6 +70,9 @@ errors:
     list: 'Kein Spiel in Arena [ARENA]!'
     teleport: 'Teleportation ist während des Spiels in Arena [ARENA] nicht erlaubt.'
     gamemodeChange: 'Du kannst wärend des Spleefens deinen game mode nicht ändern!'
+    statisticsDisabled: 'Statistiken sind ausgeschaltet.'
+    statisticsNoPlayer: 'Spieler [PLAYER] wurde in den Spleef-Statistiken nicht gefunden.'
+    statisticsEmpty: 'Keine Statistiken gefunden.'
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'
@@ -144,12 +150,15 @@ feedback:
     timeoutMinute: 'Nur noch eine Minute zu spielen in der Arena [ARENA].'
     timeoutHalfMinute: '30 Sekunden verbleiben in der Arena [ARENA].'
     timeoutCountdown: 'Noch [COUNT] Sekunden zu spielen.'
-    statisticsGamesCount: 'Bisherige Spiele: [COUNT]'
+    statisticsGamesCount: 'Gespielte Spiele: [COUNT]'
     statisticsPlayersAverage: 'Durchschnittliche Spielerzahl: [COUNT]'
     statisticsLengthAverage: 'Durchschnittliche Spieldauer: [COUNT]'
     statisticsLastStarted: 'Letztes Spiel startete: [DATETIME]'
     statisticsThisStarted: 'Dieses Spiel startete: [DATETIME]'
     statisticsLastFinished: 'Letztes Spiel endete:   [DATETIME]'
+    statisticsPlayer: 'Spleef-Statistiken von [PLAYER]'
+    statisticsGamesWon: 'Gewonnene Spiele: [COUNT]'
+    statisticsGamesLost: 'Verlorene Spiele: [COUNT]'
 admin:
     help: |
       Adminkommandos (/spl admin...)

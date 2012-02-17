@@ -20,6 +20,7 @@
 package de.beimax.simplespleef.statistics;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -66,7 +67,7 @@ public interface StatisticsModule {
 	 * @param player
 	 * @return
 	 */
-	public HashMap<String, Object> getStatistics(Player player);
+	public HashMap<String, Object> getStatistics(String player);
 	
 	/**
 	 * Get statistics for a certain game
@@ -74,4 +75,16 @@ public interface StatisticsModule {
 	 * @return
 	 */
 	public HashMap<String, Object> getStatistics(Game game);
+	
+	/**
+	 * get global top ten entries
+	 * @return
+	 */
+	public List<TopTenEntry> getTopTen();
+	
+	/**
+	 * get top ten entries of a game
+	 * @return
+	 */
+	public List<TopTenEntry> getTopTen(Game game);
 }
