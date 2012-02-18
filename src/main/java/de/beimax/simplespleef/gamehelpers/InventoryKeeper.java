@@ -85,7 +85,7 @@ public class InventoryKeeper {
 	 * @return
 	 */
 	public boolean restoreInventory(Player player) {
-		if (player == null || playerInventories == null) return false; // no NPEs
+		if (player == null || !player.isOnline() || playerInventories == null) return false; // no NPEs
 
 		// entry not found -> return
 		if (!playerInventories.containsKey(player)) return false;

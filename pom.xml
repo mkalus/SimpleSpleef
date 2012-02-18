@@ -43,6 +43,11 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=terranetworkorg  -DartifactId=stats -Dversion=2.1.1 -Dpackaging=jar -Dfile=Stats.jar' in order to make this work: -->
+			<groupId>terranetworkorg</groupId>
+			<version>[2.1.1,)</version>
+			<artifactId>stats</artifactId>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

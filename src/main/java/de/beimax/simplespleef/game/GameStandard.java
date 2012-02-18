@@ -1950,6 +1950,9 @@ public class GameStandard extends Game {
 	 * @return
 	 */
 	protected boolean removeShovelItem(Player player, boolean checkSetting) {
+		// ignore offline players
+		if (player == null || !player.isOnline()) return false;
+
 		// should setting be checked first?
 		if (checkSetting && !configuration.getBoolean("playersLoseShovelAtGameEnd", true)) return false; // no shovel lost
 		// get material
