@@ -60,6 +60,11 @@ public class CuboidImpl implements Cuboid {
 		if (this.world == world) return true;
 		return false;
 	}
+	
+	@Override
+	public World getWorld() {
+		return this.world;
+	}
 
 	/**
 	 * checks whether coordinates are within this cuboid
@@ -138,7 +143,7 @@ public class CuboidImpl implements Cuboid {
 		
 		for (int x = 0; x < blockData.length; x++)
 			for (int y = 0; y < blockData[0].length; y++)
-				for (int z = 0; z < blockData[0][0].length; z++) {					
+				for (int z = 0; z < blockData[0][0].length; z++) {
 					Block block = this.world.getBlockAt(this.coords[0] + x, this.coords[1] + y, this.coords[2] + z);
 
 					// load chunk if needed
@@ -181,5 +186,21 @@ public class CuboidImpl implements Cuboid {
 		return new Location(this.world, (this.coords[3] - this.coords[0])/2 + this.coords[0],
 				(this.coords[4] - this.coords[1])/2 + this.coords[1],
 				(this.coords[5] - this.coords[2])/2 + this.coords[2]);
+	}
+
+	@Override
+	public Location getMinimumLocation() {
+		return new Location(this.world, this.coords[0], this.coords[1], this.coords[2]);
+	}
+	
+	@Override
+	public Location getMaximumLocation() {
+		return new Location(this.world, this.coords[3], this.coords[4], this.coords[5]);
+	}
+
+	@Override
+	public final int[] getMinMaxCoords() {
+		final int[] coords = {this.coords[0], this.coords[1], this.coords[2], this.coords[3], this.coords[4], this.coords[5]};
+		return coords;
 	}
 }

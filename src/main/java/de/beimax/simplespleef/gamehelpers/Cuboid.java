@@ -21,6 +21,7 @@ package de.beimax.simplespleef.gamehelpers;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import de.beimax.simplespleef.game.Game;
@@ -62,4 +63,28 @@ public interface Cuboid {
 	 * @return
 	 */
 	public Location getCenter();
+	
+	/**
+	 * return minimum location
+	 * @return
+	 */
+	public Location getMinimumLocation();
+	
+	/**
+	 * return maximum location
+	 * @return
+	 */
+	public Location getMaximumLocation();
+	
+	/**
+	 * return min/max coordinates
+	 * @return
+	 */
+	public int[] getMinMaxCoords();
+	
+	/**
+	 * return world the cuboid is in
+	 * @return
+	 */
+	public World getWorld();
 }

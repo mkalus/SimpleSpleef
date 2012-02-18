@@ -381,11 +381,14 @@ public class GameStandard extends Game {
 		else type = "soft"; // fall back
 		
 		ArenaRestorer arenaRestorer = null;
-		if (type.equals("arenahard")) { // hard arena restorer
+		if (type.equalsIgnoreCase("arenahard")) { // hard arena restorer
 			arenaRestorer = new HardArenaRestorer(configuration.getInt("restoreArenaAfterGameTimer", 0));
 			arenaRestorer.setArena(arena);
-		} else if (type.equals("floorhard")) { // hard floor restorer
+		} else if (type.equalsIgnoreCase("floorhard") || type.equalsIgnoreCase("hard")) { // hard floor restorer
 			arenaRestorer = new HardArenaRestorer(configuration.getInt("restoreArenaAfterGameTimer", 0));
+			arenaRestorer.setArena(floor);
+		} else if (type.equalsIgnoreCase("simple")) { // simple floor restorer
+			arenaRestorer = new SimpleRestorer(configuration.getInt("restoreArenaAfterGameTimer"), configuration.getString("simpleRestorerBlock", "GRASS"));
 			arenaRestorer.setArena(floor);
 		} else { // soft restorer
 			Cuboid possibleFloor = floor==null?arena:floor;

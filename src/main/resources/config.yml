@@ -225,10 +225,13 @@ arenas:
         enableExplosionsDuringGame: false
 # Restore arena after the game - this setting allows several options:
 # - false: turn arena restoration off completely
-# - true/soft: keeps track of removed/placed blocks and restores them after the game in a "soft" way - recommended but more memory intensive
-# - floorhard: resets the floor the hard way (does not touch placed blocks outside arena floor)
+# - true/soft: keeps track of removed/placed blocks and restores them after the game in a "soft" way - memory intensive and does not work for everybody it seems
+# - simple: simple floor restorer - will fill the area defined as floor (see below) with a certain block at the start and end of games - use if you have trouble with the soft restorer
+# - floorhard: resets the floor the hard way (does not touch placed blocks outside arena floor, so disable blockplacing!)
 # - arenahard: resets the whole arena the hard way (may lag on large arenas)
         restoreArenaAfterGame: true
+# Block type that the simple restorer will set as floor block - only simple materials are allowed, so you can't set colored wool, sorry!
+        simpleRestorerBlock: GRASS
 # Wait for a number of seconds before restoring arena - 0 to disable this timer
         restoreArenaAfterGameTimer: 0
 # Players can teleport back to original position after game with /spl back?

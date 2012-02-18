@@ -48,13 +48,18 @@ public class CuboidWorldGuard implements Cuboid {
 		return this.region.contains(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}
 
+	@Override
+	public World getWorld() {
+		return this.world;
+	}
+
 	/* (non-Javadoc)
 	 * @see de.beimax.simplespleef.util.Cuboid#getSerializedBlocks()
 	 */
 	@Override
 	public SerializableBlockData[][][] getSerializedBlocks() {
 		// get blocks
-		final int[] coords = getCoords();
+		final int[] coords = getMinMaxCoords();
 		
 		SerializableBlockData[][][] blockData =
 			new SerializableBlockData[coords[3]-coords[0]+1][coords[4]-coords[1]+1][coords[5]-coords[2]+1];
@@ -116,7 +121,7 @@ public class CuboidWorldGuard implements Cuboid {
 		LinkedList<Block> diggableBlocks = new LinkedList<Block>();
 		
 		// get blocks
-		final int[] coords = getCoords();
+		final int[] coords = getMinMaxCoords();
 
 		// copy data from blocks
 		for (int x = coords[0]; x <= coords[3]; x++)
@@ -134,7 +139,7 @@ public class CuboidWorldGuard implements Cuboid {
 	@Override
 	public Location getCenter() {
 		// get blocks
-		final int[] coords = getCoords();
+		final int[] coords = getMinMaxCoords();
 
 		// return middle location
 		return new Location(this.world, (coords[3] - coords[0])/2 + coords[0],
@@ -142,11 +147,22 @@ public class CuboidWorldGuard implements Cuboid {
 				(coords[5] - coords[2])/2 + coords[2]);
 	}
 	
-	/**
-	 * get coordinates
-	 * @return
-	 */
-	private final int[] getCoords() {
+	@Override
+	public Location getMinimumLocation() {
+		int[] coords = getMinMaxCoords();
+		
+		return new Location(this.world, coords[0], coords[1], coords[2]);
+	}
+	
+	@Override
+	public Location getMaximumLocation() {
+		int[] coords = getMinMaxCoords();
+
+		return new Location(this.world, coords[3], coords[4], coords[5]);
+	}
+
+	@Override
+	public final int[] getMinMaxCoords() {
 		BlockVector max = region.getMaximumPoint();
 		BlockVector min = region.getMinimumPoint();
 		
