@@ -171,8 +171,8 @@ arenas:
             - GOLD_BLOCK
 # Players dying lose
         loseOnDeath: true
-# Players logging out lose
-        loseOnLogout: false
+# Players logging out lose change this only to false, if you have some sort of timeout set in your arena. Otherwise you might end up with neverending games...
+        loseOnLogout: true
 # Players do not starve while playing in the arena
         noHunger: true
 # Disallow PVP while spleefing (no effect on no-pvp worlds)
