@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import org.bukkit.block.Block;
 
 import de.beimax.simplespleef.SimpleSpleef;
+import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.gamehelpers.Cuboid;
 import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
@@ -134,6 +135,36 @@ public class HardArenaRestorer extends ArenaRestorer {
 
 	@Override
 	public boolean updateBlock(Block block, int oldType, byte oldData) { // ignore
+		return false;
+	}
+	
+	@Override
+	public void initialize(Game game) {
+		this.game = game;
+
+		// input file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
+		if (file.exists()) {
+			SimpleSpleef.log.info("[SimpleSpleef] Restoring arena for " + game.getId() + " - apparently there was a server crash during the game.");
+			restoreArena();
+		}
+	}
+
+	/**
+	 * try to restore the arena after a server crash
+	 * @param game
+	 * @return
+	 */
+	public boolean restoreArenaAfterServerCrash(Game game) {
+		// method is called before initialization, so we
+		this.game = game;
+
+		// input file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
+		if (file.exists()) {
+			restoreArena();
+			return true;
+		}
 		return false;
 	}
 }
