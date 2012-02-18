@@ -553,4 +553,18 @@ public abstract class Game {
 				sender.sendMessage(SimpleSpleef.ll("feedback.infoSpectators", "[SPECTATORS]", spectators));
 		}		
 	}
+	
+	/**
+	 * save arena to disk
+	 * @param sender (can be null for console)
+	 * @param temporaryStore save in temporary store
+	 */
+	public abstract void saveArena(CommandSender sender, boolean temporaryStore);
+
+	/**
+	 * restore arena from disk
+	 * @param sender (can be null for console)
+	 * @param temporaryStore restore from temporary store
+	 */
+	public abstract void restoreArena(CommandSender sender, boolean temporaryStore);
 }

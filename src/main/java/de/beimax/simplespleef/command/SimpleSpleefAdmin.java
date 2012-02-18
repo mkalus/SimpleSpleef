@@ -46,7 +46,7 @@ public class SimpleSpleefAdmin {
 	/**
 	 * commands possible from the console
 	 */
-	private final static String[] consoleCommands = {"help", "addarena", "delarena", "disable", "enable", "reload"};
+	private final static String[] consoleCommands = {"help", "addarena", "delarena", "disable", "enable", "reload", "savearena", "restorearena" };
 	/**
 	 * saves which command senders have selected which arena as current one
 	 */
@@ -127,6 +127,14 @@ public class SimpleSpleefAdmin {
 					checkArena = true;
 		} else if (adminCommand.equals("reload")) {
 			reloadConfig(sender);
+		} else if (adminCommand.equals("savearena")) {
+			// check argument length
+			if (checkThreeArgs(sender, args, adminCommand))
+				saveArena(sender, args[2]);
+		} else if (adminCommand.equals("restorearena")) {
+			// check argument length
+			if (checkThreeArgs(sender, args, adminCommand))
+				restoreArena(sender, args[2]);
 		} else // unknown command feedback
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownCommand", "[COMMAND]", adminCommand));
 		
@@ -483,6 +491,38 @@ public class SimpleSpleefAdmin {
 	protected void reloadConfig(CommandSender sender) {
 		SimpleSpleef.getPlugin().reloadSimpleSpleefConfiguration();
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.reload"));
+	}
+	
+	/**
+	 * save an arena
+	 * @param sender
+	 * @param arena
+	 */
+	protected void saveArena(CommandSender sender, String arena) {
+		Game game = SimpleSpleef.getGameHandler().getGameByName(arena);
+		// does arena exist?
+		if (game == null) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
+			return;
+		}
+		
+		game.saveArena(sender, false);
+	}
+	
+	/**
+	 * restore an arena
+	 * @param sender
+	 * @param arena
+	 */
+	protected void restoreArena(CommandSender sender, String arena) {
+		Game game = SimpleSpleef.getGameHandler().getGameByName(arena);
+		// does arena exist?
+		if (game == null) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
+			return;
+		}
+		
+		game.restoreArena(sender, false);
 	}
 
 	/**

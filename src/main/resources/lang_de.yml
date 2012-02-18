@@ -177,6 +177,8 @@ admin:
       spawn lounge/game/spectator/lose/winner|Setze Spawnpunkt.
       disable/enable arena|(De)aktiviere Arena.
       reload|Neuladen der config.yml.
+      savearena arena|Speichere Arena in Datei ab.
+      restore arena|Stelle Arena aus Datei wieder her.
 adminerrors:
     oneArgument: '[COMMAND] erwartet genau einen Parameter - Name/Id einer Arena'
     twoArguments: '[COMMAND] erwartet genau zwei Parameter - Name + neuer Wert'
@@ -184,6 +186,7 @@ adminerrors:
     addarenaArenaExists: 'Arena [ARENA] existiert bereits.'
     oneArgumentSpawn: 'spawn erwartet genau einen Parameter lounge, game, spectator oder lose.'
     worldEditRegion: 'Keine WorldEdit-Region ausgewählt.'
+    saverestore: 'Kein Arena-Kubus in [ARENA] definiert.'
 adminfeedback:
     setarena: 'Arena [ARENA] ausgewählt!'
     addarena: 'Arena [ARENA] erstellt!'
@@ -194,6 +197,8 @@ adminfeedback:
     enable: '[ARENA] aktiviert.'
     disable: '[ARENA] deaktiviert.'
     reload: 'Konfiguration neu geladen.'
+    savearena: 'Arena [ARENA] wurde gespeichert.'
+    restorearena: 'Arena [ARENA] wurde wieder hergestellt.'
 localization:
     dateFormat: 'dd.MM.yyyy HH:mm:ss'
 material:

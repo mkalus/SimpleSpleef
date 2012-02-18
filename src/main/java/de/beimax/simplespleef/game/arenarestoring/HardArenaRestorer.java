@@ -4,17 +4,12 @@
 package de.beimax.simplespleef.game.arenarestoring;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import org.bukkit.block.Block;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
 import de.beimax.simplespleef.gamehelpers.Cuboid;
-import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
 /**
  * @author mkalus
@@ -55,26 +50,7 @@ public class HardArenaRestorer extends ArenaRestorer {
 	public void saveArena() {
 		if (game == null || cuboid == null) return; //ignore invalid stuff
 
-		SerializableBlockData[][][] blockData = this.cuboid.getSerializedBlocks();
-		
-		// output file
-		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + this.game.getId() + ".save");
-		// delete old file
-		if (file.exists() && !file.delete()) {
-			SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
-			return;
-		}
-		
-		try {
-			// serialize objects
-			FileOutputStream fileStream = new FileOutputStream(file);
-			ObjectOutputStream os = new ObjectOutputStream(fileStream);
-			// write array itself
-			os.writeObject(blockData);
-			os.close();
-		} catch (Exception e) {
-			 SimpleSpleef.log.warning("[SimpleSpleef] Could not save arena file " + file.getName() + ". Reason: " + e.getMessage());
-		}
+		game.saveArena(null, true);
 	}
 
 	/* (non-Javadoc)
@@ -82,27 +58,9 @@ public class HardArenaRestorer extends ArenaRestorer {
 	 */
 	@Override
 	public void restoreArena() {
-		// input file
-		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
-		if (!file.exists()) {
-			SimpleSpleef.log.warning("[SimpleSpleef] Could find arena file " + file.getName());
-			return;
-		}
-		SerializableBlockData[][][] blockData;
-		try {
-			// deserialize objects
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
-			blockData = (SerializableBlockData[][][]) oInputStream.readObject();
-			oInputStream.close();
-		} catch (Exception e) {
-			 SimpleSpleef.log.warning("[SimpleSpleef] Could not restore arena file " + file.getName() + ". Reason: " + e.getMessage());
-			 return;
-		}
-		// restore arena - this is quite heavy on the server...
-		cuboid.setSerializedBlocks(blockData);
-		// delete file at the end - cleanup work...
-		if (!file.delete()) SimpleSpleef.log.warning("[SimpleSpleef] Could not delete file " + file.getName());
+		if (game == null || cuboid == null) return; //ignore invalid stuff
+		
+		game.restoreArena(null, true);
 	}
 
 	@Override
@@ -142,29 +100,11 @@ public class HardArenaRestorer extends ArenaRestorer {
 	public void initialize(Game game) {
 		this.game = game;
 
-		// input file
-		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
+		// restore game arena if there is a temporary file present - very likely this is the result of a server crash in the middle of a game
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + "_temporary.save");
 		if (file.exists()) {
 			SimpleSpleef.log.info("[SimpleSpleef] Restoring arena for " + game.getId() + " - apparently there was a server crash during the game.");
 			restoreArena();
 		}
-	}
-
-	/**
-	 * try to restore the arena after a server crash
-	 * @param game
-	 * @return
-	 */
-	public boolean restoreArenaAfterServerCrash(Game game) {
-		// method is called before initialization, so we
-		this.game = game;
-
-		// input file
-		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + game.getId() + ".save");
-		if (file.exists()) {
-			restoreArena();
-			return true;
-		}
-		return false;
 	}
 }

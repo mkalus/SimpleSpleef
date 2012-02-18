@@ -177,6 +177,8 @@ admin:
       spawn lounge/game/spectator/lose/winner|Set spawn point.
       enable/disable arena|Enable/disable arena.
       reload|Reload config.
+      savearena arena|Save arena to disk.
+      restore arena|Restore arena from disk.
 adminerrors:
     oneArgument: '[COMMAND] expects one parameter - name/id of arena'
     twoArguments: '[COMMAND] expects two parameters - name + new value'
@@ -184,6 +186,7 @@ adminerrors:
     addarenaArenaExists: 'Arena [ARENA] exists already.'
     oneArgumentSpawn: 'spawn expects one parameter named lounge, game, spectator, or lose.'
     worldEditRegion: 'No WorldEdit region selected.'
+    saverestore: 'No arena cube defined in [ARENA].'
 adminfeedback:
     setarena: 'Arena [ARENA] selected!'
     addarena: 'Arena [ARENA] created!'
@@ -194,6 +197,8 @@ adminfeedback:
     enable: '[ARENA] enabled.'
     disable: '[ARENA] disabled.'
     reload: 'configuration reloaded.'
+    savearena: 'Arena [ARENA] has been saved.'
+    restorearena: 'Arena [ARENA] has been restored.'
 localization:
     dateFormat: 'MM/dd/yyyy hh:mm:ss a'
 material:

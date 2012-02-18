@@ -19,6 +19,11 @@
 
 package de.beimax.simplespleef.game;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2039,5 +2044,78 @@ public class GameStandard extends Game {
 	@Override
 	public  long getFinishTime() {
 		return finishTime;
+	}
+
+	@Override
+	public void saveArena(CommandSender sender, boolean temporaryStore) {
+		if (sender == null) sender = SimpleSpleef.getPlugin().getServer().getConsoleSender();
+
+		if (arena == null) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.saverestore", "[ARENA]", getName()));
+			return;
+		}
+		
+		SerializableBlockData[][][] blockData = arena.getSerializedBlocks();
+		
+		// output file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + (temporaryStore?"_temporary":"") + ".save");
+		// delete old file
+		if (file.exists() && !file.delete()) {
+			sender.sendMessage("[SimpleSpleef] Could not delete file " + file.getName());
+			return;
+		}
+		
+		try {
+			// serialize objects
+			FileOutputStream fileStream = new FileOutputStream(file);
+			ObjectOutputStream os = new ObjectOutputStream(fileStream);
+			// write array itself
+			os.writeObject(blockData);
+			os.close();
+		} catch (Exception e) {
+			sender.sendMessage("[SimpleSpleef] Could not save arena file " + file.getName() + ". Reason: " + e.getMessage());
+		}
+		
+		//feedback, if not temporary
+		if (!temporaryStore) {
+			sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.savearena", "[ARENA]", getName()));
+		}
+	}
+
+	@Override
+	public void restoreArena(CommandSender sender, boolean temporaryStore) {
+		if (sender == null) sender = SimpleSpleef.getPlugin().getServer().getConsoleSender();
+
+		if (arena == null) {
+			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("adminerrors.saverestore", "[ARENA]", getName()));
+			return;
+		}
+		
+		// input file
+		File file = new File(SimpleSpleef.getPlugin().getDataFolder(), "arena_" + getId() + (temporaryStore?"_temporary":"") + ".save");
+		if (!file.exists()) {
+			sender.sendMessage("[SimpleSpleef] Could not find arena file " + file.getName());
+			return;
+		}
+		SerializableBlockData[][][] blockData;
+		try {
+			// deserialize objects
+			FileInputStream fileInputStream = new FileInputStream(file);
+			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
+			blockData = (SerializableBlockData[][][]) oInputStream.readObject();
+			oInputStream.close();
+		} catch (Exception e) {
+			sender.sendMessage("[SimpleSpleef] Could not restore arena file " + file.getName() + ". Reason: " + e.getMessage());
+			return;
+		}
+		// restore arena - this is quite heavy on the server...
+		arena.setSerializedBlocks(blockData);
+		// delete file at the end in teporary mode - cleanup work...
+		if (temporaryStore && !file.delete()) sender.sendMessage("[SimpleSpleef] Could not delete file " + file.getName());
+
+		//feedback, if not temporary
+		if (!temporaryStore) {
+			sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.restorearena", "[ARENA]", getName()));
+		}
 	}
 }
