@@ -196,7 +196,7 @@ public class SimpleSpleef extends JavaPlugin {
 		SimpleSpleef.gameHandler = new GameHandler();
 		SimpleSpleef.gameHandler.updateGameHandlerData();
 		// start tracking
-		SimpleSpleef.getPlugin().getServer().getScheduler().scheduleAsyncRepeatingTask(this, gameHandler, 0L, 20L);
+		SimpleSpleef.getPlugin().getServer().getScheduler().scheduleSyncRepeatingTask(this, gameHandler, 0L, 20L);
 		
 		// register vault stuff
 		setupEconomy();
