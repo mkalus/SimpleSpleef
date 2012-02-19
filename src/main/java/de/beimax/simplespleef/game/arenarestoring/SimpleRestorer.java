@@ -28,7 +28,6 @@ import org.bukkit.block.Block;
 
 import de.beimax.simplespleef.gamehelpers.Cuboid;
 import de.beimax.simplespleef.gamehelpers.MaterialHelper;
-import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
 /**
  * @author mkalus
