@@ -100,9 +100,8 @@ public class CuboidWorldGuard implements Cuboid {
 						// load chunk if needed
 						Chunk here = block.getChunk();
 						if (!here.isLoaded()) here.load();
-
-						block.setTypeId(blockData[x][y][z].getTypeId(), false);
-						block.setData(blockData[x][y][z].getData(), false);
+						
+						block.setTypeIdAndData(blockData[x][y][z].getTypeId(), blockData[x][y][z].getData(), false);
 						
 						// add to list of changed chunks
 						if (!chunksChanged.contains(here))

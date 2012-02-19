@@ -80,8 +80,7 @@ public class SoftRestorer extends ArenaRestorer {
 				Chunk here = block.getChunk();
 				if (!here.isLoaded()) here.load();
 
-				block.setTypeId(changedBlock.blockData.getTypeId(), false);
-				block.setData(changedBlock.blockData.getData(), false);	
+				block.setTypeIdAndData(changedBlock.blockData.getTypeId(), changedBlock.blockData.getData(), false);
 				
 				// add to list of changed chunks
 				if (!chunksChanged.contains(here))
