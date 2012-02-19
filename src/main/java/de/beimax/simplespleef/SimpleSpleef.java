@@ -282,7 +282,7 @@ public class SimpleSpleef extends JavaPlugin {
 		final UpdateChecker checker = new UpdateChecker();
 		
 		// possibly check for updates in the internet on startup
-		this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		this.getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
 		    public void run() {
 		    	try {
 					String newVersion = checker.checkForUpdate(SimpleSpleef.simpleSpleef.getDescription().getVersion());
