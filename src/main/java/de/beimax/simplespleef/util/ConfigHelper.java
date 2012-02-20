@@ -186,6 +186,8 @@ public class ConfigHelper {
 		        // update config
 		        languageConfig.setDefaults(defConfig);
 		        languageConfig.options().copyDefaults(true); // copy defaults, too
+		        // force update of admin.help
+		        languageConfig.set("admin.help", defConfig.getString("admin.help"));
 		        try {
 		        	// save updated config
 		        	languageConfig.save(languageFile);
