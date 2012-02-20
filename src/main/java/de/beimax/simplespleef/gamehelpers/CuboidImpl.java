@@ -150,7 +150,10 @@ public class CuboidImpl implements Cuboid {
 					Chunk here = block.getChunk();
 					if (!here.isLoaded()) here.load();
 
-					block.setTypeIdAndData(blockData[x][y][z].getTypeId(), blockData[x][y][z].getData(), false);
+					//if (blockData[x][y][z].getTypeId() != block.getTypeId() || blockData[x][y][z].getData() != block.getData()) {
+					//	System.out.println(block);
+						block.setTypeIdAndData(blockData[x][y][z].getTypeId(), blockData[x][y][z].getData(), false);
+					//}
 					
 					// add to list of changed chunks
 					if (!chunksChanged.contains(here))
