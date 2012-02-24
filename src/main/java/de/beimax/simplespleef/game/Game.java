@@ -21,6 +21,7 @@ package de.beimax.simplespleef.game;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -502,20 +503,18 @@ public abstract class Game {
 	/**
 	 * update a certain block location - notify trackers of this change
 	 * @param block
-	 * @param oldType - old type of block
-	 * @param oldData - old data of block
+	 * @param oldState old state of block
 	 */
-	public abstract void trackersUpdateBlock(Block block, int oldType, byte oldData);
+	public abstract void trackersUpdateBlock(Block block, BlockState oldState);
 	
 	/**
 	 * Called by tick()-methods of trackers when they change a block,
 	 * so other trackers can update their block database. 
 	 * @param block
-	 * @param oldType - old type of block
-	 * @param oldData - old data of block
+	 * @param oldState old state of block
 	 * @param caller
 	 */
-	public abstract void notifyChangedBlock(Block block, int oldType, byte oldData, Tracker caller);
+	public abstract void notifyChangedBlock(Block block, BlockState oldState, Tracker caller);
 
 	/**
 	 * interrupt/end game

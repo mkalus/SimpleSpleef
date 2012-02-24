@@ -7,12 +7,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.gamehelpers.Cuboid;
-import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
 /**
  * @author mkalus
@@ -28,12 +27,12 @@ public class SoftRestorer extends ArenaRestorer {
 	/**
 	 * keeps the data of the changed blocks
 	 */
-	private LinkedList<BlockChange> changedBlocks;
+	private LinkedList<BlockState> changedBlocks;
 	
 	/**
 	 * iterator for the reconstruction of the arena
 	 */
-	Iterator<BlockChange> it;
+	Iterator<BlockState> it;
 
 	/**
 	 * Constructor
@@ -52,7 +51,7 @@ public class SoftRestorer extends ArenaRestorer {
 	@Override
 	public void saveArena() {		
 		// initialize task data
-		this.changedBlocks = new LinkedList<SoftRestorer.BlockChange>();
+		this.changedBlocks = new LinkedList<BlockState>();
 		this.it = null;
 	}
 
@@ -72,9 +71,10 @@ public class SoftRestorer extends ArenaRestorer {
 				it = null;
 				break;
 			} else { // restore blocks
-				BlockChange changedBlock = it.next();
+				BlockState blockState = it.next();
+				blockState.update(true);
 
-				Block block = changedBlock.location.getBlock();
+				/*Block block = changedBlock.location.getBlock();
 
 				// load chunk if needed
 				Chunk here = block.getChunk();
@@ -84,7 +84,7 @@ public class SoftRestorer extends ArenaRestorer {
 				
 				// add to list of changed chunks
 				if (!chunksChanged.contains(here))
-					chunksChanged.addFirst(here);
+					chunksChanged.addFirst(here);*/
 			}
 		}
 
@@ -117,26 +117,11 @@ public class SoftRestorer extends ArenaRestorer {
 	}
 
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) {
+	public boolean updateBlock(Block block, BlockState oldState) {
 		if (block == null || changedBlocks == null) return false; // no NPEs
-		// just add original block type to list
-		BlockChange change = new BlockChange();
-		change.location = block.getLocation();
-		change.blockData = new SerializableBlockData(oldType, oldData);
 		// add at first position, so the restoration is done from the last block changed
-		changedBlocks.addFirst(change);
+		changedBlocks.addFirst(oldState);
 		//System.out.println("Added!");
 		return true;
-	}
-
-
-	/**
-	 * keeps original positions for blocks
-	 * @author mkalus
-	 *
-	 */
-	private class BlockChange {
-		private Location location;
-		private SerializableBlockData blockData;
 	}
 }

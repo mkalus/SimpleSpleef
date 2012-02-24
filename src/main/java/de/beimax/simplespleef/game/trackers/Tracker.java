@@ -20,6 +20,7 @@
 package de.beimax.simplespleef.game.trackers;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import de.beimax.simplespleef.game.Game;
 
@@ -49,5 +50,5 @@ public interface Tracker {
 	 * Called when a block in the arena is changed
 	 * @return true if tracker did something with the block
 	 */
-	public boolean updateBlock(Block block, int oldType, byte oldData);
+	public boolean updateBlock(Block block, BlockState oldState);
 }

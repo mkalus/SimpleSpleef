@@ -11,6 +11,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import de.beimax.simplespleef.gamehelpers.SerializableBlockData;
 
@@ -44,7 +45,7 @@ public class FloorRepairWorker extends FloorBaseWorker {
 	}
 
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) {
+	public boolean updateBlock(Block block, BlockState oldState) {
 		if (block == null) return false; // no NPEs
 
 		Location loc = block.getLocation();
@@ -68,12 +69,11 @@ public class FloorRepairWorker extends FloorBaseWorker {
 			// repair it
 			Block block = location.getBlock();
 			// get old data
-			int oldType = block.getTypeId();
-			byte oldData = block.getData();
+			BlockState oldState = block.getState();
 			block.setTypeIdAndData(blockData.getTypeId(), blockData.getData(), false);
 			air.remove(location);				
 			// notify others - and myself
-			game.trackersUpdateBlock(block, oldType, oldData);
+			game.trackersUpdateBlock(block, oldState);
 		}
 	}
 	

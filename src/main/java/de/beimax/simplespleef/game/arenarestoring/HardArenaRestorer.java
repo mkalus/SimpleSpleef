@@ -6,6 +6,7 @@ package de.beimax.simplespleef.game.arenarestoring;
 import java.io.File;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
@@ -92,7 +93,7 @@ public class HardArenaRestorer extends ArenaRestorer {
 	}
 
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) { // ignore
+	public boolean updateBlock(Block block, BlockState oldState) { // ignore
 		return false;
 	}
 	

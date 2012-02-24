@@ -40,6 +40,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -244,19 +245,19 @@ public class GameStandard extends Game {
 	}
 
 	@Override
-	public void trackersUpdateBlock(Block block, int oldType, byte oldData) {
+	public void trackersUpdateBlock(Block block, BlockState oldState) {
 		if (isEnabled() && isActive()) { // only call on active games
 			for(Tracker tracker : trackers)
-				tracker.updateBlock(block, oldType, oldData);
+				tracker.updateBlock(block, oldState);
 		}
 	}
 	
 	@Override
-	public void notifyChangedBlock(Block block, int oldType, byte oldData, Tracker caller) {
+	public void notifyChangedBlock(Block block, BlockState oldState, Tracker caller) {
 		if (isEnabled() && isActive()) { // only call on active games
 			for(Tracker tracker : trackers)
 				if (tracker != caller) // caller is not updated - has to do this itself - this avoids endless callbacks
-					tracker.updateBlock(block, oldType, oldData);
+					tracker.updateBlock(block, oldState);
 		}
 	}
 
@@ -1028,12 +1029,11 @@ public class GameStandard extends Game {
 			event.setCancelled(true);
 			// get block data
 			Block clickedBlock = event.getClickedBlock();
-			int oldType = clickedBlock.getTypeId();
-			byte oldData = clickedBlock.getData();
+			BlockState state = clickedBlock.getState();
 			// set block to air
 			clickedBlock.setTypeId(Material.AIR.getId(), false);
 			// notify trackers
-			trackersUpdateBlock(clickedBlock, oldType, oldData);
+			trackersUpdateBlock(clickedBlock, state);
 		} else
 		//check if player clicked on a "ready" block (e.g. iron block) and the game is readyable
 			if (supportsBlockReady() && isJoinable()) {
@@ -1081,8 +1081,7 @@ public class GameStandard extends Game {
 		Block block = event.getBlock();
 		if (block == null) return; // sanity check
 		// get block data
-		int oldType = block.getTypeId();
-		byte oldData = block.getData();
+		BlockState state = block.getState();
 		boolean floorBroken = false;
 		// may the block be broken?
 		if (!checkMayBreakBlock(block, event.getPlayer())) {
@@ -1099,7 +1098,7 @@ public class GameStandard extends Game {
 		} else floorBroken = true; // block was broken
 		
 		if (floorBroken) // update trackers
-			trackersUpdateBlock(block, oldType, oldData);
+			trackersUpdateBlock(block, state);
 	}
 	
 	/**
@@ -1151,7 +1150,7 @@ public class GameStandard extends Game {
 
 		// if there is a floor tracker running, tell it about the change
 		if (!event.isCancelled())
-			trackersUpdateBlock(event.getBlock(), Material.AIR.getId(), (byte) 0);
+			trackersUpdateBlock(event.getBlock(), event.getBlockReplacedState());
 	}
 
 	@Override
@@ -1195,7 +1194,7 @@ public class GameStandard extends Game {
 			for (Block block : event.blockList()) {
 				Cuboid checkCuboid = arena==null?floor:arena;
 				if (checkCuboid.contains(block.getLocation())) { 
-					trackersUpdateBlock(block, block.getTypeId(), block.getData());
+					trackersUpdateBlock(block, block.getState());
 				}
 			}
 			return true;
@@ -2075,6 +2074,7 @@ public class GameStandard extends Game {
 			os.close();
 		} catch (Exception e) {
 			sender.sendMessage("[SimpleSpleef] Could not save arena file " + file.getName() + ". Reason: " + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		//feedback, if not temporary

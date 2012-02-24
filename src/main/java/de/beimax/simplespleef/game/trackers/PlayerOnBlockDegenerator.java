@@ -27,6 +27,7 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -148,14 +149,14 @@ public class PlayerOnBlockDegenerator implements Tracker {
 				}
 				
 				// get original data
-				int oldType = keeper.checkedBlock.getTypeId();
-				byte oldData = keeper.checkedBlock.getData();
+				BlockState oldState = keeper.checkedBlock.getState();
+
 				keeper.checkedBlock.setTypeId(Material.AIR.getId(), false); // block dissolves into thin air
 
 				degenerationList.remove(player); // remove player from list
 				
 				// update trackers
-				game.trackersUpdateBlock(keeper.checkedBlock, oldType, oldData);
+				game.trackersUpdateBlock(keeper.checkedBlock, oldState);
 			}
 		}
 	}
@@ -199,7 +200,7 @@ public class PlayerOnBlockDegenerator implements Tracker {
 	 * @see de.beimax.simplespleef.game.trackers.Tracker#updateBlock(org.bukkit.block.Block, int, byte)
 	 */
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) {
+	public boolean updateBlock(Block block, BlockState oldState) {
 		return false; // ignore
 	}
 

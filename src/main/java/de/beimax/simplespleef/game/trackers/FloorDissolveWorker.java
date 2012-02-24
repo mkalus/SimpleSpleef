@@ -10,6 +10,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 /**
  * @author mkalus
@@ -36,7 +37,7 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 	}
 
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) {
+	public boolean updateBlock(Block block, BlockState oldState) {
 		if (block == null) return false; // no NPEs
 
 		Location loc = block.getLocation();
@@ -61,13 +62,12 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 		if (location != null) {
 			Block block = location.getBlock();
 			// get old data
-			int oldType = block.getTypeId();
-			byte oldData = block.getData();
+			BlockState oldState = block.getState();
 			// dissolve to air
 			block.setTypeId(Material.AIR.getId(), false);
 			nonAir.remove(location);				
 			// notify others - and myself
-			game.trackersUpdateBlock(block, oldType, oldData);
+			game.trackersUpdateBlock(block, oldState);
 		}
 	}
 

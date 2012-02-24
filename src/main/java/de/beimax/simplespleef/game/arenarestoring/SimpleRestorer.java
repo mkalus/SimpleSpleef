@@ -25,6 +25,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import de.beimax.simplespleef.gamehelpers.Cuboid;
 import de.beimax.simplespleef.gamehelpers.MaterialHelper;
@@ -96,7 +97,7 @@ public class SimpleRestorer extends ArenaRestorer {
 	 * @see de.beimax.simplespleef.game.trackers.Tracker#updateBlock(org.bukkit.block.Block, int, byte)
 	 */
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) {
+	public boolean updateBlock(Block block, BlockState oldState) {
 		return false;
 	}
 

@@ -21,6 +21,7 @@ package de.beimax.simplespleef.game.trackers;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import de.beimax.simplespleef.SimpleSpleef;
 import de.beimax.simplespleef.game.Game;
@@ -107,7 +108,7 @@ public class ArenaTimeout implements Tracker {
 	}
 
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) { // ignore
+	public boolean updateBlock(Block block, BlockState oldState) { // ignore
 		return false;
 	}
 }

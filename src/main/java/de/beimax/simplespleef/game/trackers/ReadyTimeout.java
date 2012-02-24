@@ -23,6 +23,7 @@ import java.util.LinkedList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -156,7 +157,7 @@ public class ReadyTimeout implements Tracker {
 	}
 
 	@Override
-	public boolean updateBlock(Block block, int oldType, byte oldData) { // ignore
+	public boolean updateBlock(Block block, BlockState oldState) { // ignore
 		return false;
 	}
 }
