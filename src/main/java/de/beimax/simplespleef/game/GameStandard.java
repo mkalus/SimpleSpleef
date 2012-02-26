@@ -376,7 +376,7 @@ public class GameStandard extends Game {
 		if (configuration.getBoolean("useReady", false)) {
 			int readyTimeout = configuration.getInt("readyTimeout", 0);
 			if (readyTimeout > 0) {
-				addTracker(new ReadyTimeout(arenaTimeout));
+				addTracker(new ReadyTimeout(readyTimeout));
 			}
 		}
 		
