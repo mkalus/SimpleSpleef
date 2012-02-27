@@ -253,6 +253,7 @@ public class FileStatisticsModule implements StatisticsModule {
 	 */
 	private List<TopTenEntry> getTopTen(String key) {
 		TreeSet<TopTenEntry> topTenList = new TreeSet<TopTenEntry>(TopTenEntry.getAscendingComparator());
+		if (statistics == null || statistics.getConfigurationSection(key) == null) return null; // avoid NPEs
 		// get list of all gamers
 		for (String playerName : statistics.getConfigurationSection(key).getKeys(false)) {
 			ConfigurationSection playerSection = statistics.getConfigurationSection(key + "." + playerName);
