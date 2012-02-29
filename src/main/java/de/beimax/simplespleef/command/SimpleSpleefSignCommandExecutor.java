@@ -18,12 +18,14 @@
  **/
 package de.beimax.simplespleef.command;
 
+import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import de.beimax.simplespleef.SimpleSpleef;
@@ -96,6 +98,32 @@ public class SimpleSpleefSignCommandExecutor implements Listener {
 			if (!signsOnlyRightClick || (signsOnlyRightClick && event.getAction() == Action.RIGHT_CLICK_BLOCK))
 				// let the sign command executor do the rest
 				parseSimpleSpleefSign(event.getPlayer(), (Sign)event.getClickedBlock().getState());
+		}
+	}
+	
+	/**
+	 * Listen to sign change events
+	 * @param event
+	 */
+	@EventHandler
+	public void onSignChange(SignChangeEvent event) {
+		// check sign placements
+		if (event.getBlock().getState() instanceof Sign) {
+			// do we have sign placement rights anyway?
+			if (SimpleSpleef.checkPermission(event.getPlayer(), "simplespleef.sign.create")) return; // no further checks - we are clear!
+			
+			// what should the first line of the sign be?
+			String signsFirstLine = SimpleSpleef.getPlugin().getConfig().getString("settings.signsFirstLine", "[Spleef]");
+			
+			// is the first line ok?
+			if (event.getLine(0) == null || !event.getLine(0).equals(signsFirstLine)) return; // nope
+			
+			// ok, we have a spleef sign and we do not have permissions - cancel event
+			event.setCancelled(true);
+			event.getBlock().breakNaturally(); // break sign naturally
+			
+			// tell player
+			event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.signPermissionMissing", "[COMMAND]", "create"));
 		}
 	}
 }
