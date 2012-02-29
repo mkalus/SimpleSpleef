@@ -8,10 +8,6 @@
 	<description>Simple Spleefing plugin for bukkit server</description>
 	<repositories>
 		<repository>
-			<id>sk89q-mvn2</id>
-			<url>http://mvn2.sk89q.com/repo/</url>
-		</repository>
-		<repository>
 			<id>bukkit-repo</id>
 			<url>http://repo.bukkit.org/content/groups/public/</url>
 		</repository>
@@ -24,24 +20,20 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.8 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.11 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
 			<groupId>net.milkbowl</groupId>
-			<version>[1.1.9,)</version>
+			<version>1.2.11</version>
 			<artifactId>vault</artifactId>
 		</dependency>
-        <dependency>
+        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.2 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>5.1</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>5.2</version>
         </dependency>
-		<dependency>
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldguard -Dversion=5.5.1 -Dpackaging=jar -Dfile=WorldGuard.jar' in order to make this work: -->
 			<groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>5.4</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>5.5.1</version>
         </dependency>
 		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=terranetworkorg  -DartifactId=stats -Dversion=2.1.1 -Dpackaging=jar -Dfile=Stats.jar' in order to make this work: -->
 			<groupId>terranetworkorg</groupId>
