@@ -21,8 +21,7 @@ public class SoftRestorer extends ArenaRestorer {
 	/**
 	 * cuboid to store/restore
 	 */
-	private Cuboid cuboid;
-	//TODO: not really needed at this place, is it?
+	//private Cuboid cuboid;
 
 	/**
 	 * keeps the data of the changed blocks
@@ -44,7 +43,7 @@ public class SoftRestorer extends ArenaRestorer {
 
 	@Override
 	public void setArena(Cuboid cuboid) {
-		this.cuboid = cuboid;
+		//this.cuboid = cuboid;
 		saveArena();
 	}
 

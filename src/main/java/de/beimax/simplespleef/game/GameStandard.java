@@ -43,13 +43,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EndermanPickupEvent;
-import org.bukkit.event.entity.EndermanPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -1253,9 +1253,10 @@ public class GameStandard extends Game {
 	}
 	
 	@Override
-	public boolean onEndermanPickup(EndermanPickupEvent event) {
+	public boolean onEntityChangeBlock(EntityChangeBlockEvent event) {
 		if (!isEnabled() || (arena == null && floor == null) || !configuration.getBoolean("protectArena", true)) return false; // ignore disabled and undifined arenas, as well as those that are not protected
-		
+		if (!(event.getEntity() instanceof Enderman)) return false; // only consider Endermen for now
+
 		// check location of enderman event
 		Location loc = event.getBlock().getLocation();
 		if ((arena != null && arena.contains(loc)) || (floor != null && floor.contains(loc))) { // if within arena or floor...
@@ -1264,20 +1265,6 @@ public class GameStandard extends Game {
 		
 		return false;
 	}
-	
-	@Override
-	public boolean onEndermanPlace(EndermanPlaceEvent event) {
-		if (!isEnabled() || (arena == null && floor == null) || !configuration.getBoolean("protectArena", true)) return false; // ignore disabled and undifined arenas, as well as those that are not protected
-		
-		// check location of enderman event
-		Location loc = event.getLocation();
-		if ((arena != null && arena.contains(loc)) || (floor != null && floor.contains(loc))) { // if within arena or floor...
-			event.setCancelled(true); //..cancel spawn event
-		}
-		
-		return false;
-	}
-
 
 	/**
 	 * Do end game maintenance

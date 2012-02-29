@@ -40,8 +40,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EndermanPickupEvent;
-import org.bukkit.event.entity.EndermanPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -695,25 +694,12 @@ public class GameHandler implements Listener, Runnable {
 	 * @param event
 	 */
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onEndermanPickup(EndermanPickupEvent event) {
+	public void onEntityChangeBlock(EntityChangeBlockEvent event) {
 		if (event.isCancelled()) return;
 		
 		// pass event to games
 		for (Game game : games) {
-			if (game.onEndermanPickup(event)) return;
-		}
-	}
-	
-	/**
-	 * @param event
-	 */
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onEndermanPlace(EndermanPlaceEvent event) {
-		if (event.isCancelled()) return;
-		
-		// pass event to games
-		for (Game game : games) {
-			if (game.onEndermanPlace(event)) return;
+			if (game.onEntityChangeBlock(event)) return;
 		}
 	}
 
