@@ -264,6 +264,7 @@ public class SimpleSpleefAdmin {
 
 		// set new default arena
 		setSelectedArena(sender, id);
+
 		// feedback
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.setarena", "[ARENA]", id));
 	}
@@ -284,7 +285,7 @@ public class SimpleSpleefAdmin {
 		}
 		// create new arena entry in config
 		ConfigHelper configHelper = new ConfigHelper();
-		if (!configHelper.createNewArena(id, arena)) {
+		if (!configHelper.createNewArena(id, arena)) { // createNewArena also saves config to disk
 			sender.sendMessage(ChatColor.DARK_RED + "Internal error: Could not create arena - see log file for details.");
 			return false;
 		}
@@ -539,6 +540,11 @@ public class SimpleSpleefAdmin {
 		}
 		// enable arena
 		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", true);
+
+		// save config to file
+		SimpleSpleef.getPlugin().saveConfig();
+		
+		// feedback to player
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.enable", "[ARENA]", arena));
 		return true;
 	}
@@ -555,8 +561,11 @@ public class SimpleSpleefAdmin {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return false;
 		}
-		// disable arena
-		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", false);
+
+		// save config to file
+		SimpleSpleef.getPlugin().saveConfig();
+		
+		// feedback to player
 		sender.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("adminfeedback.disable", "[ARENA]", arena));
 		return true;
 	}

@@ -229,7 +229,7 @@ public class SimpleSpleef extends JavaPlugin {
 		//TODO add if more stuff comes along
 
 		//save config to disk
-		this.saveConfig();
+		//this.saveConfig();
 		
 		// derefer self reference
 		SimpleSpleef.simpleSpleef = null;
