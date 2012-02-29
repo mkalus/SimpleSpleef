@@ -73,6 +73,7 @@ errors:
     statisticsDisabled: 'Statistics have been disabled.'
     statisticsNoPlayer: 'Player [PLAYER] not found in spleef statistics.'
     statisticsEmpty: 'Could not find any statics entries.'
+    commandNotWhitelisted: 'You are not allowed to use this command during a game.'
 broadcasts:
     announce: '[PLAYER] has announced a new game in arena [ARENA]. Come and join the Spleef!'
     join: '[PLAYER] has joined a game in arena [ARENA].'

@@ -369,3 +369,13 @@ arenas:
             x: 0.0
             y: 0.0
             z: 0.0
+# Command whitelist section
+checkCommands:
+# Activate command white list during games. If you set this on, only commands in the whitelist will be accepted for spleefers during games.
+# ALL other commands will be blocked!
+    activateWhitelist: true
+# Whitelist list. List command patterns that are whitelisted. This uses regular expressions - e.g. ^ means start of the string.
+# For a short tutorial, see http://www.vogella.de/articles/JavaRegularExpressions/article.html
+    whitelist:
+        - '^/spl'
+        - '^/spla '

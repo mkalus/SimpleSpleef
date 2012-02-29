@@ -73,6 +73,7 @@ errors:
     statisticsDisabled: 'Statistiken sind ausgeschaltet.'
     statisticsNoPlayer: 'Spieler [PLAYER] wurde in den Spleef-Statistiken nicht gefunden.'
     statisticsEmpty: 'Keine Statistiken gefunden.'
+    commandNotWhitelisted: 'Du darfst dieses Kommando nicht während eines Spiels verwenden.'
 broadcasts:
     announce: '[PLAYER] hat ein neues Spleef Spiel in der Arena [ARENA] angekündigt. Kommt alle und spielt mit!'
     join: '[PLAYER] nimmt am Spleef in der Arena [ARENA] teil.'

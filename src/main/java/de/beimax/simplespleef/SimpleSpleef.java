@@ -39,6 +39,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 import de.beimax.simplespleef.command.SimpleSpleefCommandExecutor;
+import de.beimax.simplespleef.command.SimpleSpleefCommandWhitelist;
 import de.beimax.simplespleef.command.SimpleSpleefSignCommandExecutor;
 import de.beimax.simplespleef.game.GameHandler;
 import de.beimax.simplespleef.gamehelpers.OriginalPositionKeeper;
@@ -315,6 +316,7 @@ public class SimpleSpleef extends JavaPlugin {
 		pm.registerEvents(gameHandler, this);
 		pm.registerEvents(new UpdateChecker(), this); // check updates
 		pm.registerEvents(new SimpleSpleefSignCommandExecutor(), this); // check sign actions
+		pm.registerEvents(new SimpleSpleefCommandWhitelist(), this); // check command whitelist
 	}
 
 	/**
