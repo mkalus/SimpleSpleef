@@ -71,6 +71,8 @@ public class FloorRepairWorker extends FloorBaseWorker {
 			// get old data
 			BlockState oldState = block.getState();
 			block.setTypeIdAndData(blockData.getTypeId(), blockData.getData(), false);
+			// update chunk information
+			block.getWorld().refreshChunk(block.getChunk().getX(), block.getChunk().getZ());
 			air.remove(location);				
 			// notify others - and myself
 			game.trackersUpdateBlock(block, oldState);

@@ -1032,6 +1032,8 @@ public class GameStandard extends Game {
 			BlockState state = clickedBlock.getState();
 			// set block to air
 			clickedBlock.setTypeId(Material.AIR.getId(), false);
+			// update chunk information
+			clickedBlock.getWorld().refreshChunk(clickedBlock.getChunk().getX(), clickedBlock.getChunk().getZ());
 			// notify trackers
 			trackersUpdateBlock(clickedBlock, state);
 		} else
@@ -1095,6 +1097,8 @@ public class GameStandard extends Game {
 			floorBroken = true;
 			// set block to air
 			block.setTypeId(Material.AIR.getId(), false);
+			// update chunk information
+			block.getWorld().refreshChunk(block.getChunk().getX(), block.getChunk().getZ());
 		} else floorBroken = true; // block was broken
 		
 		if (floorBroken) // update trackers

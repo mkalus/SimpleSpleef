@@ -65,6 +65,8 @@ public class FloorDissolveWorker extends FloorBaseWorker {
 			BlockState oldState = block.getState();
 			// dissolve to air
 			block.setTypeId(Material.AIR.getId(), false);
+			// update chunk information
+			block.getWorld().refreshChunk(block.getChunk().getX(), block.getChunk().getZ());
 			nonAir.remove(location);				
 			// notify others - and myself
 			game.trackersUpdateBlock(block, oldState);

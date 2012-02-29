@@ -153,6 +153,9 @@ public class PlayerOnBlockDegenerator implements Tracker {
 
 				keeper.checkedBlock.setTypeId(Material.AIR.getId(), false); // block dissolves into thin air
 
+				// update chunk information
+				keeper.checkedBlock.getWorld().refreshChunk(keeper.checkedBlock.getChunk().getX(), keeper.checkedBlock.getChunk().getZ());
+				
 				degenerationList.remove(player); // remove player from list
 				
 				// update trackers
