@@ -104,7 +104,11 @@ arenas:
 # seconds for other players to ready. Once the timer expires, unready players will be kicked from the spleef game. If readyAutoStart has
 # been set to true and enough players are available, the game will then start. Otherwise, the game will be ready to start via command/sign.
         readyTimeout: 0
-# Clear inventory at game start and restore after game has ended
+# Require players to have an empty inventory and no armor when joining (keeps them from possibly losing their inventory when they log out)
+        emptyInventoryToJoin: false
+# Require spectators to have an empty inventory and no armor (they can't throw peanuts at the players)
+        emptyInventoryToSpectate: false
+# Clear inventory at game start and restore after game has ended (sometimes inventory cannot be restored when logging out)
         clearInventory: false
 # Add stuff the inventory? amount:item or amount:item:subid
         addToInventory: false

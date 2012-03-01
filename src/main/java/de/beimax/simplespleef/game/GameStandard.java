@@ -464,6 +464,14 @@ public class GameStandard extends Game {
 			return false;
 		}
 
+		// player has join with empty inventory?
+		if (configuration.getBoolean("emptyInventoryToJoin", false)) {
+			if (!InventoryKeeper.inventoryIsEmpty(player)) {
+				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.joinEmptyInventory"));
+				return false;
+			}
+		}
+
 		// check funds of player...
 		if (SimpleSpleef.economy != null) {
 			double entryFee = configuration.getDouble("entryFee", 0.0);
@@ -786,6 +794,14 @@ public class GameStandard extends Game {
 		if (!configuration.isConfigurationSection("spectatorSpawn") || !configuration.getBoolean("spectatorSpawn.enabled", false)) {
 			player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.watchNoSpawnDefined", "[ARENA]", getName()));
 			return false;
+		}
+
+		// player has to watch with empty inventory?
+		if (configuration.getBoolean("emptyInventoryToSpectate", false)) {
+			if (!InventoryKeeper.inventoryIsEmpty(player)) {
+				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.watchEmptyInventory"));
+				return false;
+			}
 		}
 
 		// save spectator's original position

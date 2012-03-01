@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,25 @@ import org.bukkit.inventory.ItemStack;
  *
  */
 public class InventoryKeeper {
+	/**
+	 * Check players inventory if it is empty
+	 * @param player
+	 * @return true if empty
+	 */
+	public static boolean inventoryIsEmpty(Player player) {
+		// check inventory contents for nun-null entries
+		for (ItemStack stack : player.getInventory().getContents())
+			if (stack != null && stack.getType() != Material.AIR) return false;
+
+		// check armor
+		for (ItemStack stack : player.getInventory().getArmorContents()) {
+			System.out.println(stack);
+			if (stack != null && stack.getType() != Material.AIR) return false;
+		}
+
+		return true;
+	}
+	
 	/**
 	 * inventory positions of armor
 	 */
