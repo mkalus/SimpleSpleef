@@ -74,7 +74,7 @@ permissions:
     description: Admin commands
     default: op
   simplespleef.sign.create:
-    description: Create Spleef signs?
+    description: Create Spleef signs
     default: true
   simplespleef.sign.help:
     description: Display help (sign command)

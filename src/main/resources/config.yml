@@ -378,4 +378,4 @@ checkCommands:
 # For a short tutorial, see http://www.vogella.de/articles/JavaRegularExpressions/article.html
     whitelist:
         - '^/spl'
-        - '^/spla '
+        - '^/spla'
