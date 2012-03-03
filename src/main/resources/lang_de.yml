@@ -111,7 +111,7 @@ feedback:
     refund: 'Dir wurden [AMOUNT] gutgeschrieben.'
     gamemodeChanged: 'Dein game mode wurde geändert.'
     ready: 'Du bist bereit für das Spiel!'
-    readyTimeoutStart: 'Der erste Spieler ist bereit zum Spiel in der Arena [ARENA! Macht euch jetzt ebenfalls möglichst schnell bereit!'
+    readyTimeoutStart: 'Der erste Spieler ist bereit zum Spiel in der Arena [ARENA]! Macht euch jetzt ebenfalls möglichst schnell bereit!'
     readyTimeoutStop: 'Keine bereiten Spieler mehr vorhanden in der Arena [ARENA].'
     readyCountdown: 'Verbleibende Zeit zum Anmelden: [COUNT]'
     readyMinutes: 'Noch [COUNT] Minuten verbleiben, um sich in der [ARENA] bereit zu erklären.'

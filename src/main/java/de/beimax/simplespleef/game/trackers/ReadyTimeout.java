@@ -139,7 +139,8 @@ public class ReadyTimeout implements Tracker {
 					// reset timer
 					counterStarted = false;
 					count = originalCount;
-				}
+				} else
+					return true; // game in progress now - kill timer
 			}
 			
 			if (count % 60 == 0) { // announce full minutes

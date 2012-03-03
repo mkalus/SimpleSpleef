@@ -115,6 +115,11 @@ public class GameStandard extends Game {
 	private Set<Player> teleportOkList;
 	
 	/**
+	 * list of players which may change their game mode - used by onGameModeChange
+	 */
+	private Set<Player> gamemodeChangeOkList;
+	
+	/**
 	 * arena cuboid
 	 */
 	private Cuboid arena;
@@ -180,6 +185,7 @@ public class GameStandard extends Game {
 		this.spleefers = new SpleeferList();
 		this.spectators = new LinkedList<Player>();
 		this.teleportOkList = new HashSet<Player>();
+		this.gamemodeChangeOkList = new HashSet<Player>();
 		this.trackers = new LinkedList<Tracker>();
 	}
 
@@ -710,6 +716,7 @@ public class GameStandard extends Game {
 		// teleport him/her back to original position, if supported
 		if (configuration.getBoolean("enableBackCommand", true)) {
 			// get original position
+			boolean wasInCreativeBefore = SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player);
 			Location originalLocation = SimpleSpleef.getOriginalPositionKeeper().getOriginalPosition(player);
 			if (originalLocation == null) { // no position
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.backNoLocation"));
@@ -720,6 +727,9 @@ public class GameStandard extends Game {
 			// teleport player to original position
 			SimpleSpleef.simpleSpleefTeleport(player, originalLocation);
 			player.sendMessage(ChatColor.GREEN + SimpleSpleef.ll("feedback.back"));
+			// change game mode back, if needed
+			if (wasInCreativeBefore)
+				changeGameModeToCreative(player);
 		}
 		
 		// check game status
@@ -1252,9 +1262,14 @@ public class GameStandard extends Game {
 		
 		// players and spectators may not change game mode
 		if (hasPlayer(player) || hasSpectator(player)) {
-			event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.gamemodeChange"));
-			event.setCancelled(true); //cancel event
-			return true;
+			// ... if they are not in the game mode change ok list
+			if (gamemodeChangeOkList.contains(player)) {
+				gamemodeChangeOkList.remove(player);
+			} else {
+				event.getPlayer().sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.gamemodeChange"));
+				event.setCancelled(true); //cancel event
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1648,6 +1663,9 @@ public class GameStandard extends Game {
 		restoreInventory(player);
 		// teleport player to lose spawn
 		if (teleport) teleportPlayer(player, "lose");
+		// update player's game mode
+		if (SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player))
+			changeGameModeToCreative(player);
 		// determine if game is over...
 		if (checkGameOver()) gameOver();
 	}
@@ -1699,6 +1717,10 @@ public class GameStandard extends Game {
 				// notify statistics
 				if (SimpleSpleef.getStatisticsModule() != null)
 					SimpleSpleef.getStatisticsModule().playerWonGame(player, this);
+				
+				// change player's game mode, if it was creative before
+				if (SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player))
+					changeGameModeToCreative(player);
 
 				// teleport winners back to winner's point or to lounge
 				if (configuration.isConfigurationSection("winnerSpawn") && configuration.getBoolean("winnerSpawn.enabled", false))
@@ -2041,6 +2063,15 @@ public class GameStandard extends Game {
 			// player gets message
 			player.sendMessage(ChatColor.AQUA + SimpleSpleef.ll("feedback.refund", "[ARENA]", getName(), "[MONEY]", formated));
 		}
+	}
+
+	/**
+	 * change game mode to creative and add player to gamemodeChangeOkList
+	 * @param player
+	 */
+	private void changeGameModeToCreative(Player player) {
+		gamemodeChangeOkList.add(player); // may change game mode
+		player.setGameMode(GameMode.CREATIVE);
 	}
 
 	@Override
