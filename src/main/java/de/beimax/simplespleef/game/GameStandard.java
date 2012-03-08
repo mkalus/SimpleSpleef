@@ -916,6 +916,11 @@ public class GameStandard extends Game {
 				// send message to all receivers
 				sendMessage(broadcastMessage, player);
 			}
+
+			// update player's game mode
+			if (SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player))
+				changeGameModeToCreative(player);
+
 			// player loses, if set to true
 			playerLoses(player, false); // do not teleport dead players...
 		} // else - do nothing...
@@ -946,6 +951,12 @@ public class GameStandard extends Game {
 					// send message to all receivers
 					sendMessage(broadcastMessage, player);
 				}
+
+				// change game mode
+				// update player's game mode
+				if (SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player))
+					changeGameModeToCreative(player);
+
 				// player loses, if set to true
 				playerLoses(player, false); // do not teleport dead players...
 			} // else - do nothing...
