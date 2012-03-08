@@ -561,6 +561,8 @@ public class SimpleSpleefAdmin {
 			sender.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.unknownArena", "[ARENA]", arena));
 			return false;
 		}
+		// disable arena
+		SimpleSpleef.getPlugin().getConfig().set("arenas." + arena.toLowerCase() + ".enabled", false);
 
 		// save config to file
 		SimpleSpleef.getPlugin().saveConfig();
