@@ -112,7 +112,7 @@ public class PlayerOnBlockDegenerator implements Tracker {
 		
 		// run through active spleefers and check their positions
 		for (Spleefer spleefer : game.getSpleefers().get()) {
-			if (!spleefer.hasLost())
+			if (!spleefer.hasLost() && spleefer.getPlayer().isOnline())
 				updatePosition(spleefer.getPlayer());
 		}
 		
@@ -132,13 +132,15 @@ public class PlayerOnBlockDegenerator implements Tracker {
 		} else {
 			// check player position
 			Block playerOnBlock = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
+
 			// did the player move?
-			if (playerOnBlock != keeper.checkedBlock) {
+			if (playerOnBlock.getX() != keeper.checkedBlock.getX() || playerOnBlock.getY() != keeper.checkedBlock.getY()
+					 || playerOnBlock.getZ() != keeper.checkedBlock.getZ()) {
 				degenerationList.remove(player); // remove player from list
 				addNewBlock(player); // new block for player
 				return;
 			}
-			
+
 			// decrement counter and check
 			keeper.counter--;
 			if (keeper.counter <= 0) { // reset counter
@@ -151,7 +153,7 @@ public class PlayerOnBlockDegenerator implements Tracker {
 				// get original data
 				BlockState oldState = keeper.checkedBlock.getState();
 
-				keeper.checkedBlock.setTypeId(Material.AIR.getId(), false); // block dissolves into thin air
+				keeper.checkedBlock.setType(Material.AIR); // block dissolves into thin air
 
 				// update chunk information
 				keeper.checkedBlock.getWorld().refreshChunk(keeper.checkedBlock.getChunk().getX(), keeper.checkedBlock.getChunk().getZ());
