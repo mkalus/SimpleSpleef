@@ -19,7 +19,7 @@ command:
     me: 'me|Show my game statistics'
     player: 'player name|Show game statistics of player'
     topten: 'topten [arena]|Show top 10 total or by arena'
-    admin: 'admin [cammand]|Execute an admin command.'
+    admin: 'admin [command]|Execute an admin command.'
 errors:
     noPermissionAtAll: 'You do not possess permissions for SimpleSpleef!'
     permissionMissing: 'You do not have the permission for the command [COMMAND]. You need the permission simplespleef.[COMMAND].'
