@@ -1098,7 +1098,7 @@ public class GameStandard extends Game {
 		if (player == null) return false; // no NPEs
 		
 		// is player a spleefer?
-		if (hasPlayer(player)) {
+		if (isInProgress() && hasPlayer(player) && !spleefers.getSpleefer(player).hasLost()) {
 			blockBreakInGame(event);
 			return true;
 		} else { // not in spleefer list, check arena area nevertheless
@@ -1162,7 +1162,7 @@ public class GameStandard extends Game {
 		if (player == null) return true; // no NPEs
 		
 		// is player a spleefer?
-		if (hasPlayer(player)) {
+		if (isInProgress() && hasPlayer(player) && !spleefers.getSpleefer(player).hasLost()) {
 			blockPlaceInGame(event);
 			return true;
 		} else { // not in spleefer list, check arena area nevertheless
