@@ -1287,7 +1287,7 @@ public class GameStandard extends Game {
 	
 	@Override
 	public boolean onCreatureSpawn(CreatureSpawnEvent event) {
-		if (!isEnabled() || arena == null || !configuration.getBoolean("disallowCreatureSpawns", true)) return false; // ignore disabled and undifined arenas, as well as those that allow spawning
+		if (!isEnabled() || arena == null || !configuration.getBoolean("disallowCreatureSpawns", true)) return false; // ignore disabled and undefined arenas, as well as those that allow spawning
 		
 		// check location of spawn event
 		Location loc = event.getLocation();
