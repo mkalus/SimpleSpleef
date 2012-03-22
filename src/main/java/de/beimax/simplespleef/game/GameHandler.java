@@ -680,7 +680,7 @@ public class GameHandler implements Listener, Runnable {
 	/**
 	 * @param event
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (event.isCancelled()) return;
 		
