@@ -456,6 +456,9 @@ public class SimpleSpleefAdmin {
 		spawn = spawn.toLowerCase();
 		adminCommand = adminCommand.toLowerCase();
 		
+		// aliases
+		if (adminCommand.equals("win")) adminCommand = "winner";
+		
 		// get player location and arena
 		String arena = getSelectedArena(sender);
 		// check arena existence
