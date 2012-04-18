@@ -1569,10 +1569,10 @@ public class GameStandard extends Game {
 			for (Player player : this.spectators) {
 				player.sendMessage(message);
 			}
-		}
-		// send to console, too?
-		if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.sendMessagesToConsole", true)) {
-			SimpleSpleef.getPlugin().getServer().getConsoleSender().sendMessage(message);
+			// send to console, too?
+			if (SimpleSpleef.getPlugin().getConfig().getBoolean("settings.sendMessagesToConsole", true)) {
+				SimpleSpleef.getPlugin().getServer().getConsoleSender().sendMessage(message);
+			}
 		}
 	}
 
