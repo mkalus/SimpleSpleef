@@ -51,10 +51,26 @@ public class UpdateChecker implements Listener {
 		// just read first line
 		String inputLine = in.readLine();
 		in.close();
-
-		if (inputLine != null && inputLine.equals(version)) return null; // no new update
+		
+		// convert versions to number and compare
+		if (inputLine != null &&  versionToNumber(inputLine) <= versionToNumber(version)) return null; // no new update
 
 		return inputLine; // new version
+	}
+	
+	/**
+	 * convert version string to long
+	 * @param version
+	 * @return
+	 */
+	protected long versionToNumber(String versionString) {
+		String[] noPoints = versionString.split("\\.");
+		if (noPoints.length != 3) return 0;
+		long version = 0;
+		for (int i = 0; i < noPoints.length; i++)
+			version = version * 100 + Integer.valueOf(noPoints[i]);
+		
+		return version;
 	}
 
 	/**
