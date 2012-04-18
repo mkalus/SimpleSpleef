@@ -19,6 +19,8 @@
 package de.beimax.simplespleef.gamehelpers;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.bukkit.Location;
@@ -127,11 +129,17 @@ public class OriginalPositionKeeper {
 		long checkTime = (System.currentTimeMillis() / 1000) - maxTime;
 
 		// delete entries that are too old
+		List<String> keys = new LinkedList<String>();
 		for (Entry<String, PlayerOriginalLocation> entry : playerOriginalLocations
 				.entrySet()) {
-			if (entry.getValue().timestamp < checkTime) // remove entries that
+			if (entry.getValue().timestamp < checkTime) // mark entries that
 														// are too old
-				playerOriginalLocations.remove(entry.getKey());
+				keys.add(entry.getKey()); // add to list to remove later
+		}
+		
+		// now remove old keys
+		for (String key: keys) {
+			playerOriginalLocations.remove(key);
 		}
 	}
 
