@@ -51,6 +51,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -71,6 +72,16 @@ public class GameHandler implements Listener, Runnable {
 	 * games array
 	 */
 	private List<Game> games;
+	
+	/**
+	 * keeps respawn locations for players that dies during game
+	 */
+	private HashMap<Player, LocationTime> respawnLocations;
+	
+	private class LocationTime {
+		public Location location;
+		public long time;
+	}
 
 	/**
 	 * Initialize game handler - mainly read arena cubes and update game data
@@ -88,6 +99,9 @@ public class GameHandler implements Listener, Runnable {
 			// add game to list
 			games.add(game);
 		}
+		
+		// initialize respawn locations
+		respawnLocations = new HashMap<Player, LocationTime>();
 	}
 
 	/**
@@ -537,7 +551,21 @@ public class GameHandler implements Listener, Runnable {
 			if (game.onPlayerDeath((Player) event.getEntity())) return;
 		}
 	}
-	
+
+	/**
+	 * @param event
+	 */
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		Player player = event.getPlayer();
+		// pass event to games
+		if (respawnLocations != null && respawnLocations.containsKey(player)) {
+			LocationTime locationTime = respawnLocations.remove(player);
+			if (locationTime.time + 60000 > System.currentTimeMillis()) // only teleport back if within one minute
+				event.setRespawnLocation(locationTime.location);
+		}
+	}
+
 	/**
 	 * @param event
 	 */
@@ -676,7 +704,7 @@ public class GameHandler implements Listener, Runnable {
 			if (game.onPlayerGameModeChange(event)) return;
 		}
 	}
-	
+
 	/**
 	 * @param event
 	 */
@@ -689,7 +717,7 @@ public class GameHandler implements Listener, Runnable {
 			if (game.onCreatureSpawn(event)) return;
 		}
 	}
-	
+
 	/**
 	 * @param event
 	 */
@@ -701,6 +729,22 @@ public class GameHandler implements Listener, Runnable {
 		for (Game game : games) {
 			if (game.onEntityChangeBlock(event)) return;
 		}
+	}
+
+	/**
+	 * Add a player respawn location
+	 * @param player
+	 * @param location
+	 */
+	public void addPlayerRespawnLocation(Player player, Location location) {
+		if (respawnLocations == null) respawnLocations = new HashMap<Player, LocationTime>();
+		// create new location time
+		LocationTime locationTime = new LocationTime();
+		locationTime.location = location;
+		locationTime.time = System.currentTimeMillis();
+		
+		// add it
+		respawnLocations.put(player, locationTime);
 	}
 
 	/**

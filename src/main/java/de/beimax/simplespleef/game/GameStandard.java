@@ -941,6 +941,12 @@ public class GameStandard extends Game {
 		if (hasPlayer(player)) {
 			// delete original position, because player spawns somewhere else anyhow
 			SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
+			
+			// add respawn location, if set
+			Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection("loseSpawn"));
+			if (teleportTo != null) {
+				SimpleSpleef.getGameHandler().addPlayerRespawnLocation(player, teleportTo);
+			}
 	
 			if (configuration.getBoolean("loseOnDeath", true)) {
 				// broadcast message of somebody loosing
@@ -958,7 +964,7 @@ public class GameStandard extends Game {
 					changeGameModeToCreative(player);
 
 				// player loses, if set to true
-				playerLoses(player, false); // do not teleport dead players... TODO
+				playerLoses(player, false); // do not teleport dead players...
 			} // else - do nothing...
 			return true;
 		}
