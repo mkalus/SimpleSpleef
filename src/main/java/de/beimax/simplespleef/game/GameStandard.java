@@ -958,7 +958,7 @@ public class GameStandard extends Game {
 					changeGameModeToCreative(player);
 
 				// player loses, if set to true
-				playerLoses(player, false); // do not teleport dead players...
+				playerLoses(player, false); // do not teleport dead players... TODO
 			} // else - do nothing...
 			return true;
 		}

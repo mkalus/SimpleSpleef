@@ -150,6 +150,12 @@ public class PlayerOnBlockDegenerator implements Tracker {
 					return;
 				}
 				
+				// is the block not within the arena? ignore
+				if (!game.checkMayBreakBlock(playerOnBlock, player)) {
+					degenerationList.remove(player); // remove player from list
+					return;
+				}
+				
 				// get original data
 				BlockState oldState = keeper.checkedBlock.getState();
 
