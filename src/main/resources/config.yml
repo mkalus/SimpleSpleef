@@ -59,6 +59,10 @@ settings:
     preventTeleportingDuringGames: true
 # Keep original positions of players/spectators for this number of seconds (default is 1h)
     keepOriginalLocationsSeconds: 3600
+# Change the game mode when a game ends or when teleporting back. This only applies when a player was in creative mode and leaves the game.
+# Keep in mind that this opens a possible exploit: When joining from a creative world and leaving the game players stay in creative mode.
+# If you have a combination of creative and survival games, turn off this setting.
+    changeGameModeBackToCreative: true
 # Enable statistics module?
     enableStatistics: true
 # Type of statistics module; possible values are: file

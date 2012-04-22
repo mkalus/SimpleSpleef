@@ -2081,8 +2081,11 @@ public class GameStandard extends Game {
 	 * @param player
 	 */
 	private void changeGameModeToCreative(Player player) {
-		gamemodeChangeOkList.add(player); // may change game mode
-		player.setGameMode(GameMode.CREATIVE);
+		// change only if setting has been set to do so
+		if (configuration.getBoolean("changeGameModeBackToCreative", true)) {
+			gamemodeChangeOkList.add(player); // may change game mode
+			player.setGameMode(GameMode.CREATIVE);
+		}
 	}
 
 	@Override
