@@ -65,7 +65,8 @@ settings:
     changeGameModeBackToCreative: true
 # Enable statistics module?
     enableStatistics: true
-# Type of statistics module; possible values are: file
+# Type of statistics module; possible values are: file, beardstat
+# beardstat uses beardstat api for players' wins and losses - adds a spleef category with these two entries
     statisticsModule: file
 # Settings for statistics modules
     statisticsSettings: false

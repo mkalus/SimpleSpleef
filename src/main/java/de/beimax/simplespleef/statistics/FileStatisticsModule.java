@@ -42,12 +42,12 @@ public class FileStatisticsModule implements StatisticsModule {
 	/**
 	 * statistics reference (YAML)
 	 */
-	YamlConfiguration statistics;
+	protected YamlConfiguration statistics;
 	
 	/**
 	 * file reference
 	 */
-	File statisticsFile;
+	protected File statisticsFile;
 
 	/* (non-Javadoc)
 	 * @see de.beimax.simplespleef.statistics.StatisticsModule#initialize()
