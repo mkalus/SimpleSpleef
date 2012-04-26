@@ -1064,10 +1064,11 @@ public class GameStandard extends Game {
 	public boolean onPlayerInteract(PlayerInteractEvent event) {
 		if (!isEnabled()) return false; // ignore disabled arenas
 		Block block = event.getClickedBlock();
-		if (block == null || event.getPlayer() == null || !hasPlayer(event.getPlayer())) return false; // ignore null blocks and null players and players not in game
+		Player player = event.getPlayer();
+		if (block == null || player == null || !hasPlayer(player) || spleefers.getSpleefer(player).hasLost()) return false; // ignore null blocks and null players and players not in game
 		
 		// check instant dig and block may be broken
-		if (event.getAction() == Action.LEFT_CLICK_BLOCK && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block, event.getPlayer())) {
+		if (event.getAction() == Action.LEFT_CLICK_BLOCK && configuration.getBoolean("instantDig", true) && checkMayBreakBlock(block, player)) {
 			// cancel event
 			event.setCancelled(true);
 			// get block data
@@ -1091,7 +1092,7 @@ public class GameStandard extends Game {
 				if (readyBlockMaterial == null) return true; // ignore null materials
 				// material has been checked, now test, if clicked block is of the same material
 				if (readyBlockMaterial.getTypeId() == block.getTypeId() && MaterialHelper.isSameBlockType(block, readyBlockMaterial)) {
-					ready(event.getPlayer(), true);
+					ready(player, true);
 				}
 			}
 		return true;
@@ -1104,16 +1105,16 @@ public class GameStandard extends Game {
 		if (player == null) return false; // no NPEs
 		
 		// is player a spleefer?
-		if (isInProgress() && hasPlayer(player) && !spleefers.getSpleefer(player).hasLost()) {
-			blockBreakInGame(event);
-			return true;
-		} else { // not in spleefer list, check arena area nevertheless
+		if (!isInProgress() || !hasPlayer(player) || spleefers.getSpleefer(player).hasLost()) {
 			if (inProtectedArenaCube(event.getBlock())) { //check if block is in cube
 				// cancel event
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.DARK_RED + SimpleSpleef.ll("errors.noDig"));
 				return true;
 			}
+		} else { // not in spleefer list, check arena area nevertheless
+			blockBreakInGame(event);
+			return true;			
 		}
 		return false;
 	}
