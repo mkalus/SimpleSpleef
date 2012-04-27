@@ -65,8 +65,9 @@ settings:
     changeGameModeBackToCreative: true
 # Enable statistics module?
     enableStatistics: true
-# Type of statistics module; possible values are: file, beardstat
-# beardstat uses beardstat api for players' wins and losses - adds a spleef category with these two entries
+# Type of statistics module; possible values are: file, beardstat, hawkeye
+# beardstat uses beardstat api for players' wins and losses - adds a spleef category with these two entries (other stats are kept in file)
+# hawkeye feeds HawkEye with several types of statistics events such as winning and losing (stats themselves are kept in file)
     statisticsModule: file
 # Settings for statistics modules
     statisticsSettings: false

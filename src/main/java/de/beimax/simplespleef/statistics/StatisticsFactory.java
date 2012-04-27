@@ -42,6 +42,9 @@ public class StatisticsFactory {
 		} else if (moduleName.equalsIgnoreCase("beardstat")) {
 			// just create file statistics - do nothing else
 			module = new BeardStatisticsModule();
+		} else if (moduleName.equalsIgnoreCase("hawkeye")) {
+			// just create file statistics - do nothing else
+			module = new HawkEyeStatisticsModule();
 		}
 		// TODO: more module types here
 		

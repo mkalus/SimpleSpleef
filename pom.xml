@@ -40,6 +40,16 @@
 			<version>[0.4,)</version>
 			<artifactId>beardstat</artifactId>
 		</dependency>
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=maniacraft  -DartifactId=statsandachievements -Dversion=1.7 -Dpackaging=jar -Dfile=StatsAndAchievements-1.7.jar' in order to make this work: -->
+			<groupId>maniacraft</groupId>
+			<version>[1.7,)</version>
+			<artifactId>statsandachievements</artifactId>
+		</dependency>
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=hawkeye  -DartifactId=hawkeye -Dversion=1.0.7b -Dpackaging=jar -Dfile=HawkEye.jar' in order to make this work: -->
+			<groupId>hawkeye</groupId>
+			<version>1.0.7b</version>
+			<artifactId>hawkeye</artifactId>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
