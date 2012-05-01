@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.bukkit.entity.Player;
 
@@ -42,11 +43,18 @@ public class SpleeferList {
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
 		String comma = SimpleSpleef.ll("feedback.infoComma");
-		// compile list of spleefers
+		
+		// Sort by display name
+		TreeSet<String> ordered = new TreeSet<String>();
 		for (Spleefer spleefer : players) {
+			ordered.add(spleefer.getPlayer().getDisplayName());
+		}
+		
+		// compile list of spleefers
+		for (String playerName : ordered) {
 			if (i > 0 && i == players.size() - 1) builder.append(SimpleSpleef.ll("feedback.infoAnd")); // last element with end
 			else if (i > 0) builder.append(comma); // other elements with ,
-			builder.append(spleefer.getPlayer().getDisplayName());
+			builder.append(playerName);
 		}
 		return builder.toString();
 	}
