@@ -20,20 +20,20 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.12 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.15 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
 			<groupId>net.milkbowl</groupId>
-			<version>1.2.12</version>
+			<version>1.2.15</version>
 			<artifactId>vault</artifactId>
 		</dependency>
-        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.2 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
+        <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.3 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>5.2</version>
+            <version>5.3</version>
         </dependency>
-		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldguard -Dversion=5.5.1 -Dpackaging=jar -Dfile=WorldGuard.jar' in order to make this work: -->
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldguard -Dversion=5.5.2 -Dpackaging=jar -Dfile=worldguard-5.5.2.jar' in order to make this work: -->
 			<groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
-            <version>5.5.1</version>
+            <version>5.5.2</version>
         </dependency>
 		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=tehbeard  -DartifactId=beardstat -Dversion=0.4 -Dpackaging=jar -Dfile=BeardStat.jar' in order to make this work: -->
 			<groupId>tehbeard</groupId>
