@@ -72,12 +72,14 @@ public class BeardStatisticsModule extends FileStatisticsModule {
 		int gamesCount = statistics.getInt(key + "gamesWon", 0);
 		
 		// set stats
-		PlayerStatBlob blob = beardStatManager.findPlayerBlob(player.getName());
-		PlayerStat stat = blob.getStat("spleef", "won");
-		if (stat == null) stat = new PlayerStat("spleef", "won", gamesCount);
-		else stat.setValue(gamesCount);
+		if (beardStatManager != null) {
+			PlayerStatBlob blob = beardStatManager.findPlayerBlob(player.getName());
+			PlayerStat stat = blob.getStat("spleef", "won");
+			if (stat == null) stat = new PlayerStat("spleef", "won", gamesCount);
+			else stat.setValue(gamesCount);
 		
-		blob.addStat(stat);
+			blob.addStat(stat);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -92,11 +94,13 @@ public class BeardStatisticsModule extends FileStatisticsModule {
 		int gamesCount = statistics.getInt(key + "gamesLost", 0);
 
 		// set stats
-		PlayerStatBlob blob = beardStatManager.findPlayerBlob(player.getName());
-		PlayerStat stat = blob.getStat("spleef", "lost");
-		if (stat == null) stat = new PlayerStat("spleef", "lost", gamesCount);
-		else stat.setValue(gamesCount);
-		
-		blob.addStat(stat);
+		if (beardStatManager != null) {
+			PlayerStatBlob blob = beardStatManager.findPlayerBlob(player.getName());
+			PlayerStat stat = blob.getStat("spleef", "lost");
+			if (stat == null) stat = new PlayerStat("spleef", "lost", gamesCount);
+			else stat.setValue(gamesCount);
+			
+			blob.addStat(stat);
+		}
 	}
 }

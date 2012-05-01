@@ -109,7 +109,7 @@ public class SpleeferList {
 	 * @return
 	 */
 	public boolean hasSpleefer(Player player) {
-		return spleefers.containsValue(player.getName());
+		return spleefers.containsKey(player.getName());
 	}
 	
 	/**
