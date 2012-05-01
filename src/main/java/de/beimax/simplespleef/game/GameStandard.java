@@ -1349,9 +1349,8 @@ public class GameStandard extends Game {
 		
 		// do we need to teleport players?
 		if (oldStatus == Game.STATUS_COUNTDOWN || oldStatus == Game.STATUS_INTERRUPTED) { // game ended during countdown - teleport players back to lounge
-			for (Spleefer spleefer : spleefers.get()) {
-				if (!spleefer.hasLost()) // will leave out players that left, died, lost, etc.
-					teleportPlayer(spleefer.getPlayer(), "lounge");
+			for (Spleefer spleefer : spleefers.getLost()) {
+				teleportPlayer(spleefer.getPlayer(), "lounge");
 			}
 		}
 		
@@ -1488,10 +1487,7 @@ public class GameStandard extends Game {
 		// no spleefers - return null
 		if (spleefers == null || spleefers.size() == 0) return null;
 		// get unready spleefers
-		LinkedList<Spleefer> list = new LinkedList<Spleefer>();
-		for (Spleefer spleefer : spleefers.get()) {
-			if (!spleefer.isReady()) list.add(spleefer);
-		}
+		List<Spleefer> list = spleefers.getUnready();
 		// is the list empty?
 		if (list.size() == 0) return null; // no unready spleefes
 		// compile list
@@ -1703,9 +1699,9 @@ public class GameStandard extends Game {
 	 * @param player
 	 */
 	protected void winByTouching(Player player) {
-		for (Spleefer spleefer : spleefers.get()) {
+		for (Spleefer spleefer : spleefers.getNotLost()) {
 			// if not the winning player and not already lost
-			if (spleefer.getPlayer() != player && !spleefer.hasLost())
+			if (spleefer.getPlayer() != player)
 				playerLoses(spleefer.getPlayer(), true);
 		}
 		// check game over manually, if there was no winner yet
@@ -1980,9 +1976,8 @@ public class GameStandard extends Game {
 		// check setting first
 		if (!configuration.getBoolean("playersLoseShovelAtGameEnd", true)) return false; // no shovels lost
 		// if yes, remove shovels from remaining players
-		for (Spleefer spleefer : spleefers.get()) {
-			if (!spleefer.hasLost())
-				removeShovelItem(spleefer.getPlayer(), false); // remove shovel without checking setting again
+		for (Spleefer spleefer : spleefers.getNotLost()) {
+			removeShovelItem(spleefer.getPlayer(), false); // remove shovel without checking setting again
 		}
 		return true;
 	}

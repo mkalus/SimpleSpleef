@@ -18,6 +18,7 @@
  **/
 package de.beimax.simplespleef.game;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SpleeferList {
 	 * @param players
 	 * @return
 	 */
-	public static String getPrintablePlayerList(LinkedList<Spleefer> players) {
+	public static String getPrintablePlayerList(List<Spleefer> players) {
 		// build list of winners
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
@@ -54,13 +55,13 @@ public class SpleeferList {
 	 *  list of spleefers currently spleefing
 	 *  - Since we have to iterate the list most of the time anyway, we simply use a linked list
 	 */
-	private LinkedList<Spleefer> spleefers;
+	private HashMap<String, Spleefer> spleefers;
 
 	/**
 	 * Constructor
 	 */
 	public SpleeferList() {
-		spleefers = new LinkedList<Spleefer>();
+		spleefers = new HashMap<String, Spleefer>();
 	}
 
 	/**
@@ -69,10 +70,7 @@ public class SpleeferList {
 	 * @return spleefer or null
 	 */
 	public Spleefer getSpleefer(Player player) {
-		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) return spleefer;
-		}
-		return null;
+		return spleefers.get(player.getName());
 	}
 
 	/**
@@ -82,7 +80,7 @@ public class SpleeferList {
 	 */
 	public boolean addSpleefer(Player player) {
 		if (hasSpleefer(player)) return false;
-		spleefers.add(new Spleefer(player));
+		spleefers.put(player.getName(), new Spleefer(player));
 		return true;
 	}
 	
@@ -92,12 +90,8 @@ public class SpleeferList {
 	 * @return boolean, true if successful
 	 */
 	public boolean removeSpleefer(Player player) {
-		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) {
-				spleefers.remove(spleefer);
-				return true;
-			}
-		}
+		if (spleefers.remove(player.getName()) != null) return true;
+		
 		return false;
 	}
 
@@ -107,10 +101,7 @@ public class SpleeferList {
 	 * @return
 	 */
 	public boolean hasSpleefer(Player player) {
-		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) return true;
-		}
-		return false;
+		return spleefers.containsValue(player.getName());
 	}
 	
 	/**
@@ -119,9 +110,9 @@ public class SpleeferList {
 	 * @return
 	 */
 	public boolean hasLost(Player player) {
-		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) return spleefer.hasLost();
-		}
+		Spleefer spleefer = getSpleefer(player);
+		if (spleefer != null) return spleefer.hasLost();
+
 		return false;
 	}
 
@@ -130,9 +121,8 @@ public class SpleeferList {
 	 * @param player
 	 */
 	public void setLost(Player player) {
-		for (Spleefer spleefer : spleefers) {
-			if (spleefer.getPlayer() == player) spleefer.setLost(true);
-		}
+		Spleefer spleefer = getSpleefer(player);
+		if (spleefer != null) spleefer.setLost(true);
 	}
 	
 	/**
@@ -141,7 +131,7 @@ public class SpleeferList {
 	 */
 	public int inGame() {
 		int inGame = 0;
-		for (Spleefer spleefer : spleefers) {
+		for (Spleefer spleefer : spleefers.values()) {
 			if (!spleefer.hasLost()) inGame++;
 		}
 		return inGame;
@@ -154,7 +144,7 @@ public class SpleeferList {
 	 */
 	public int inGame(int team) {
 		int inGame = 0;
-		for (Spleefer spleefer : spleefers) {
+		for (Spleefer spleefer : spleefers.values()) {
 			if (spleefer.getTeam() == team && !spleefer.hasLost()) inGame++;
 		}
 		return inGame;
@@ -173,7 +163,44 @@ public class SpleeferList {
 	 * @return
 	 */
 	public List<Spleefer> get() {
-		return spleefers;
+		LinkedList<Spleefer> list = new LinkedList<Spleefer>();
+		for (Spleefer spleefer : spleefers.values()) {
+			list.add(spleefer);
+		}
+		return list;
+	}
+	
+	/**
+	 * get list of players that have lost
+	 */
+	public List<Spleefer> getLost() {
+		LinkedList<Spleefer> list = new LinkedList<Spleefer>();
+		for (Spleefer spleefer : spleefers.values()) {
+			if (spleefer.hasLost()) list.add(spleefer);
+		}
+		return list;
+	}
+	
+	/**
+	 * get list of players that have not lost yet
+	 */
+	public List<Spleefer> getNotLost() {
+		LinkedList<Spleefer> list = new LinkedList<Spleefer>();
+		for (Spleefer spleefer : spleefers.values()) {
+			if (!spleefer.hasLost()) list.add(spleefer);
+		}
+		return list;
+	}
+	
+	/**
+	 * get list of players that are not ready yet
+	 */
+	public List<Spleefer> getUnready() {
+		LinkedList<Spleefer> list = new LinkedList<Spleefer>();
+		for (Spleefer spleefer : spleefers.values()) {
+			if (!spleefer.isReady()) list.add(spleefer);
+		}
+		return list;
 	}
 	
 	/**
@@ -181,7 +208,7 @@ public class SpleeferList {
 	 * @return
 	 */
 	public Iterator<Spleefer> iterator() {
-		return spleefers.iterator();
+		return spleefers.values().iterator();
 	}
 	
 	/**
@@ -191,7 +218,7 @@ public class SpleeferList {
 	 */
 	public List<Spleefer> getTeam(int team) {
 		LinkedList<Spleefer> compiledTeam = new LinkedList<Spleefer>();
-		for (Spleefer spleefer : spleefers) {
+		for (Spleefer spleefer : spleefers.values()) {
 			if (spleefer.getTeam() == team) compiledTeam.add(spleefer);
 		}
 		
@@ -205,7 +232,7 @@ public class SpleeferList {
 	 */
 	public int countUnreadyPlayers() {
 		int unready = 0;
-		for (Spleefer spleefer : spleefers) {
+		for (Spleefer spleefer : spleefers.values()) {
 			if (!spleefer.isReady()) unready++;
 		}
 		return unready;
@@ -217,7 +244,7 @@ public class SpleeferList {
 	 */
 	public int countLostPlayers() {
 		int lost = 0;
-		for (Spleefer spleefer : spleefers) {
+		for (Spleefer spleefer : spleefers.values()) {
 			if (!spleefer.hasLost()) lost++;
 		}
 		return lost;

@@ -200,12 +200,10 @@ public class GameWithTeams extends GameStandard {
 		// check if teams are still here
 		boolean[] stillHere = {false, false};
 		// check spleefer's status
-		for (Spleefer spleefer : spleefers.get()) {
-			if (!spleefer.hasLost()) { // not lost?
-				int team = spleefer.getTeam(); //out-of-bounds check
-				if (team == Spleefer.TEAM_BLUE || team == Spleefer.TEAM_RED)
-					stillHere[spleefer.getTeam() - 1] = true; // team is still here
-			}
+		for (Spleefer spleefer : spleefers.getNotLost()) {
+			int team = spleefer.getTeam(); //out-of-bounds check
+			if (team == Spleefer.TEAM_BLUE || team == Spleefer.TEAM_RED)
+				stillHere[spleefer.getTeam() - 1] = true; // team is still here
 		}
 		// do we have a team that isn't here?
 		for (int i = 0; i < stillHere.length; i++)
@@ -217,11 +215,9 @@ public class GameWithTeams extends GameStandard {
 	protected void winByTouching(Player player) {
 		// get team
 		int team = -99;
-		for (Spleefer spleefer : spleefers.get()) {
-			if (spleefer.getPlayer() == player) {
-				team = spleefer.getTeam();
-				break;
-			}
+		Spleefer s;
+		if ((s = spleefers.getSpleefer(player)) != null) {
+			team = s.getTeam();
 		}
 		if (team == -99) {
 			SimpleSpleef.log.warning("[SimpleSpleef] Could not determine winning team while touching a block.");
