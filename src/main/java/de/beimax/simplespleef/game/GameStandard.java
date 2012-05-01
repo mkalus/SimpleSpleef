@@ -940,12 +940,13 @@ public class GameStandard extends Game {
 		
 		if (hasPlayer(player)) {
 			// delete original position, because player spawns somewhere else anyhow
+			boolean creativeMode = SimpleSpleef.getOriginalPositionKeeper().wasInCreativeBefore(player);
 			SimpleSpleef.getOriginalPositionKeeper().deleteOriginalPosition(player);
 			
 			// add respawn location, if set
 			Location teleportTo = LocationHelper.configToExactLocation(configuration.getConfigurationSection("loseSpawn"));
 			if (teleportTo != null) {
-				SimpleSpleef.getGameHandler().addPlayerRespawnLocation(player, teleportTo);
+				SimpleSpleef.getGameHandler().addPlayerRespawnLocation(player, teleportTo, creativeMode);
 			}
 	
 			if (configuration.getBoolean("loseOnDeath", true)) {

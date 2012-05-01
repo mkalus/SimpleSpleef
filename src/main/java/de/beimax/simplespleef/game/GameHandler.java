@@ -81,6 +81,7 @@ public class GameHandler implements Listener, Runnable {
 	private class LocationTime {
 		public Location location;
 		public long time;
+		public boolean creative;
 	}
 
 	/**
@@ -561,8 +562,10 @@ public class GameHandler implements Listener, Runnable {
 		// pass event to games
 		if (respawnLocations != null && respawnLocations.containsKey(player)) {
 			LocationTime locationTime = respawnLocations.remove(player);
-			if (locationTime.time + 60000 > System.currentTimeMillis()) // only teleport back if within one minute
+			if (locationTime.time + 60000 > System.currentTimeMillis()) { // only teleport back if within one minute
 				event.setRespawnLocation(locationTime.location);
+				if (locationTime.creative) player.setGameMode(GameMode.CREATIVE);
+			}
 		}
 	}
 
@@ -735,13 +738,15 @@ public class GameHandler implements Listener, Runnable {
 	 * Add a player respawn location
 	 * @param player
 	 * @param location
+	 * @param creative - return to creative mode?
 	 */
-	public void addPlayerRespawnLocation(Player player, Location location) {
+	public void addPlayerRespawnLocation(Player player, Location location, boolean creative) {
 		if (respawnLocations == null) respawnLocations = new HashMap<Player, LocationTime>();
 		// create new location time
 		LocationTime locationTime = new LocationTime();
 		locationTime.location = location;
 		locationTime.time = System.currentTimeMillis();
+		locationTime.creative = creative;
 		
 		// add it
 		respawnLocations.put(player, locationTime);
