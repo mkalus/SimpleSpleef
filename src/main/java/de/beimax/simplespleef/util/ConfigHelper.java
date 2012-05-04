@@ -43,7 +43,7 @@ public class ConfigHelper {
 	/**
 	 * available languages
 	 */
-	public final static String[] languagesAvailable = {"en", "de"};
+	public final static String[] languagesAvailable = {"en", "de", "pl"};
 	
 	/**
 	 * Create a new arena configuration section.
