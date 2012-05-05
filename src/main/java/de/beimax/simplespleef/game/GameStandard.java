@@ -1843,6 +1843,10 @@ public class GameStandard extends Game {
 		} else prize = prizes.get(generator.nextInt(prizes.size() - 1));
 		// interpret line to Item Stack
 		ItemStack itemStack = MaterialHelper.getItemStackFromString(prize, false);
+		if (itemStack == null) { // fix NPE
+			SimpleSpleef.log.warning("[SimpleSpleef] Item prize error: NPE for prize index #" + prize + "! Ignoring prize.");
+			return;
+		}
 		// give prizes to player
 		player.getInventory().addItem(itemStack);
 		// player gets message
