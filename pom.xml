@@ -16,13 +16,13 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.2.3-R0.1</version>
+			<version>1.2.5-R3.0</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.15 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
+		<dependency><!-- You have to run 'mvn install:install-file -DgroupId=net.milkbowl -DartifactId=vault -Dversion=1.2.16 -Dpackaging=jar -Dfile=Vault.jar' in order to make this work: -->
 			<groupId>net.milkbowl</groupId>
-			<version>1.2.15</version>
+			<version>1.2.16</version>
 			<artifactId>vault</artifactId>
 		</dependency>
         <dependency><!-- You have to run 'mvn install:install-file -DgroupId=com.sk89q -DartifactId=worldedit -Dversion=5.3 -Dpackaging=jar -Dfile=WorldEdit.jar' in order to make this work: -->
