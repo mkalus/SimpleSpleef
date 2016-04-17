@@ -33,6 +33,20 @@ import de.beimax.simplespleef.SimpleSpleef;
  *
  */
 public class SpleeferList {
+
+	/**
+	 *  list of spleefers currently spleefing
+	 *  - Since we have to iterate the list most of the time anyway, we simply use a linked list
+	 */
+	private HashMap<String, Spleefer> spleefers;
+
+	/**
+	 * Constructor
+	 */
+	public SpleeferList() {
+		spleefers = new HashMap<String, Spleefer>();
+	}
+
 	/**
 	 * Get a compiled list of players with commas and and at the end
 	 * @param players
@@ -57,19 +71,6 @@ public class SpleeferList {
 			builder.append(playerName);
 		}
 		return builder.toString();
-	}
-	
-	/**
-	 *  list of spleefers currently spleefing
-	 *  - Since we have to iterate the list most of the time anyway, we simply use a linked list
-	 */
-	private HashMap<String, Spleefer> spleefers;
-
-	/**
-	 * Constructor
-	 */
-	public SpleeferList() {
-		spleefers = new HashMap<String, Spleefer>();
 	}
 
 	/**

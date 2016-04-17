@@ -31,7 +31,35 @@ public class Spleefer {
 	public static final int TEAM_NONE = 0;
 	public static final int TEAM_BLUE = 1;
 	public static final int TEAM_RED = 2;
-	
+
+	/**
+	 * reference to player object
+	 */
+	private Player player;
+
+	/**
+	 * has the player lost?
+	 */
+	private boolean lost = false;
+
+	/**
+	 * is player ready to play?
+	 */
+	private boolean ready = false;
+
+	/**
+	 * Team of this player
+	 */
+	private int team = TEAM_NONE;
+
+	/**
+	 * Constructor
+	 * @param player
+	 */
+	public Spleefer(Player player) {
+		this.player = player;
+	}
+
 	/**
 	 * get String id of team name (or "none" for errors)
 	 * @param team
@@ -43,34 +71,6 @@ public class Spleefer {
 		case TEAM_RED: return "red";
 		}
 		return "none";
-	}
-	
-	/**
-	 * reference to player object
-	 */
-	private Player player;
-	
-	/**
-	 * has the player lost?
-	 */
-	private boolean lost = false;
-	
-	/**
-	 * is player ready to play?
-	 */
-	private boolean ready = false;
-
-	/**
-	 * Team of this player
-	 */
-	private int team = TEAM_NONE;
-	
-	/**
-	 * Constructor
-	 * @param player
-	 */
-	public Spleefer(Player player) {
-		this.player = player;
 	}
 
 	/**

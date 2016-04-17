@@ -46,6 +46,11 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 	private final static String[] consoleCommands = {"help", "announce", "arenas", "info", "list", "countdown", "reset", "admin", "player", "topten" };
 
 	/**
+	 * reference to command executor for admin class
+	 */
+	private static SimpleSpleefAdmin simpleSpleefAdmin = new SimpleSpleefAdmin();
+
+	/**
 	 * Print command string from settings line
 	 * @param sender
 	 * @param commandString comand|description...
@@ -57,12 +62,7 @@ public class SimpleSpleefCommandExecutor implements CommandExecutor {
 			sender.sendMessage(ChatColor.GOLD + commandString.substring(0, pos)
 					+ ": " + ChatColor.WHITE + commandString.substring(pos + 1));
 	}
-	
-	/**
-	 * reference to command executor for admin class
-	 */
-	private static SimpleSpleefAdmin simpleSpleefAdmin = new SimpleSpleefAdmin();
-	
+
 	/**
 	 * Executed whenever simplespeef is hit by a command
 	 */

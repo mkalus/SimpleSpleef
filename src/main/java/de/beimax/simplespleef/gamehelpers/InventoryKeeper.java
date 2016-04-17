@@ -18,6 +18,20 @@ import org.bukkit.inventory.ItemStack;
  *
  */
 public class InventoryKeeper {
+
+	/**
+	 * inventory positions of armor
+	 */
+	public static final int HELMET = -10;
+	public static final int CHESTPLATE = -11;
+	public static final int LEGGINGS = -12;
+	public static final int BOOTS = -13;
+
+	/**
+	 * keeps the players' inventories
+	 */
+	private HashMap<Player, List<InventoryEntry>> playerInventories = new HashMap<Player, List<InventoryEntry>>();
+
 	/**
 	 * Check players inventory if it is empty
 	 * @param player
@@ -36,20 +50,7 @@ public class InventoryKeeper {
 
 		return true;
 	}
-	
-	/**
-	 * inventory positions of armor
-	 */
-	public static final int HELMET = -10;
-	public static final int CHESTPLATE = -11;
-	public static final int LEGGINGS = -12;
-	public static final int BOOTS = -13;
-	
-	/**
-	 * keeps the players' inventories
-	 */
-	private HashMap<Player, List<InventoryEntry>> playerInventories = new HashMap<Player, List<InventoryEntry>>();
-	
+
 	/**
 	 * save a player's inventory to a file
 	 * @param player
