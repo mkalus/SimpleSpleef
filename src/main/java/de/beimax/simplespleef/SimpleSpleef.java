@@ -66,7 +66,51 @@ public class SimpleSpleef extends JavaPlugin {
 	 * reference to Vault permissions
 	 */
 	public static Permission permission = null;
-	
+
+	/**
+	 * self reference to singleton
+	 */
+	private static SimpleSpleef simpleSpleef;
+
+	/**
+	 * reference to game handler
+	 */
+	private static GameHandler gameHandler;
+
+	/**
+	 * reference to statistics handler
+	 */
+	private static StatisticsModule statisticsModule;
+
+	/**
+	 * world edit API
+	 */
+	private static WorldEditAPI worldEditAPI = null;
+
+	/**
+	 * keeper of original positions
+	 */
+	private static OriginalPositionKeeper originalPositionKeeper;
+
+	/**
+	 * reference to command handler
+	 */
+	private SimpleSpleefCommandExecutor commandExecutor;
+
+	/**
+	 * reference to translator
+	 */
+	private static Translator lang;
+
+	/**
+	 * get originalPositionKeeper instance (singleton)
+	 * @return
+	 */
+	public static OriginalPositionKeeper getOriginalPositionKeeper() {
+		if (originalPositionKeeper == null) originalPositionKeeper = new OriginalPositionKeeper();
+		return originalPositionKeeper;
+	}
+
 	/**
 	 * checks permission, either Vault-based or using builtin system
 	 * @param sender
@@ -86,11 +130,6 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * self reference to singleton
-	 */
-	private static SimpleSpleef simpleSpleef;
-	
-	/**
 	 * get instance
 	 * @return
 	 */
@@ -99,21 +138,11 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * reference to game handler
-	 */
-	private static GameHandler gameHandler;
-
-	/**
 	 * @return the gameHandler
 	 */
 	public static GameHandler getGameHandler() {
 		return gameHandler;
 	}
-	
-	/**
-	 * reference to statistics handler
-	 */
-	private static StatisticsModule statisticsModule;
 
 	/**
 	 * @return the statisticsModule
@@ -121,11 +150,6 @@ public class SimpleSpleef extends JavaPlugin {
 	public static StatisticsModule getStatisticsModule() {
 		return statisticsModule;
 	}
-
-	/**
-	 * world edit API
-	 */
-	private static WorldEditAPI worldEditAPI = null;
 
 	/**
 	 * sets the world edit API for this plugin
@@ -144,20 +168,6 @@ public class SimpleSpleef extends JavaPlugin {
 	}
 
 	/**
-	 * keeper of original positions
-	 */
-	private static OriginalPositionKeeper originalPositionKeeper;
-
-	/**
-	 * get originalPositionKeeper instance (singleton)
-	 * @return
-	 */
-	public static OriginalPositionKeeper getOriginalPositionKeeper() {
-		if (originalPositionKeeper == null) originalPositionKeeper = new OriginalPositionKeeper();
-		return originalPositionKeeper;
-	}
-	
-	/**
 	 * Teleport a player to a location - fixes people falling through the floor
 	 * @param player
 	 * @param location
@@ -165,16 +175,6 @@ public class SimpleSpleef extends JavaPlugin {
 	public static void simpleSpleefTeleport(Player player, Location location) {
 		player.teleport(location.add(0, 0.25, 0), TeleportCause.PLUGIN); // add a quarter block to the height of the location to let the player "fall" onto the block
 	}
-
-	/**
-	 * reference to command handler
-	 */
-	private SimpleSpleefCommandExecutor commandExecutor;
-
-	/**
-	 * reference to translator
-	 */
-	private static Translator lang;
 
 	/**
 	 * Called when enabling plugin
